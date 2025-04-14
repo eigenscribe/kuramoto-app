@@ -17,7 +17,7 @@ body {
     padding: 20px;
 }
 
-/* Gradient text styles */
+/* Gradient text styles - THESE TWO SPECIFIC GRADIENTS SHOULD BE USED */
 .gradient_text1 {
     font-weight: bold;
     background: -webkit-linear-gradient(#14a5ff, #8138ff);
@@ -63,7 +63,11 @@ body {
 }
 
 .section h2 {
-    color: #22f793;
+    font-weight: bold;
+    background: linear-gradient(#00ffee, #27aaff);
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
     margin-top: 0;
     font-size: 1.8rem;
     width: 100%;
@@ -71,7 +75,11 @@ body {
 }
 
 .section h3 {
-    color: #27aaff;
+    font-weight: bold;
+    background: -webkit-linear-gradient(#14a5ff, #8138ff);
+    -webkit-background-clip: text;
+    color: transparent;
+    background-clip: text;
     font-size: 1.4rem;
 }
 
@@ -105,7 +113,11 @@ body {
 }
 
 .feature-box-content h3 {
-    color: #22f793;
+    font-weight: bold;
+    background: -webkit-linear-gradient(#14a5ff, #8138ff);
+    -webkit-background-clip: text;
+    color: transparent;
+    background-clip: text;
     margin-top: 0;
     font-size: 1.5rem;
     width: 100%;

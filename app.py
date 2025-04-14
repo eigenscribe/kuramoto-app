@@ -40,15 +40,32 @@ st.set_page_config(
 with open("styles.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-# Add custom background
+# Add custom background and custom font
 st.markdown("""
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Aclonica&display=swap');
+    
     .stApp {
         background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
-                         url('https://images.unsplash.com/photo-1534270804882-6b5048b1c1fc?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=3300');
+                         url('static/images/wisp.jpg');
         background-size: cover;
         background-repeat: no-repeat;
         background-attachment: fixed;
+    }
+    
+    /* Ensure Aclonica font is applied everywhere */
+    body, div, p, h1, h2, h3, h4, h5, h6, li, span, label, button {
+        font-family: 'Aclonica', sans-serif !important;
+    }
+    
+    /* Fix Streamlit buttons to use Aclonica */
+    button, .stButton button, .stDownloadButton button {
+        font-family: 'Aclonica', sans-serif !important;
+    }
+    
+    /* Fix Streamlit widgets text */
+    .stSlider label, .stSelectbox label, .stNumberInput label {
+        font-family: 'Aclonica', sans-serif !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -214,9 +231,9 @@ with tab1:
     points = np.array([times, order_parameter]).T.reshape(-1, 1, 2)
     segments = np.concatenate([points[:-1], points[1:]], axis=1)
     
-    # Create a custom colormap that transitions from blue to purple to red
+    # Create a custom colormap that uses our primary gradients
     cmap = LinearSegmentedColormap.from_list("order_param", 
-                                           ["#3498db", "#9b59b6", "#e74c3c"], 
+                                           ["#00ffee", "#27aaff", "#14a5ff", "#8138ff"], 
                                            N=256)
     
     # Create the line collection with gradient coloring based on order parameter value
@@ -283,8 +300,13 @@ with tab1:
     for y in [0, np.pi/2, np.pi, 3*np.pi/2, 2*np.pi]:
         ax2.axhspan(y-0.1, y+0.1, color='#222233', alpha=0.4, zorder=0)
     
-    # Plot phases with color gradient by natural frequency
-    line_colors = plt.cm.plasma(np.linspace(0, 1, n_oscillators))
+    # Create custom colormap that matches our gradient theme
+    custom_cmap = LinearSegmentedColormap.from_list("kuramoto_colors", 
+                                                 ["#00ffee", "#27aaff", "#14a5ff", "#8138ff"], 
+                                                 N=256)
+    
+    # Plot phases with color gradient matching our theme
+    line_colors = custom_cmap(np.linspace(0, 1, n_oscillators))
     for i in range(n_oscillators):
         ax2.plot(times, phases[i, :] % (2 * np.pi), color=line_colors[i], alpha=0.8, linewidth=1.5)
     
@@ -368,8 +390,13 @@ with tab2:
     x = np.cos(phases_at_time)
     y = np.sin(phases_at_time)
     
+    # Create custom colormap that matches our gradient theme
+    custom_cmap = LinearSegmentedColormap.from_list("kuramoto_colors", 
+                                                 ["#00ffee", "#27aaff", "#14a5ff", "#8138ff"], 
+                                                 N=256)
+    
     # Color oscillators by their natural frequency with enhanced visuals
-    sc = ax_circle.scatter(x, y, c=frequencies, cmap='plasma', s=120, 
+    sc = ax_circle.scatter(x, y, c=frequencies, cmap=custom_cmap, s=120, 
                           alpha=0.9, edgecolor='white', linewidth=1, zorder=10)
     cbar = plt.colorbar(sc, ax=ax_circle, label='Natural Frequency')
     cbar.ax.yaxis.label.set_color('white')
@@ -449,8 +476,13 @@ with tab3:
         n_bins = 15
         counts, bin_edges = np.histogram(phases_at_t, bins=n_bins)
         
-        # Create custom colors with a gradient effect
-        colors = plt.cm.viridis(np.linspace(0.1, 0.9, n_bins))
+        # Create custom colormap that matches our gradient theme
+        custom_cmap = LinearSegmentedColormap.from_list("kuramoto_colors", 
+                                                  ["#00ffee", "#27aaff", "#14a5ff", "#8138ff"], 
+                                                  N=256)
+        
+        # Create custom colors with a gradient effect that matches our theme
+        colors = custom_cmap(np.linspace(0.1, 0.9, n_bins))
         
         # Plot the histogram with gradient colors and outline
         bars = ax_phase.bar(

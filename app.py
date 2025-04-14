@@ -295,7 +295,7 @@ with tab1:
     
     st.markdown("""
     <div class='section'>
-        <h3>Order Parameter Analysis</h3>
+        <h3 class='gradient_text1'>Order Parameter Analysis</h3>
         <p>The order parameter r(t) measures the degree of synchronization among oscillators:</p>
         <ul>
             <li>r = 1: Complete synchronization (all oscillators have the same phase)</li>
@@ -305,7 +305,7 @@ with tab1:
     </div>
     """, unsafe_allow_html=True)
     
-    # Enhanced phase plot
+    # Enhanced phase plot with dot visualization
     fig2, ax2 = plt.subplots(figsize=(10, 6))
     
     # Add background and styling
@@ -320,10 +320,19 @@ with tab1:
                                                  ["#00ffee", "#27aaff", "#14a5ff", "#8138ff"], 
                                                  N=256)
     
-    # Plot phases with color gradient matching our theme
-    line_colors = custom_cmap(np.linspace(0, 1, n_oscillators))
+    # Iterate through oscillators to create dot plots with varying colors
     for i in range(n_oscillators):
-        ax2.plot(times, phases[i, :] % (2 * np.pi), color=line_colors[i], alpha=0.8, linewidth=1.5)
+        # Determine color based on oscillator's natural frequency
+        normalized_freq = (frequencies[i] - min(frequencies)) / (max(frequencies) - min(frequencies) + 1e-10)
+        color = custom_cmap(normalized_freq)
+        
+        # Plot oscillator phases as dots with color gradient
+        ax2.scatter(times, phases[i, :] % (2 * np.pi), 
+                   color=color, alpha=0.8, s=25, edgecolor='white', linewidth=0.5, zorder=5)
+        
+        # Add a subtle connecting line with low opacity
+        ax2.plot(times, phases[i, :] % (2 * np.pi), 
+                color=color, alpha=0.2, linewidth=0.8, zorder=2)
     
     # Add labels for key phase positions
     phase_labels = [(0, '0'), (np.pi/2, 'π/2'), (np.pi, 'π'), (3*np.pi/2, '3π/2'), (2*np.pi, '2π')]
@@ -351,9 +360,10 @@ with tab1:
     
     st.markdown("""
     <div class='section'>
-        <h3>Phase Evolution</h3>
+        <h3 class='gradient_text1'>Phase Evolution</h3>
         <p>The plot above shows how the phase of each oscillator evolves over time.</p>
-        <p>When synchronized, oscillators will move with similar phases (lines will cluster together).</p>
+        <p>When synchronized, oscillators will move with similar phases (dots will cluster together).</p>
+        <p>The color of each dot corresponds to the oscillator's natural frequency.</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -598,15 +608,83 @@ with tab2:
             
         return fig
     
+    # Function to create oscillator phases over time plot (as dots)
+    def create_oscillator_phases_plot(time_idx):
+        fig, ax = plt.subplots(figsize=(6, 6))
+        
+        # Add background
+        ax.set_facecolor('#1a1a1a')
+        
+        # Create transparent bands at phase regions
+        for y in [0, np.pi/2, np.pi, 3*np.pi/2, 2*np.pi]:
+            ax.axhspan(y-0.1, y+0.1, color='#222233', alpha=0.4, zorder=0)
+        
+        # Create custom colormap that matches our gradient theme
+        custom_cmap = LinearSegmentedColormap.from_list("kuramoto_colors", 
+                                                     ["#00ffee", "#27aaff", "#14a5ff", "#8138ff"], 
+                                                     N=256)
+        
+        # Plot all oscillators as dots up to the current time point
+        for i in range(n_oscillators):
+            # Determine color based on oscillator's natural frequency
+            normalized_freq = (frequencies[i] - min(frequencies)) / (max(frequencies) - min(frequencies) + 1e-10)
+            color = custom_cmap(normalized_freq)
+            
+            # Plot oscillator phases as dots with color gradient
+            ax.scatter(times[:time_idx+1], phases[i, :time_idx+1] % (2 * np.pi), 
+                      color=color, alpha=0.7, s=30, edgecolor='white', linewidth=0.5, zorder=5)
+            
+            # Add a subtle connecting line with low opacity
+            ax.plot(times[:time_idx+1], phases[i, :time_idx+1] % (2 * np.pi), 
+                   color=color, alpha=0.2, linewidth=0.8, zorder=2)
+            
+            # Highlight current position with a slightly larger marker
+            ax.scatter([times[time_idx]], [phases[i, time_idx] % (2 * np.pi)], 
+                      s=100, color=color, 
+                      edgecolor='white', linewidth=1.5, zorder=15)
+        
+        # Add labels for key phase positions
+        phase_labels = [(0, '0'), (np.pi/2, 'π/2'), (np.pi, 'π'), (3*np.pi/2, '3π/2'), (2*np.pi, '2π')]
+        for y, label in phase_labels:
+            ax.annotate(label, xy=(-0.02, y), xycoords=('axes fraction', 'data'),
+                       fontsize=11, color='white', ha='center', va='center')
+        
+        # Plot styling
+        ax.set_xlabel('Time', fontsize=13, fontweight='bold', color='white')
+        ax.set_ylabel('Phase (mod 2π)', fontsize=13, fontweight='bold', color='white')
+        ax.set_title(f'Oscillator Phases at t={times[time_idx]:.2f}', 
+                    fontsize=14, fontweight='bold', color='white', pad=15)
+        ax.set_ylim(0, 2 * np.pi)
+        ax.set_yticks([0, np.pi/2, np.pi, 3*np.pi/2, 2*np.pi])
+        ax.set_yticklabels(['0', 'π/2', 'π', '3π/2', '2π'])
+        ax.set_xlim(times.min(), times.max())
+        
+        # Custom grid
+        ax.grid(True, color='#333333', alpha=0.4, linestyle=':')
+        
+        # Add box around the plot
+        for spine in ax.spines.values():
+            spine.set_edgecolor('#555555')
+            spine.set_linewidth(1)
+            
+        return fig
+    
+    # Create three columns for visualization
+    viz_col1, viz_col2, viz_col3 = st.columns(3)
+    
     # Create placeholders for our plots
     with viz_col1:
-        phase_plot_placeholder = st.empty()
+        circle_plot_placeholder = st.empty()
         
     with viz_col2:
+        phases_plot_placeholder = st.empty()
+        
+    with viz_col3:
         order_plot_placeholder = st.empty()
     
     # Display initial plots
-    phase_plot_placeholder.pyplot(create_phase_plot(time_index))
+    circle_plot_placeholder.pyplot(create_phase_plot(time_index))
+    phases_plot_placeholder.pyplot(create_oscillator_phases_plot(time_index))
     order_plot_placeholder.pyplot(create_order_parameter_plot(time_index))
     
     # If animation is triggered
@@ -630,8 +708,9 @@ with tab2:
             progress = i / (len(times) - 1)
             progress_bar.progress(progress)
             
-            # Update plots
-            phase_plot_placeholder.pyplot(create_phase_plot(i))
+            # Update all three plots
+            circle_plot_placeholder.pyplot(create_phase_plot(i))
+            phases_plot_placeholder.pyplot(create_oscillator_phases_plot(i))
             order_plot_placeholder.pyplot(create_order_parameter_plot(i))
             
             # Add a short pause to control animation speed
@@ -643,10 +722,11 @@ with tab2:
     st.markdown("""
     <div class='section'>
         <h3 class='gradient_text1'>Visualization Guide</h3>
-        <p>The left plot shows oscillators on a unit circle. Each dot represents an oscillator, with color indicating its natural frequency.</p>
-        <p>The red arrow shows the mean field vector, with length equal to the order parameter r.</p>
-        <p>The right plot shows the order parameter over time, with color-coded dots showing the synchronization level.</p>
-        <p>Use the slider to manually explore different time points or click "Play Animation" to watch the full simulation.</p>
+        <p>The <b>left plot</b> shows oscillators on a unit circle. Each dot represents an oscillator, with color indicating its natural frequency.</p>
+        <p>The <b>middle plot</b> shows oscillator phases over time as dots. Each horizontal trace represents one oscillator's phase trajectory.</p>
+        <p>The <b>right plot</b> shows the order parameter over time, with color-coded dots showing the synchronization level.</p>
+        <p>The red arrow in the circle plot shows the mean field vector, with length equal to the order parameter r.</p>
+        <p>Use the slider to manually explore different time points or click "Play Animation" to watch all three visualizations animate together.</p>
     </div>
     """, unsafe_allow_html=True)
 

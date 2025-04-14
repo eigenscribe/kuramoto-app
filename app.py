@@ -8,6 +8,26 @@ import base64
 from kuramoto_model import KuramotoModel
 import time
 
+# Set up Matplotlib style for dark theme plots
+plt.style.use('dark_background')
+plt.rcParams.update({
+    'axes.facecolor': '#1e1e1e',
+    'figure.facecolor': '#1e1e1e',
+    'savefig.facecolor': '#1e1e1e',
+    'axes.edgecolor': '#757575',
+    'axes.labelcolor': 'white',
+    'axes.grid': True,
+    'grid.color': '#333333',
+    'grid.linestyle': '--',
+    'grid.alpha': 0.7,
+    'xtick.color': 'white',
+    'ytick.color': 'white',
+    'text.color': 'white',
+    'figure.figsize': (10, 6),
+    'font.size': 12,
+    'lines.linewidth': 2,
+})
+
 # Set page title and configuration
 st.set_page_config(
     page_title="Kuramoto Model Simulator",
@@ -19,6 +39,19 @@ st.set_page_config(
 # Load custom CSS
 with open("styles.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
+# Add custom background
+st.markdown("""
+<style>
+    .stApp {
+        background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                         url('https://images.unsplash.com/photo-1534270804882-6b5048b1c1fc?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=3300');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+</style>
+""", unsafe_allow_html=True)
 
 # Title and description
 st.markdown("<h1 class='gradient_text1'>Kuramoto Model Simulator</h1>", unsafe_allow_html=True)
@@ -163,14 +196,68 @@ model, times, phases, order_parameter = run_simulation(
 with tab1:
     st.markdown("<h2 class='gradient_text2'>Simulation Results</h2>", unsafe_allow_html=True)
     
-    # Plot order parameter
+    # Enhanced order parameter plot
     fig1, ax1 = plt.subplots(figsize=(10, 6))
-    ax1.plot(times, order_parameter)
-    ax1.set_xlabel('Time', fontsize=12)
-    ax1.set_ylabel('Order Parameter r(t)', fontsize=12)
-    ax1.set_title('Phase Synchronization in Kuramoto Model', fontsize=14)
-    ax1.grid(True)
+    
+    # Add background gradient
+    ax1.set_facecolor('#1a1a1a')
+    
+    # Add subtle horizontal bands for visual reference
+    for y in np.linspace(0, 1, 6):
+        ax1.axhspan(y-0.05, y+0.05, color='#222233', alpha=0.3, zorder=0)
+    
+    # Plot order parameter with gradient line effect
+    from matplotlib.collections import LineCollection
+    from matplotlib.colors import LinearSegmentedColormap
+    
+    # Create points and segments
+    points = np.array([times, order_parameter]).T.reshape(-1, 1, 2)
+    segments = np.concatenate([points[:-1], points[1:]], axis=1)
+    
+    # Create a custom colormap that transitions from blue to purple to red
+    cmap = LinearSegmentedColormap.from_list("order_param", 
+                                           ["#3498db", "#9b59b6", "#e74c3c"], 
+                                           N=256)
+    
+    # Create the line collection with gradient coloring based on order parameter value
+    lc = LineCollection(segments, cmap=cmap, linewidth=3, zorder=5)
+    lc.set_array(order_parameter)
+    ax1.add_collection(lc)
+    
+    # Add highlights at important thresholds
+    ax1.axhline(y=0.5, color='#aaaaaa', linestyle='--', alpha=0.5, zorder=1, 
+               label='Partial Synchronization (r=0.5)')
+    ax1.axhline(y=0.8, color='#ffffff', linestyle='--', alpha=0.5, zorder=1,
+               label='Strong Synchronization (r=0.8)')
+    
+    # Enhance the plot appearance
+    ax1.set_xlim(times.min(), times.max())
     ax1.set_ylim(0, 1.05)
+    ax1.set_xlabel('Time', fontsize=13, fontweight='bold', color='white')
+    ax1.set_ylabel('Order Parameter r(t)', fontsize=13, fontweight='bold', color='white')
+    ax1.set_title('Phase Synchronization in Kuramoto Model', 
+                 fontsize=15, fontweight='bold', color='white', pad=15)
+    
+    # Create custom grid
+    ax1.grid(True, color='#333333', alpha=0.5, linestyle=':')
+    
+    # Add legend
+    ax1.legend(loc='upper right', framealpha=0.7)
+    
+    # Add subtle box around the plot
+    for spine in ax1.spines.values():
+        spine.set_edgecolor('#555555')
+        spine.set_linewidth(1)
+    
+    # Add explanation annotations
+    if max(order_parameter) > 0.8:
+        max_idx = np.argmax(order_parameter)
+        ax1.annotate('Peak synchronization', 
+                   xy=(times[max_idx], order_parameter[max_idx]),
+                   xytext=(times[max_idx]-1, order_parameter[max_idx]+0.15),
+                   fontsize=11,
+                   color='white',
+                   arrowprops=dict(facecolor='white', shrink=0.05, width=1.5, alpha=0.7))
     
     st.pyplot(fig1)
     
@@ -186,15 +273,42 @@ with tab1:
     </div>
     """, unsafe_allow_html=True)
     
-    # Plot phases
+    # Enhanced phase plot
     fig2, ax2 = plt.subplots(figsize=(10, 6))
+    
+    # Add background and styling
+    ax2.set_facecolor('#1a1a1a')
+    
+    # Create transparent bands at phase regions
+    for y in [0, np.pi/2, np.pi, 3*np.pi/2, 2*np.pi]:
+        ax2.axhspan(y-0.1, y+0.1, color='#222233', alpha=0.4, zorder=0)
+    
+    # Plot phases with color gradient by natural frequency
+    line_colors = plt.cm.plasma(np.linspace(0, 1, n_oscillators))
     for i in range(n_oscillators):
-        ax2.plot(times, phases[i, :] % (2 * np.pi), alpha=0.7)
-    ax2.set_xlabel('Time', fontsize=12)
-    ax2.set_ylabel('Phase (mod 2π)', fontsize=12)
-    ax2.set_title('Oscillator Phases Over Time', fontsize=14)
+        ax2.plot(times, phases[i, :] % (2 * np.pi), color=line_colors[i], alpha=0.8, linewidth=1.5)
+    
+    # Add labels for key phase positions
+    phase_labels = [(0, '0'), (np.pi/2, 'π/2'), (np.pi, 'π'), (3*np.pi/2, '3π/2'), (2*np.pi, '2π')]
+    for y, label in phase_labels:
+        ax2.annotate(label, xy=(-0.5, y), xycoords=('axes fraction', 'data'),
+                   fontsize=11, color='white', ha='center', va='center')
+    
+    # Plot styling
+    ax2.set_xlabel('Time', fontsize=13, fontweight='bold', color='white')
+    ax2.set_ylabel('Phase (mod 2π)', fontsize=13, fontweight='bold', color='white')
+    ax2.set_title('Oscillator Phases Over Time', fontsize=15, fontweight='bold', color='white', pad=15)
     ax2.set_ylim(0, 2 * np.pi)
-    ax2.grid(True)
+    ax2.set_yticks([0, np.pi/2, np.pi, 3*np.pi/2, 2*np.pi])
+    ax2.set_yticklabels(['0', 'π/2', 'π', '3π/2', '2π'])
+    
+    # Custom grid
+    ax2.grid(True, color='#333333', alpha=0.4, linestyle=':')
+    
+    # Add box around the plot
+    for spine in ax2.spines.values():
+        spine.set_edgecolor('#555555')
+        spine.set_linewidth(1)
     
     st.pyplot(fig2)
     
@@ -227,12 +341,26 @@ with tab2:
     
     st.markdown(f"**Time:** {current_time:.2f}  |  **Order Parameter:** {current_r:.3f}")
     
-    # Create visualization
+    # Create visualization with enhanced visuals for dark theme
     fig_circle = plt.figure(figsize=(8, 8))
     ax_circle = fig_circle.add_subplot(111)
     
-    # Draw unit circle
-    circle = plt.Circle((0, 0), 1, fill=False, color='black', linestyle='--')
+    # Add background glow effect
+    bg_circle = plt.Circle((0, 0), 1.1, fill=True, color='#121a24', alpha=0.6, zorder=1)
+    ax_circle.add_patch(bg_circle)
+    
+    # Add subtle circle rings for reference
+    for radius in [0.25, 0.5, 0.75]:
+        ring = plt.Circle((0, 0), radius, fill=False, color='#334455', 
+                         linestyle=':', alpha=0.5, zorder=2)
+        ax_circle.add_patch(ring)
+    
+    # Draw unit circle with glow effect
+    circle_glow = plt.Circle((0, 0), 1.02, fill=False, color='#4488aa', alpha=0.3, linewidth=3, zorder=3)
+    ax_circle.add_patch(circle_glow)
+    
+    circle = plt.Circle((0, 0), 1, fill=False, color='#66ccff', linestyle='-', 
+                       linewidth=1.5, alpha=0.8, zorder=4)
     ax_circle.add_patch(circle)
     
     # Plot oscillators
@@ -240,24 +368,41 @@ with tab2:
     x = np.cos(phases_at_time)
     y = np.sin(phases_at_time)
     
-    # Color oscillators by their natural frequency
-    sc = ax_circle.scatter(x, y, c=frequencies, cmap='viridis', s=100, zorder=10)
-    plt.colorbar(sc, ax=ax_circle, label='Natural Frequency')
+    # Color oscillators by their natural frequency with enhanced visuals
+    sc = ax_circle.scatter(x, y, c=frequencies, cmap='plasma', s=120, 
+                          alpha=0.9, edgecolor='white', linewidth=1, zorder=10)
+    cbar = plt.colorbar(sc, ax=ax_circle, label='Natural Frequency')
+    cbar.ax.yaxis.label.set_color('white')
     
     # Calculate and show order parameter
     r = order_parameter[time_index]
     psi = np.angle(np.sum(np.exp(1j * phases_at_time)))
     
-    # Draw arrow showing mean field
+    # Draw arrow showing mean field with glow effect
+    # First add glow/shadow
     ax_circle.arrow(0, 0, r * np.cos(psi), r * np.sin(psi), 
-                   head_width=0.05, head_length=0.1, fc='red', ec='red', 
-                   width=0.02, zorder=5)
+                   head_width=0.07, head_length=0.12, fc='#ff6655', ec='#ff6655', 
+                   width=0.03, alpha=0.3, zorder=5)
     
-    ax_circle.set_xlim(-1.1, 1.1)
-    ax_circle.set_ylim(-1.1, 1.1)
+    # Then add main arrow
+    ax_circle.arrow(0, 0, r * np.cos(psi), r * np.sin(psi), 
+                   head_width=0.05, head_length=0.1, fc='#ff3322', ec='#ff3322', 
+                   width=0.02, zorder=6)
+    
+    # Draw axes
+    ax_circle.axhline(y=0, color='#555555', linestyle='-', alpha=0.5, zorder=0)
+    ax_circle.axvline(x=0, color='#555555', linestyle='-', alpha=0.5, zorder=0)
+    
+    ax_circle.set_xlim(-1.2, 1.2)
+    ax_circle.set_ylim(-1.2, 1.2)
     ax_circle.set_aspect('equal')
-    ax_circle.grid(True)
-    ax_circle.set_title(f'Oscillators at time t={times[time_index]:.2f}, r={r:.3f}')
+    
+    # Add subtle grid
+    ax_circle.grid(True, color='#333333', alpha=0.4, linestyle=':')
+    
+    # Enhance title
+    ax_circle.set_title(f'Oscillators at time t={times[time_index]:.2f}, r={r:.3f}', 
+                       color='white', fontsize=14, pad=15)
     
     st.pyplot(fig_circle)
     
@@ -298,11 +443,63 @@ with tab3:
         fig_phase, ax_phase = plt.subplots(figsize=(8, 4))
         
         phases_at_t = phases[:, time_idx_hist] % (2 * np.pi)
-        ax_phase.hist(phases_at_t, bins=15, alpha=0.7, color='green')
-        ax_phase.set_xlabel('Phase (mod 2π)', fontsize=12)
-        ax_phase.set_ylabel('Count', fontsize=12)
-        ax_phase.set_title(f'Phase Distribution at t={times[time_idx_hist]:.2f}', fontsize=14)
-        ax_phase.grid(True, alpha=0.3)
+        
+        # Create a beautiful gradient for the histogram
+        # Use a gradient colormap for the histogram
+        n_bins = 15
+        counts, bin_edges = np.histogram(phases_at_t, bins=n_bins)
+        
+        # Create custom colors with a gradient effect
+        colors = plt.cm.viridis(np.linspace(0.1, 0.9, n_bins))
+        
+        # Plot the histogram with gradient colors and outline
+        bars = ax_phase.bar(
+            (bin_edges[:-1] + bin_edges[1:]) / 2, 
+            counts, 
+            width=(bin_edges[1] - bin_edges[0]) * 0.9,
+            color=colors, 
+            alpha=0.8,
+            edgecolor='white',
+            linewidth=0.5
+        )
+        
+        # Add a soft glow effect behind bars
+        for bar, color in zip(bars, colors):
+            x = bar.get_x()
+            width = bar.get_width()
+            height = bar.get_height()
+            glow = plt.Rectangle(
+                (x - width * 0.05, 0), 
+                width * 1.1, 
+                height, 
+                color=color,
+                alpha=0.3,
+                zorder=-1
+            )
+            ax_phase.add_patch(glow)
+        
+        # Enhance the axes and labels
+        ax_phase.set_facecolor('#1a1a1a')
+        ax_phase.set_xlabel('Phase (mod 2π)', fontsize=12, fontweight='bold', color='white')
+        ax_phase.set_ylabel('Count', fontsize=12, fontweight='bold', color='white')
+        ax_phase.set_title(f'Phase Distribution at t={times[time_idx_hist]:.2f}', 
+                          fontsize=14, fontweight='bold', color='white', pad=15)
+        
+        # Highlight synchronized phases with vertical line if order is high
+        r_at_t = order_parameter[time_idx_hist]
+        if r_at_t > 0.6:
+            psi = np.angle(np.sum(np.exp(1j * phases_at_t))) % (2 * np.pi)
+            ax_phase.axvline(x=psi, color='#ff5555', linestyle='-', linewidth=2, alpha=0.7,
+                           label=f'Mean Phase ψ={psi:.2f}')
+            ax_phase.legend(framealpha=0.7)
+        
+        # Customize grid
+        ax_phase.grid(True, color='#333333', alpha=0.4, linestyle=':')
+        
+        # Add a subtle box around the plot
+        for spine in ax_phase.spines.values():
+            spine.set_edgecolor('#555555')
+            spine.set_linewidth(1)
         
         st.pyplot(fig_phase)
     

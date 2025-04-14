@@ -54,6 +54,19 @@ class KuramotoModel:
         self.times = None
         self.phases = None
         self.order_parameter = None
+        
+        # Set adjacency matrix (network structure)
+        if adjacency_matrix is None:
+            # Default: fully connected network (all-to-all coupling)
+            self.adjacency_matrix = np.ones((n_oscillators, n_oscillators))
+            # Remove self-connections (set diagonal to 0)
+            np.fill_diagonal(self.adjacency_matrix, 0)
+        else:
+            # Use provided adjacency matrix
+            self.adjacency_matrix = np.array(adjacency_matrix)
+            # Ensure it has the correct shape
+            if self.adjacency_matrix.shape != (n_oscillators, n_oscillators):
+                raise ValueError(f"Adjacency matrix must have shape ({n_oscillators}, {n_oscillators})")
 
     def kuramoto_ode(self, t, y):
         """
@@ -79,9 +92,10 @@ class KuramotoModel:
             # Natural frequency term
             dydt[i] = self.frequencies[i]
             
-            # Coupling term
+            # Coupling term using adjacency matrix
             for j in range(self.n_oscillators):
-                dydt[i] += (self.coupling_strength / self.n_oscillators) * np.sin(phases[j] - phases[i])
+                if self.adjacency_matrix[i, j] > 0:  # Only consider connected oscillators
+                    dydt[i] += (self.coupling_strength * self.adjacency_matrix[i, j] / self.n_oscillators) * np.sin(phases[j] - phases[i])
                 
         return dydt
     

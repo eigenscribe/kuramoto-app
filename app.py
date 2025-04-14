@@ -174,19 +174,71 @@ time_step = st.sidebar.slider(
 # Initialize model with specified parameters
 random_seed = st.sidebar.number_input("Random Seed", value=42, help="Seed for reproducibility")
 
+# Network Connectivity Configuration
+st.sidebar.markdown("<h3 class='gradient_text1'>Network Connectivity</h3>", unsafe_allow_html=True)
+network_type = st.sidebar.radio(
+    "Network Type",
+    options=["Fully Connected", "Custom Adjacency Matrix"],
+    help="Define how oscillators are connected to each other"
+)
+
+# Custom adjacency matrix input
+adj_matrix = None
+if network_type == "Custom Adjacency Matrix":
+    st.sidebar.markdown("""
+    <div style="font-size: 0.85em;">
+    Enter your adjacency matrix as comma-separated values. Each row should be on a new line.
+    <br>Example for 3 oscillators:
+    <pre style="background-color: #222; padding: 5px; border-radius: 3px;">
+0, 1, 0.5
+1, 0, 0.8
+0.5, 0.8, 0</pre>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    adj_matrix_input = st.sidebar.text_area(
+        "Adjacency Matrix",
+        height=150,
+        help="Enter the adjacency matrix as comma-separated values, each row on a new line"
+    )
+    
+    # Process the input adjacency matrix
+    if adj_matrix_input:
+        try:
+            # Parse the input text into a numpy array
+            rows = adj_matrix_input.strip().split('\n')
+            adj_matrix = []
+            for row in rows:
+                values = [float(val.strip()) for val in row.split(',')]
+                adj_matrix.append(values)
+            
+            adj_matrix = np.array(adj_matrix)
+            
+            # Validate the adjacency matrix
+            if adj_matrix.shape[0] != adj_matrix.shape[1]:
+                st.sidebar.error("The adjacency matrix must be square.")
+            elif adj_matrix.shape[0] != n_oscillators:
+                st.sidebar.error(f"Matrix dimensions ({adj_matrix.shape[0]}x{adj_matrix.shape[1]}) don't match oscillator count ({n_oscillators}).")
+            else:
+                st.sidebar.success("Adjacency matrix validated successfully!")
+        except Exception as e:
+            st.sidebar.error(f"Error parsing matrix: {str(e)}")
+            adj_matrix = None
+
 # Create tabs for different visualizations
 tab1, tab2, tab3 = st.tabs(["Simulation", "About", "Database"])
 
 # Function to simulate model
 @st.cache_data(ttl=300)
-def run_simulation(n_oscillators, coupling_strength, frequencies, simulation_time, time_step, random_seed):
+def run_simulation(n_oscillators, coupling_strength, frequencies, simulation_time, time_step, random_seed, adjacency_matrix=None):
     model = KuramotoModel(
         n_oscillators=n_oscillators,
         coupling_strength=coupling_strength,
         frequencies=frequencies,
         simulation_time=simulation_time,
         time_step=time_step,
-        random_seed=random_seed
+        random_seed=random_seed,
+        adjacency_matrix=adjacency_matrix
     )
     
     times, phases, order_parameter = model.simulate()
@@ -199,7 +251,8 @@ model, times, phases, order_parameter = run_simulation(
     frequencies=frequencies,
     simulation_time=simulation_time,
     time_step=time_step,
-    random_seed=random_seed
+    random_seed=random_seed,
+    adjacency_matrix=adj_matrix
 )
 
 # Tab 1: Simulation
@@ -680,6 +733,52 @@ with tab1:
         <p>At critical coupling strength (K_c), the system transitions from desynchronized to partially synchronized state.</p>
     </div>
     """, unsafe_allow_html=True)
+    
+    # Show network structure if custom adjacency matrix is used
+    if network_type == "Custom Adjacency Matrix" and adj_matrix is not None:
+        st.markdown("<h3 class='gradient_text2'>Network Structure</h3>", unsafe_allow_html=True)
+        
+        # Create a network visualization
+        fig, ax = plt.subplots(figsize=(8, 6))
+        
+        # Create a heatmap of the adjacency matrix
+        im = ax.imshow(adj_matrix, cmap='viridis')
+        plt.colorbar(im, ax=ax, label='Connection Strength')
+        
+        # Add labels and styling
+        ax.set_title('Oscillator Network Connectivity', color='white', fontsize=14)
+        ax.set_xlabel('Oscillator Index', color='white')
+        ax.set_ylabel('Oscillator Index', color='white')
+        
+        # Set background color
+        ax.set_facecolor('#1a1a1a')
+        fig.patch.set_facecolor('#121212')
+        
+        # Add a grid to help distinguish cells
+        ax.grid(False)
+        
+        # Add text annotations for connection strength
+        for i in range(adj_matrix.shape[0]):
+            for j in range(adj_matrix.shape[1]):
+                if adj_matrix[i, j] > 0:
+                    ax.text(j, i, f"{adj_matrix[i, j]:.1f}", 
+                            ha="center", va="center", 
+                            color="white" if adj_matrix[i, j] < 0.7 else "black",
+                            fontsize=9)
+        
+        st.pyplot(fig)
+        
+        st.markdown("""
+        <div class='section'>
+            <p>The heatmap above shows the connection strength between oscillators, where:</p>
+            <ul>
+                <li>Each cell (i,j) represents the coupling strength from oscillator j to oscillator i</li>
+                <li>Brighter colors indicate stronger coupling</li>
+                <li>Dark/black cells indicate no coupling</li>
+            </ul>
+            <p>The structure of this network affects how synchronization patterns emerge.</p>
+        </div>
+        """, unsafe_allow_html=True)
 
 # Tab 2: About
 with tab2:
@@ -932,7 +1031,7 @@ with tab3:
                 frequencies=frequencies,
                 freq_type=freq_type,
                 freq_params=freq_params,
-                adjacency_matrix=None  # No adjacency matrix in this version
+                adjacency_matrix=adj_matrix  # Store custom adjacency matrix if provided
             )
             
             if sim_id:

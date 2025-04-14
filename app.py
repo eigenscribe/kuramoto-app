@@ -227,7 +227,8 @@ if network_type == "Custom Adjacency Matrix":
             adj_matrix = None
 
 # Create tabs for different visualizations
-tab1, tab2, tab3 = st.tabs(["Simulation", "About", "Database"])
+# Create tabs with Network being the default tab
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["Network", "Distributions", "Animation", "About", "Database"])
 
 # Function to simulate model
 @st.cache_data(ttl=300)
@@ -256,12 +257,17 @@ model, times, phases, order_parameter = run_simulation(
     adjacency_matrix=adj_matrix
 )
 
-# Tab 1: Simulation
+# Tab 1: Network Structure Visualization
 with tab1:
-    st.markdown("<h2 class='gradient_text2'>Kuramoto Simulation</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 class='gradient_text2'>Network Structure</h2>", unsafe_allow_html=True)
     
-    # Start with network structure visualization at the top
-    st.markdown("<h3 class='gradient_text2'>Network Structure</h3>", unsafe_allow_html=True)
+    # Display simulation information
+    st.markdown(f"""
+    <div style='background-color: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px; margin-bottom: 20px;'>
+        <span style='font-size: 1.2em;'><b>Simulation Information</b></span><br>
+        <span><b>Oscillators:</b> {n_oscillators} | <b>Coupling Strength:</b> {coupling_strength} | <b>Network Type:</b> {network_type}</span>
+    </div>
+    """, unsafe_allow_html=True)
     
     # Create a network visualization - this code moved from below
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5), gridspec_kw={'width_ratios': [2, 1]})
@@ -408,9 +414,20 @@ with tab1:
         <p>The structure of this network affects how synchronization patterns emerge and propagate through the system.</p>
     </div>
     """, unsafe_allow_html=True)
+
+# Tab 2: Distributions tab
+with tab2:
+    st.markdown("<h2 class='gradient_text2'>Initial Distributions</h2>", unsafe_allow_html=True)
     
-    # Continue with the distribution histograms
-    st.markdown("<h3 class='gradient_text1'>Initial Distributions</h3>", unsafe_allow_html=True)
+    # Display simulation information at the top
+    st.markdown(f"""
+    <div style='background-color: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px; margin-bottom: 20px;'>
+        <span style='font-size: 1.2em;'><b>Simulation Information</b></span><br>
+        <span><b>Oscillators:</b> {n_oscillators} | <b>Coupling Strength:</b> {coupling_strength} | <b>Network Type:</b> {network_type}</span>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Add the distribution histograms
     dist_col1, dist_col2 = st.columns(2)
     
     with dist_col1:

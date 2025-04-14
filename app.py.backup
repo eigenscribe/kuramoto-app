@@ -18,16 +18,17 @@ plt.rcParams.update({
     'axes.facecolor': '#1e1e1e',
     'figure.facecolor': '#1e1e1e',
     'savefig.facecolor': '#1e1e1e',
+    'axes.edgecolor': '#757575',
+    'axes.labelcolor': 'white',
     'axes.grid': True,
-    'grid.color': '#444444',
-    'grid.alpha': 0.3,
+    'grid.color': '#333333',
     'grid.linestyle': '--',
-    'axes.edgecolor': '#444444',
-    'xtick.color': '#888888',
-    'ytick.color': '#888888',
-    'text.color': '#ffffff',
-    'axes.labelcolor': '#ffffff',
-    'axes.titlecolor': '#ffffff',
+    'grid.alpha': 0.7,
+    'xtick.color': 'white',
+    'ytick.color': 'white',
+    'text.color': 'white',
+    'figure.figsize': (10, 6),
+    'font.size': 12,
     'lines.linewidth': 2,
 })
 
@@ -141,9 +142,7 @@ elif freq_type == "Bimodal":
     peak1 = st.sidebar.slider("Peak 1", -5.0, 0.0, -1.0, 0.1)
     peak2 = st.sidebar.slider("Peak 2", 0.0, 5.0, 1.0, 0.1)
     mix = np.random.choice([0, 1], size=n_oscillators)
-    freq1 = np.random.normal(peak1, 0.3, n_oscillators)
-    freq2 = np.random.normal(peak2, 0.3, n_oscillators)
-    frequencies = mix * freq1 + (1 - mix) * freq2
+    frequencies = mix * np.random.normal(peak1, 0.3, n_oscillators) + (1 - mix) * np.random.normal(peak2, 0.3, n_oscillators)
     
 else:  # Custom
     custom_freqs = st.sidebar.text_area(
@@ -187,7 +186,7 @@ random_seed = st.sidebar.number_input("Random Seed", value=42, help="Seed for re
 st.sidebar.markdown("<h3 class='gradient_text1'>Network Connectivity</h3>", unsafe_allow_html=True)
 network_type = st.sidebar.radio(
     "Network Type",
-    options=["All-to-All", "Nearest Neighbor", "Random", "Custom Adjacency Matrix"],
+    options=["Fully Connected", "Custom Adjacency Matrix"],
     help="Define how oscillators are connected to each other"
 )
 
@@ -234,7 +233,8 @@ if network_type == "Custom Adjacency Matrix":
             st.sidebar.error(f"Error parsing matrix: {str(e)}")
             adj_matrix = None
 
-# Create tabs for different visualizations (Network is default tab)
+# Create tabs for different visualizations
+# Create tabs with Network being the default tab
 tab1, tab2, tab3, tab4, tab5 = st.tabs(["Network", "Distributions", "Animation", "About", "Database"])
 
 # Function to simulate model
@@ -264,9 +264,7 @@ model, times, phases, order_parameter = run_simulation(
     adjacency_matrix=adj_matrix
 )
 
-########################
-# TAB 1: NETWORK TAB
-########################
+# Tab 1: Network Structure Visualization
 with tab1:
     st.markdown("<h2 class='gradient_text2'>Network Structure</h2>", unsafe_allow_html=True)
     
@@ -278,7 +276,7 @@ with tab1:
     </div>
     """, unsafe_allow_html=True)
     
-    # Create a network visualization
+    # Create a network visualization - this code moved from below
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5), gridspec_kw={'width_ratios': [2, 1]})
     
     # Import networkx for graph visualization
@@ -339,7 +337,7 @@ with tab1:
     
     # Draw the graph
     edges = nx.draw_networkx_edges(G, pos, ax=ax1, alpha=0.5, 
-                               edge_color='#00ffee', width=1.5)
+                                edge_color='#00ffee', width=1.5)
     
     # Convert the RGBA colors to hex for networkx
     node_colors = []
@@ -349,23 +347,23 @@ with tab1:
             rgba = c.tolist()
         else:  # If it's already a tuple/list
             rgba = c
-        # Format as hex
+        # Format as hex, ensuring we have proper RGB components
         node_colors.append(f"#{int(rgba[0]*255):02x}{int(rgba[1]*255):02x}{int(rgba[2]*255):02x}")
     
     nodes = nx.draw_networkx_nodes(G, pos, ax=ax1, 
-                               node_color=node_colors, 
-                               node_size=300, alpha=0.9, 
-                               edgecolors='white', linewidths=1.5)
+                                node_color=node_colors, 
+                                node_size=300, alpha=0.9, 
+                                edgecolors='white', linewidths=1.5)
     
     # Add node labels only if there are relatively few nodes
     if n_oscillators <= 15:
         labels = {i: str(i) for i in range(n_oscillators)}
         nx.draw_networkx_labels(G, pos, labels=labels, ax=ax1, 
-                           font_color='white', font_weight='bold')
+                            font_color='white', font_weight='bold')
         
     # Add title and styling
     ax1.set_title(f'Oscillator Network Graph ({network_type})', 
-               color='white', fontsize=14, pad=15)
+                color='white', fontsize=14, pad=15)
     ax1.set_axis_off()
     
     # Add a legend explaining node colors
@@ -424,9 +422,7 @@ with tab1:
     </div>
     """, unsafe_allow_html=True)
 
-########################
-# TAB 2: DISTRIBUTIONS TAB
-########################
+# Tab 2: Distributions tab
 with tab2:
     st.markdown("<h2 class='gradient_text2'>Initial Distributions</h2>", unsafe_allow_html=True)
     
@@ -453,8 +449,8 @@ with tab2:
         
         # Create custom colormap that matches our gradient theme
         custom_cmap = LinearSegmentedColormap.from_list("kuramoto_colors", 
-                                                ["#00ffee", "#27aaff"], 
-                                                N=256)
+                                                 ["#00ffee", "#27aaff"], 
+                                                 N=256)
         
         # Create custom colors with a gradient effect that matches our theme
         colors = custom_cmap(np.linspace(0.1, 0.9, n_bins))
@@ -490,12 +486,12 @@ with tab2:
         ax_freq.set_xlabel('Natural Frequency', fontsize=12, fontweight='bold', color='white')
         ax_freq.set_ylabel('Count', fontsize=12, fontweight='bold', color='white')
         ax_freq.set_title(f'Natural Frequency Distribution ({freq_type})', 
-                       fontsize=14, fontweight='bold', color='white', pad=15)
+                        fontsize=14, fontweight='bold', color='white', pad=15)
         
         # Add mean frequency marker
         mean_freq = np.mean(frequencies)
         ax_freq.axvline(x=mean_freq, color='#ff5555', linestyle='-', linewidth=2, alpha=0.7,
-                      label=f'Mean: {mean_freq:.2f}')
+                       label=f'Mean: {mean_freq:.2f}')
         ax_freq.legend(framealpha=0.7)
         
         # Customize grid
@@ -564,7 +560,7 @@ with tab2:
         ax_init_phase.set_xlabel('Phase (mod 2π)', fontsize=12, fontweight='bold', color='white')
         ax_init_phase.set_ylabel('Count', fontsize=12, fontweight='bold', color='white')
         ax_init_phase.set_title('Initial Phase Distribution (t=0)', 
-                             fontsize=14, fontweight='bold', color='white', pad=15)
+                              fontsize=14, fontweight='bold', color='white', pad=15)
         
         # Calculate initial order parameter
         initial_r = order_parameter[0]
@@ -573,7 +569,7 @@ with tab2:
         # Add mean phase marker if order parameter is significant
         if initial_r > 0.3:
             ax_init_phase.axvline(x=initial_psi, color='#ff5555', linestyle='-', linewidth=2, alpha=0.7,
-                               label=f'Mean Phase: {initial_psi:.2f}')
+                                label=f'Mean Phase: {initial_psi:.2f}')
             ax_init_phase.legend(framealpha=0.7)
         
         # Customize grid
@@ -607,9 +603,7 @@ with tab2:
     </div>
     """, unsafe_allow_html=True)
 
-########################
-# TAB 3: ANIMATION TAB
-########################
+# Tab 3: Animation tab
 with tab3:
     st.markdown("<h2 class='gradient_text2'>Interactive Animation</h2>", unsafe_allow_html=True)
     
@@ -669,7 +663,7 @@ with tab3:
         # Add subtle circle rings for reference
         for radius in [0.25, 0.5, 0.75]:
             ring = plt.Circle((0, 0), radius, fill=False, color='#334455', 
-                            linestyle=':', alpha=0.5, zorder=2)
+                             linestyle=':', alpha=0.5, zorder=2)
             ax_circle.add_patch(ring)
         
         # Draw unit circle with glow effect
@@ -677,7 +671,7 @@ with tab3:
         ax_circle.add_patch(circle_glow)
         
         circle = plt.Circle((0, 0), 1, fill=False, color='#66ccff', linestyle='-', 
-                         linewidth=1.5, alpha=0.8, zorder=4)
+                           linewidth=1.5, alpha=0.8, zorder=4)
         ax_circle.add_patch(circle)
         
         # Plot oscillators
@@ -703,7 +697,7 @@ with tab3:
         
         # Scatter plot with oscillator colors
         sc = ax_circle.scatter(x, y, facecolors=oscillator_colors, edgecolor='white', s=180, 
-                             alpha=0.9, linewidth=1.5, zorder=10)
+                              alpha=0.9, linewidth=1.5, zorder=10)
         
         # Calculate and show order parameter
         r = order_parameter[time_idx]
@@ -733,7 +727,7 @@ with tab3:
         
         # Enhance title
         ax_circle.set_title(f'Oscillators at t={times[time_idx]:.2f}', 
-                          color='white', fontsize=14, pad=15)
+                           color='white', fontsize=14, pad=15)
         
         # Close any previous figure to avoid memory issues
         plt.close('all')
@@ -771,29 +765,29 @@ with tab3:
             
             # Plot oscillator phases as filled dots with color gradient
             ax.scatter(times[:time_idx+1], phases[i, :time_idx+1] % (2 * np.pi), 
-                     facecolors=color, edgecolor='white', alpha=0.7, s=50, 
-                     linewidth=0.5, zorder=5)
+                      facecolors=color, edgecolor='white', alpha=0.7, s=50, 
+                      linewidth=0.5, zorder=5)
             
             # Add a subtle connecting line with low opacity
             ax.plot(times[:time_idx+1], phases[i, :time_idx+1] % (2 * np.pi), 
-                  color=color, alpha=0.2, linewidth=0.8, zorder=2)
+                   color=color, alpha=0.2, linewidth=0.8, zorder=2)
             
             # Highlight current position with a larger filled marker
             ax.scatter([times[time_idx]], [phases[i, time_idx] % (2 * np.pi)], 
-                     s=140, facecolors=color, edgecolor='white', 
-                     linewidth=1.5, zorder=15)
+                      s=140, facecolors=color, edgecolor='white', 
+                      linewidth=1.5, zorder=15)
         
         # Add labels for key phase positions
         phase_labels = [(0, '0'), (np.pi/2, 'π/2'), (np.pi, 'π'), (3*np.pi/2, '3π/2'), (2*np.pi, '2π')]
         for y, label in phase_labels:
             ax.annotate(label, xy=(-0.02, y), xycoords=('axes fraction', 'data'),
-                      fontsize=11, color='white', ha='center', va='center')
+                       fontsize=11, color='white', ha='center', va='center')
         
         # Plot styling
         ax.set_xlabel('Time', fontsize=13, fontweight='bold', color='white')
         ax.set_ylabel('Phase (mod 2π)', fontsize=13, fontweight='bold', color='white')
         ax.set_title(f'Oscillator Phases at t={times[time_idx]:.2f}', 
-                   fontsize=14, fontweight='bold', color='white', pad=15)
+                    fontsize=14, fontweight='bold', color='white', pad=15)
         ax.set_ylim(0, 2 * np.pi)
         ax.set_yticks([0, np.pi/2, np.pi, 3*np.pi/2, 2*np.pi])
         ax.set_yticklabels(['0', 'π/2', 'π', '3π/2', '2π'])
@@ -825,18 +819,18 @@ with tab3:
         
         # Create a custom colormap that matches gradient_text2
         cmap = LinearSegmentedColormap.from_list("order_param", 
-                                             ["#00ffee", "#27aaff"], 
-                                             N=256)
+                                              ["#00ffee", "#27aaff"], 
+                                              N=256)
         
         # Plot order parameter with filled gradient dots
         colors = [cmap(r) for r in order_parameter[:time_idx+1]]
         scatter = ax.scatter(times[:time_idx+1], order_parameter[:time_idx+1],
-                          facecolors=colors, edgecolor='white',
-                          s=70, alpha=0.9, linewidth=0.5, zorder=10)
+                           facecolors=colors, edgecolor='white',
+                           s=70, alpha=0.9, linewidth=0.5, zorder=10)
         
         # Add a connecting line with low opacity
         ax.plot(times[:time_idx+1], order_parameter[:time_idx+1], 
-              color='white', alpha=0.3, linewidth=1, zorder=5)
+               color='white', alpha=0.3, linewidth=1, zorder=5)
         
         # Highlight current position with a larger filled marker
         if time_idx > 0:
@@ -847,9 +841,9 @@ with tab3:
         
         # Add highlights at important thresholds
         ax.axhline(y=0.5, color='#aaaaaa', linestyle='--', alpha=0.5, zorder=1, 
-                 label='Partial Synchronization (r=0.5)')
+                  label='Partial Synchronization (r=0.5)')
         ax.axhline(y=0.8, color='#ffffff', linestyle='--', alpha=0.5, zorder=1,
-                 label='Strong Synchronization (r=0.8)')
+                  label='Strong Synchronization (r=0.8)')
         
         # Enhance the plot appearance
         ax.set_xlim(times.min(), times.max())
@@ -857,7 +851,7 @@ with tab3:
         ax.set_xlabel('Time', fontsize=13, fontweight='bold', color='white')
         ax.set_ylabel('Order Parameter r(t)', fontsize=13, fontweight='bold', color='white')
         ax.set_title(f'Phase Synchronization at t={times[time_idx]:.2f}', 
-                   fontsize=14, fontweight='bold', color='white', pad=15)
+                    fontsize=14, fontweight='bold', color='white', pad=15)
         
         # Create custom grid
         ax.grid(True, color='#333333', alpha=0.5, linestyle=':')
@@ -943,10 +937,8 @@ with tab3:
         <p>At critical coupling strength (K_c), the system transitions from desynchronized to partially synchronized state.</p>
     </div>
     """, unsafe_allow_html=True)
-
-########################
-# TAB 4: ABOUT TAB
-########################
+    
+# Tab 4: About tab
 with tab4:
     st.markdown("<h2 class='gradient_text2'>About the Kuramoto Model</h2>", unsafe_allow_html=True)
     
@@ -1026,9 +1018,7 @@ with tab4:
     </div>
     """, unsafe_allow_html=True)
 
-########################
-# TAB 5: DATABASE TAB
-########################
+# Tab 5: Database tab
 with tab5:
     st.markdown("<h2 class='gradient_text2'>Database</h2>", unsafe_allow_html=True)
     

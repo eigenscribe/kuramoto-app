@@ -1,6 +1,7 @@
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.colors
 from matplotlib.animation import FuncAnimation
 import plotly.graph_objects as go
 from matplotlib.colors import LinearSegmentedColormap
@@ -811,8 +812,19 @@ with tab1:
     # Draw the graph
     edges = nx.draw_networkx_edges(G, pos, ax=ax1, alpha=0.5, 
                                  edge_color='#00ffee', width=1.5)
+    # Convert the RGBA colors to hex for networkx
+    node_colors = []
+    for c in oscillator_colors:
+        # Create hex color from the custom colormap colors
+        if hasattr(c, 'tolist'):  # If it's a numpy array
+            rgba = c.tolist()
+        else:  # If it's already a tuple/list
+            rgba = c
+        # Format as hex, ensuring we have proper RGB components
+        node_colors.append(f"#{int(rgba[0]*255):02x}{int(rgba[1]*255):02x}{int(rgba[2]*255):02x}")
+    
     nodes = nx.draw_networkx_nodes(G, pos, ax=ax1, 
-                                  node_color=[matplotlib.colors.rgb2hex(c) for c in oscillator_colors], 
+                                  node_color=node_colors, 
                                   node_size=300, alpha=0.9, 
                                   edgecolors='white', linewidths=1.5)
     

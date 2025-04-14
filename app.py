@@ -267,7 +267,7 @@ with tab1:
         st.markdown("<h4>Natural Frequency Distribution</h4>", unsafe_allow_html=True)
         
         # Create frequency distribution histogram
-        fig_freq, ax_freq = plt.subplots(figsize=(4, 3))
+        fig_freq, ax_freq = plt.subplots(figsize=(3.5, 2.5))
         
         # Use a gradient colormap for the histogram
         n_bins = 15
@@ -332,7 +332,7 @@ with tab1:
         
         # Distribution properties description
         st.markdown(f"""
-        <div class='section'>
+        <div class='section' style='font-size: 0.85em;'>
             <p><b>Mean:</b> {np.mean(frequencies):.4f}</p>
             <p><b>Standard Deviation:</b> {np.std(frequencies):.4f}</p>
             <p><b>Min:</b> {np.min(frequencies):.4f}</p>
@@ -344,7 +344,7 @@ with tab1:
         st.markdown("<h4>Initial Phase Distribution</h4>", unsafe_allow_html=True)
         
         # Create initial phase distribution histogram
-        fig_init_phase, ax_init_phase = plt.subplots(figsize=(4, 3))
+        fig_init_phase, ax_init_phase = plt.subplots(figsize=(3.5, 2.5))
         
         initial_phases = phases[:, 0] % (2 * np.pi)
         
@@ -410,11 +410,9 @@ with tab1:
         
         # Initial phase properties description
         st.markdown(f"""
-        <div class='section'>
+        <div class='section' style='font-size: 0.85em;'>
             <p><b>Initial Order Parameter:</b> {initial_r:.4f}</p>
             <p><b>Initial Mean Phase:</b> {initial_psi:.4f}</p>
-            <p>The initial phase distribution affects how quickly the system synchronizes.</p>
-            <p>A higher initial order parameter generally leads to faster synchronization.</p>
         </div>
         """, unsafe_allow_html=True)
     

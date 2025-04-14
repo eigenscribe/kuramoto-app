@@ -583,16 +583,33 @@ with tab2:
         </div>
         """, unsafe_allow_html=True)
     
-    # Display simulation information between histograms and interactive visualization
+    # Order Parameter Analysis section
+    st.markdown("""
+    <div class='section'>
+        <h3 class='gradient_text1'>Order Parameter Analysis</h3>
+        <p>The order parameter r(t) measures the degree of synchronization among oscillators:</p>
+        <ul>
+            <li>r = 1: Complete synchronization (all oscillators have the same phase)</li>
+            <li>r = 0: Complete desynchronization (phases are uniformly distributed)</li>
+        </ul>
+        <p>At critical coupling strength (K_c), the system transitions from desynchronized to partially synchronized state.</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+# Tab 3: Animation tab
+with tab3:
+    st.markdown("<h2 class='gradient_text2'>Interactive Animation</h2>", unsafe_allow_html=True)
+    
+    # Display simulation information at the top
     st.markdown(f"""
-    <div style='background-color: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px; margin-top: 20px; margin-bottom: 20px;'>
+    <div style='background-color: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px; margin-bottom: 20px;'>
         <span style='font-size: 1.2em;'><b>Simulation Information</b></span><br>
         <span><b>Oscillators:</b> {n_oscillators} | <b>Coupling Strength:</b> {coupling_strength} | <b>Network Type:</b> {network_type}</span>
     </div>
     """, unsafe_allow_html=True)
     
-    # Create oscillator visualization below the histograms
-    st.markdown("<h3 class='gradient_text1'>Interactive Visualization</h3>", unsafe_allow_html=True)
+    # Create oscillator visualization
+    st.markdown("<h3 class='gradient_text1'>Oscillator Synchronization</h3>", unsafe_allow_html=True)
     
     # Add animation controls with full width
     st.subheader("Animation Controls")
@@ -914,157 +931,27 @@ with tab2:
     </div>
     """, unsafe_allow_html=True)
     
-    # Show network structure visualization for all network types
-    st.markdown("<h3 class='gradient_text2'>Network Structure</h3>", unsafe_allow_html=True)
+# Tab 4: About tab
+with tab4:
+    st.markdown("<h2 class='gradient_text2'>About the Kuramoto Model</h2>", unsafe_allow_html=True)
     
-    # Create a network visualization
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5), gridspec_kw={'width_ratios': [2, 1]})
-    
-    # Import networkx for graph visualization
-    import networkx as nx
-    
-    # Make sure adj_matrix is defined for all network types
-    if network_type == "All-to-All":
-        # For all-to-all, create a fully connected matrix with uniform coupling
-        network_adj_matrix = np.ones((n_oscillators, n_oscillators))
-        np.fill_diagonal(network_adj_matrix, 0)  # No self-connections
-    elif network_type == "Nearest Neighbor":
-        # For nearest neighbor, create a ring topology
-        network_adj_matrix = np.zeros((n_oscillators, n_oscillators))
-        for i in range(n_oscillators):
-            # Connect to left and right neighbors on the ring
-            network_adj_matrix[i, (i-1) % n_oscillators] = 1
-            network_adj_matrix[i, (i+1) % n_oscillators] = 1
-    elif network_type == "Random":
-        # For random, create random connections with 20% probability
-        np.random.seed(random_seed)  # Use same seed for reproducibility
-        network_adj_matrix = np.random.random((n_oscillators, n_oscillators)) < 0.2
-        network_adj_matrix = network_adj_matrix.astype(float)
-        np.fill_diagonal(network_adj_matrix, 0)  # No self-connections
-    else:  # Custom Adjacency Matrix
-        network_adj_matrix = adj_matrix if adj_matrix is not None else np.ones((n_oscillators, n_oscillators))
-    
-    # Create a graph visualization using networkx
-    G = nx.from_numpy_array(network_adj_matrix)
-    
-    # Create custom colormap that matches our gradient_text1 theme for nodes
-    custom_cmap = LinearSegmentedColormap.from_list("kuramoto_colors", 
-                                                ["#14a5ff", "#8138ff"], 
-                                                N=256)
-    
-    # Sort oscillators by their natural frequency for consistent coloring
-    sorted_indices = np.argsort(frequencies)
-    color_indices = np.linspace(0, 1, n_oscillators)
-    oscillator_colors = np.zeros(n_oscillators, dtype=object)
-    
-    # Assign colors based on frequency order
-    for i, idx in enumerate(sorted_indices):
-        oscillator_colors[idx] = custom_cmap(color_indices[i])
-    
-    # Choose layout based on network type
-    if network_type == "Nearest Neighbor":
-        # Circular layout for nearest neighbor (ring)
-        pos = nx.circular_layout(G)
-    elif n_oscillators <= 20:
-        # Spring layout for smaller networks
-        pos = nx.spring_layout(G, seed=random_seed)
-    else:
-        # Circular layout is better for visualization with many nodes
-        pos = nx.circular_layout(G)
-    
-    # Create graph visualization
-    ax1.set_facecolor('#121212')
-    
-    # Draw the graph
-    edges = nx.draw_networkx_edges(G, pos, ax=ax1, alpha=0.5, 
-                                 edge_color='#00ffee', width=1.5)
-    # Convert the RGBA colors to hex for networkx
-    node_colors = []
-    for c in oscillator_colors:
-        # Create hex color from the custom colormap colors
-        if hasattr(c, 'tolist'):  # If it's a numpy array
-            rgba = c.tolist()
-        else:  # If it's already a tuple/list
-            rgba = c
-        # Format as hex, ensuring we have proper RGB components
-        node_colors.append(f"#{int(rgba[0]*255):02x}{int(rgba[1]*255):02x}{int(rgba[2]*255):02x}")
-    
-    nodes = nx.draw_networkx_nodes(G, pos, ax=ax1, 
-                                  node_color=node_colors, 
-                                  node_size=300, alpha=0.9, 
-                                  edgecolors='white', linewidths=1.5)
-    
-    # Add node labels only if there are relatively few nodes
-    if n_oscillators <= 15:
-        labels = {i: str(i) for i in range(n_oscillators)}
-        nx.draw_networkx_labels(G, pos, labels=labels, ax=ax1, 
-                              font_color='white', font_weight='bold')
-        
-    # Add title and styling
-    ax1.set_title(f'Oscillator Network Graph ({network_type})', 
-                color='white', fontsize=14, pad=15)
-    ax1.set_axis_off()
-    
-    # Add a legend explaining node colors
-    legend_elements = [
-        plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=custom_cmap(0.1), 
-                  markeredgecolor='white', markersize=10, label='Lower frequency'),
-        plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=custom_cmap(0.5), 
-                  markeredgecolor='white', markersize=10, label='Medium frequency'),
-        plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=custom_cmap(0.9), 
-                  markeredgecolor='white', markersize=10, label='Higher frequency')
-    ]
-    ax1.legend(handles=legend_elements, loc='upper right', 
-             frameon=True, framealpha=0.7, facecolor='#121212', 
-             edgecolor='#555555', labelcolor='white')
-    
-    # Create a heatmap of the adjacency matrix on the right side
-    im = ax2.imshow(network_adj_matrix, cmap='viridis')
-    plt.colorbar(im, ax=ax2, label='Connection Strength')
-    
-    # Add labels and styling
-    ax2.set_title(f'Adjacency Matrix', color='white', fontsize=14)
-    ax2.set_xlabel('Oscillator Index', color='white')
-    ax2.set_ylabel('Oscillator Index', color='white')
-    
-    # Set background color
-    ax2.set_facecolor('#1a1a1a')
-    fig.patch.set_facecolor('#121212')
-    
-    # Add a grid to help distinguish cells
-    ax2.grid(False)
-    
-    # Add text annotations for connection strength (only for matrices smaller than 15x15)
-    if n_oscillators <= 12:
-        for i in range(network_adj_matrix.shape[0]):
-            for j in range(network_adj_matrix.shape[1]):
-                if network_adj_matrix[i, j] > 0:
-                    ax2.text(j, i, f"{network_adj_matrix[i, j]:.1f}", 
-                            ha="center", va="center", 
-                            color="white" if network_adj_matrix[i, j] < 0.7 else "black",
-                            fontsize=9)
-    
-    # Adjust spacing between subplots
-    plt.tight_layout()
-    
-    # Display the figure
-    st.pyplot(fig)
-    
+    # Add math explanation with the Kuramoto equation
     st.markdown("""
     <div class='section'>
-        <p>The network visualization shows:</p>
-        <ul>
-            <li><b>Left:</b> Graph representation of oscillator connections, with nodes colored by natural frequency</li>
-            <li><b>Right:</b> Adjacency matrix representation, where each cell (i,j) represents the connection strength between oscillators</li>
-        </ul>
-        <p>The structure of this network affects how synchronization patterns emerge and propagate through the system.</p>
+        <h3 class='gradient_text1'>Mathematical Description</h3>
+        <p>The Kuramoto model is described by the following differential equation for each oscillator:</p>
+        <p style="text-align: center; background-color: rgba(0,0,0,0.3); padding: 15px; border-radius: 5px; font-size: 1.2em;">
+            dθ<sub>i</sub>/dt = ω<sub>i</sub> + (K/N) Σ<sub>j=1</sub><sup>N</sup> A<sub>ij</sub> sin(θ<sub>j</sub> - θ<sub>i</sub>)
+        </p>
+        <p>where A<sub>ij</sub> represents the adjacency matrix element between oscillators i and j.</p>
+        <p>The order parameter r(t) is defined as:</p>
+        <p style="text-align: center; background-color: rgba(0,0,0,0.3); padding: 15px; border-radius: 5px; font-size: 1.2em;">
+            r(t)e<sup>iψ(t)</sup> = (1/N) Σ<sub>j=1</sub><sup>N</sup> e<sup>iθ<sub>j</sub>(t)</sup>
+        </p>
+        <p>where r(t) is the magnitude, indicating the degree of synchronization, and ψ(t) is the mean phase.</p>
     </div>
     """, unsafe_allow_html=True)
 
-# Tab 2: About
-with tab2:
-    st.markdown("<h2 class='gradient_text2'>About the Kuramoto Model</h2>", unsafe_allow_html=True)
-    
     st.markdown("""
     <div class='section'>
         <div class='section-content'>
@@ -1116,9 +1003,16 @@ with tab2:
         </div>
     </div>
     """, unsafe_allow_html=True)
+    
+    # Add copyright information
+    st.markdown("""
+    <div class='footer'>
+    <p>© 2025 Lauren Shriver. All rights reserved.</p>
+    </div>
+    """, unsafe_allow_html=True)
 
-# Database tab
-with tab3:
+# Tab 5: Database tab
+with tab5:
     st.markdown("<h2 class='gradient_text2'>Database</h2>", unsafe_allow_html=True)
     
     st.markdown("""

@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import plotly.graph_objects as go
+from matplotlib.colors import LinearSegmentedColormap
 from io import BytesIO
 import base64
 import json
@@ -85,31 +86,8 @@ st.markdown(f"""
 </style>
 """, unsafe_allow_html=True)
 
-# Title and description
+# Title
 st.markdown("<h1 class='gradient_text1'>Kuramoto Model Simulator</h1>", unsafe_allow_html=True)
-
-st.markdown("""
-<div class='section'>
-    <h2 class='gradient_text2'>About the Kuramoto Model</h2>
-    <div class='section-content'>
-        <p>The Kuramoto model is a mathematical model used to describe synchronization in systems of coupled oscillators.</p>
-        <p>It was first introduced by Yoshiki Kuramoto in 1975 and has applications in neuroscience, chemical oscillators, 
-        power grids, and many other complex systems.</p>
-        <p>The model describes each oscillator by its phase θ, where the dynamics are governed by:</p>
-        <p style='text-align: center; font-size: 1.2em;'>
-            dθ<sub>i</sub>/dt = ω<sub>i</sub> + (K/N) Σ<sub>j=1</sub><sup>N</sup> sin(θ<sub>j</sub> - θ<sub>i</sub>)
-        </p>
-        <p>where:</p>
-        <ul>
-            <li>θ<sub>i</sub> is the phase of oscillator i</li>
-            <li>ω<sub>i</sub> is the natural frequency of oscillator i</li>
-            <li>K is the coupling strength between oscillators</li>
-            <li>N is the total number of oscillators</li>
-        </ul>
-        <p>The order parameter r(t) measures the coherence of the system, with r = 1 indicating complete synchronization.</p>
-    </div>
-</div>
-""", unsafe_allow_html=True)
 
 # Create sidebar with parameters
 st.sidebar.markdown("<h2 class='gradient_text1'>Simulation Parameters</h2>", unsafe_allow_html=True)
@@ -197,7 +175,7 @@ time_step = st.sidebar.slider(
 random_seed = st.sidebar.number_input("Random Seed", value=42, help="Seed for reproducibility")
 
 # Create tabs for different visualizations
-tab1, tab2, tab3 = st.tabs(["Simulation", "Initial Distributions", "Database"])
+tab1, tab2, tab3 = st.tabs(["Simulation", "About", "Database"])
 
 # Function to simulate model
 @st.cache_data(ttl=300)
@@ -228,7 +206,166 @@ model, times, phases, order_parameter = run_simulation(
 with tab1:
     st.markdown("<h2 class='gradient_text2'>Kuramoto Simulation</h2>", unsafe_allow_html=True)
     
-    # Create oscillator visualization at different time points
+    # Create two columns for the two distributions (histograms at the top)
+    st.markdown("<h3 class='gradient_text1'>Initial Distributions</h3>", unsafe_allow_html=True)
+    dist_col1, dist_col2 = st.columns(2)
+    
+    with dist_col1:
+        st.markdown("<h4>Natural Frequency Distribution</h4>", unsafe_allow_html=True)
+        
+        # Create frequency distribution histogram
+        fig_freq, ax_freq = plt.subplots(figsize=(6, 5))
+        
+        # Use a gradient colormap for the histogram
+        n_bins = 15
+        counts, bin_edges = np.histogram(frequencies, bins=n_bins)
+        
+        # Create custom colormap that matches our gradient theme
+        custom_cmap = LinearSegmentedColormap.from_list("kuramoto_colors", 
+                                                 ["#00ffee", "#27aaff", "#14a5ff", "#8138ff"], 
+                                                 N=256)
+        
+        # Create custom colors with a gradient effect that matches our theme
+        colors = custom_cmap(np.linspace(0.1, 0.9, n_bins))
+        
+        # Plot the histogram with gradient colors and outline
+        bars = ax_freq.bar(
+            (bin_edges[:-1] + bin_edges[1:]) / 2, 
+            counts, 
+            width=(bin_edges[1] - bin_edges[0]) * 0.9,
+            color=colors, 
+            alpha=0.8,
+            edgecolor='white',
+            linewidth=0.5
+        )
+        
+        # Add a soft glow effect behind bars
+        for bar, color in zip(bars, colors):
+            x = bar.get_x()
+            width = bar.get_width()
+            height = bar.get_height()
+            glow = plt.Rectangle(
+                (x - width * 0.05, 0), 
+                width * 1.1, 
+                height, 
+                color=color,
+                alpha=0.3,
+                zorder=-1
+            )
+            ax_freq.add_patch(glow)
+        
+        # Enhance the axes and labels
+        ax_freq.set_facecolor('#1a1a1a')
+        ax_freq.set_xlabel('Natural Frequency', fontsize=12, fontweight='bold', color='white')
+        ax_freq.set_ylabel('Count', fontsize=12, fontweight='bold', color='white')
+        ax_freq.set_title(f'Natural Frequency Distribution ({freq_type})', 
+                        fontsize=14, fontweight='bold', color='white', pad=15)
+        
+        # Add mean frequency marker
+        mean_freq = np.mean(frequencies)
+        ax_freq.axvline(x=mean_freq, color='#ff5555', linestyle='-', linewidth=2, alpha=0.7,
+                       label=f'Mean: {mean_freq:.2f}')
+        ax_freq.legend(framealpha=0.7)
+        
+        # Customize grid
+        ax_freq.grid(True, color='#333333', alpha=0.4, linestyle=':')
+        
+        # Add a subtle box around the plot
+        for spine in ax_freq.spines.values():
+            spine.set_edgecolor('#555555')
+            spine.set_linewidth(1)
+        
+        st.pyplot(fig_freq)
+        
+        # Distribution properties description
+        st.markdown(f"""
+        <div class='section'>
+            <p><b>Mean:</b> {np.mean(frequencies):.4f}</p>
+            <p><b>Standard Deviation:</b> {np.std(frequencies):.4f}</p>
+            <p><b>Min:</b> {np.min(frequencies):.4f}</p>
+            <p><b>Max:</b> {np.max(frequencies):.4f}</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with dist_col2:
+        st.markdown("<h4>Initial Phase Distribution</h4>", unsafe_allow_html=True)
+        
+        # Create initial phase distribution histogram
+        fig_init_phase, ax_init_phase = plt.subplots(figsize=(6, 5))
+        
+        initial_phases = phases[:, 0] % (2 * np.pi)
+        
+        # Use a gradient colormap for the histogram
+        n_bins = 15
+        counts, bin_edges = np.histogram(initial_phases, bins=n_bins)
+        
+        # Create custom colors with a gradient effect that matches our theme
+        colors = custom_cmap(np.linspace(0.1, 0.9, n_bins))
+        
+        # Plot the histogram with gradient colors and outline
+        bars = ax_init_phase.bar(
+            (bin_edges[:-1] + bin_edges[1:]) / 2, 
+            counts, 
+            width=(bin_edges[1] - bin_edges[0]) * 0.9,
+            color=colors, 
+            alpha=0.8,
+            edgecolor='white',
+            linewidth=0.5
+        )
+        
+        # Add a soft glow effect behind bars
+        for bar, color in zip(bars, colors):
+            x = bar.get_x()
+            width = bar.get_width()
+            height = bar.get_height()
+            glow = plt.Rectangle(
+                (x - width * 0.05, 0), 
+                width * 1.1, 
+                height, 
+                color=color,
+                alpha=0.3,
+                zorder=-1
+            )
+            ax_init_phase.add_patch(glow)
+        
+        # Enhance the axes and labels
+        ax_init_phase.set_facecolor('#1a1a1a')
+        ax_init_phase.set_xlabel('Phase (mod 2π)', fontsize=12, fontweight='bold', color='white')
+        ax_init_phase.set_ylabel('Count', fontsize=12, fontweight='bold', color='white')
+        ax_init_phase.set_title('Initial Phase Distribution (t=0)', 
+                              fontsize=14, fontweight='bold', color='white', pad=15)
+        
+        # Calculate initial order parameter
+        initial_r = order_parameter[0]
+        initial_psi = np.angle(np.sum(np.exp(1j * initial_phases))) % (2 * np.pi)
+        
+        # Add mean phase marker if order parameter is significant
+        if initial_r > 0.3:
+            ax_init_phase.axvline(x=initial_psi, color='#ff5555', linestyle='-', linewidth=2, alpha=0.7,
+                                label=f'Mean Phase: {initial_psi:.2f}')
+            ax_init_phase.legend(framealpha=0.7)
+        
+        # Customize grid
+        ax_init_phase.grid(True, color='#333333', alpha=0.4, linestyle=':')
+        
+        # Add a subtle box around the plot
+        for spine in ax_init_phase.spines.values():
+            spine.set_edgecolor('#555555')
+            spine.set_linewidth(1)
+        
+        st.pyplot(fig_init_phase)
+        
+        # Initial phase properties description
+        st.markdown(f"""
+        <div class='section'>
+            <p><b>Initial Order Parameter:</b> {initial_r:.4f}</p>
+            <p><b>Initial Mean Phase:</b> {initial_psi:.4f}</p>
+            <p>The initial phase distribution affects how quickly the system synchronizes.</p>
+            <p>A higher initial order parameter generally leads to faster synchronization.</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # Create oscillator visualization below the histograms
     st.markdown("<h3 class='gradient_text1'>Interactive Visualization</h3>", unsafe_allow_html=True)
     
     # Add a play button for animation
@@ -266,9 +403,8 @@ with tab1:
         </div>
         """, unsafe_allow_html=True)
     
-    # Import needed modules
+    # Import needed module
     from matplotlib.collections import LineCollection
-    from matplotlib.colors import LinearSegmentedColormap
     
     # Function to create the phase visualization
     def create_phase_plot(time_idx):
@@ -535,25 +671,61 @@ with tab1:
     </div>
     """, unsafe_allow_html=True)
 
-# Tab 2: Initial Distributions
+# Tab 2: About
 with tab2:
-    st.markdown("<h2 class='gradient_text2'>Initial Distributions</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 class='gradient_text2'>About the Kuramoto Model</h2>", unsafe_allow_html=True)
     
     st.markdown("""
     <div class='section'>
-        <h3 class='gradient_text1'>Initial Properties</h3>
-        <p>This tab shows the initial conditions of the simulation:</p>
-        <ul>
-            <li><b>Natural Frequencies</b>: The intrinsic oscillation rates of each oscillator (constant over time)</li>
-            <li><b>Initial Phases</b>: The starting phases of each oscillator at t=0</li>
-        </ul>
-        <p>Natural frequencies are key determinants of the system's final synchronization state.</p>
+        <div class='section-content'>
+            <p>The Kuramoto model is a mathematical model used to describe synchronization in systems of coupled oscillators.</p>
+            <p>It was first introduced by Yoshiki Kuramoto in 1975 and has applications in neuroscience, chemical oscillators, 
+            power grids, and many other complex systems.</p>
+            <p>The model describes each oscillator by its phase θ, where the dynamics are governed by:</p>
+            <p style='text-align: center; font-size: 1.2em;'>
+                dθ<sub>i</sub>/dt = ω<sub>i</sub> + (K/N) Σ<sub>j=1</sub><sup>N</sup> sin(θ<sub>j</sub> - θ<sub>i</sub>)
+            </p>
+            <p>where:</p>
+            <ul>
+                <li>θ<sub>i</sub> is the phase of oscillator i</li>
+                <li>ω<sub>i</sub> is the natural frequency of oscillator i</li>
+                <li>K is the coupling strength between oscillators</li>
+                <li>N is the total number of oscillators</li>
+            </ul>
+            <p>The order parameter r(t) measures the coherence of the system, with r = 1 indicating complete synchronization.</p>
+        </div>
     </div>
     """, unsafe_allow_html=True)
-
-
     
-    # Create two columns for the two distributions
+    # Applications section
+    st.markdown("""
+    <div class='section'>
+        <h3 class='gradient_text1'>Applications of the Kuramoto Model</h3>
+        <div class='section-content'>
+            <ul>
+                <li><b>Neuroscience</b>: Modeling neural oscillations and brain rhythms</li>
+                <li><b>Power Grids</b>: Synchronization of power generators</li>
+                <li><b>Biology</b>: Circadian rhythms and firefly synchronization</li>
+                <li><b>Chemistry</b>: Coupled chemical oscillators</li>
+                <li><b>Crowd Dynamics</b>: Synchronized clapping after performances</li>
+            </ul>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # References section
+    st.markdown("""
+    <div class='section'>
+        <h3 class='gradient_text1'>References</h3>
+        <div class='section-content'>
+            <ul>
+                <li>Kuramoto, Y. (1975). Self-entrainment of a population of coupled non-linear oscillators.</li>
+                <li>Strogatz, S. H. (2000). From Kuramoto to Crawford: exploring the onset of synchronization in populations of coupled oscillators.</li>
+                <li>Acebrón, J. A., et al. (2005). The Kuramoto model: A simple paradigm for synchronization phenomena.</li>
+            </ul>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
     dist_col1, dist_col2 = st.columns(2)
     
     with dist_col1:
@@ -867,36 +1039,6 @@ with tab3:
                     st.error("Failed to delete simulation.")
             else:
                 st.warning(f"No simulation found with ID {delete_id}.")
-
-# Display info about Kuramoto model applications
-st.markdown("""
-<div class='section'>
-    <h2 class='gradient_text2'>Applications of the Kuramoto Model</h2>
-    <div class='section-content'>
-        <ul>
-            <li><b>Neuroscience</b>: Modeling neural oscillations and brain rhythms</li>
-            <li><b>Power Grids</b>: Synchronization of power generators</li>
-            <li><b>Biology</b>: Circadian rhythms and firefly synchronization</li>
-            <li><b>Chemistry</b>: Coupled chemical oscillators</li>
-            <li><b>Crowd Dynamics</b>: Synchronized clapping after performances</li>
-        </ul>
-    </div>
-</div>
-""", unsafe_allow_html=True)
-
-# Add references
-st.markdown("""
-<div class='section'>
-    <h2 class='gradient_text2'>References</h2>
-    <div class='section-content'>
-        <ul>
-            <li>Kuramoto, Y. (1975). Self-entrainment of a population of coupled non-linear oscillators.</li>
-            <li>Strogatz, S. H. (2000). From Kuramoto to Crawford: exploring the onset of synchronization in populations of coupled oscillators.</li>
-            <li>Acebrón, J. A., et al. (2005). The Kuramoto model: A simple paradigm for synchronization phenomena.</li>
-        </ul>
-    </div>
-</div>
-""", unsafe_allow_html=True)
 
 # Add footer
 st.markdown("""

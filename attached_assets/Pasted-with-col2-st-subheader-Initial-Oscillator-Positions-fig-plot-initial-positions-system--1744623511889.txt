@@ -1,0 +1,95 @@
+with col2:
+    st.subheader("Initial Oscillator Positions")
+    fig = plot_initial_positions(system, sefirot, scale_factor)
+    st.pyplot(fig)
+
+# Solve system
+if st.button("Run Simulation", use_container_width=True, key='run_sim'):
+    # Create placeholder containers
+    plot_container = st.empty()
+    progress_bar = st.progress(0)
+    
+    # Solve the system
+    t, P = system.solve(tmax)
+    r, psi, q_sum = system.compute_order_parameter()
+    
+    # Create animation figure
+    animation_data = create_animation_figure(system, sefirot, scale_factor)
+    fig, ax1, ax2, ax3, ax4, scatter1, scatter2, scatter3, scatter4, colors = animation_data
+    
+    # Initialize frames list for GIF export
+    frames = []
+    total_frames = len(t)
+    
+    # Calculate effective frames based on frame_skip
+    effective_frames = range(0, total_frames, frame_skip)
+    
+    for idx, frame in enumerate(effective_frames):
+        # Update progress
+        progress = frame / total_frames
+        progress_bar.progress(progress)
+        
+        # Update animation frame
+        fig = update_animation_frame(
+            frame, t, P, q_sum, r, sefirot, 
+            fig, ax1, ax2, ax3, ax4, 
+            scatter1, scatter2, scatter3, scatter4, colors
+        )
+        
+        # Display the frame
+        plot_container.pyplot(fig)
+        
+        # Capture frame for GIF with improved quality
+        fig.canvas.draw()
+        
+        # Use higher quality buffer conversion for smoother animation
+        image = np.frombuffer(fig.canvas.buffer_rgba(), dtype=np.uint8)
+        image = image.reshape(fig.canvas.get_width_height()[::-1] + (4,))
+        # Preserve alpha channel for better quality
+        frames.append(image[:,:,:3])
+        
+        # Small pause for smoother rendering (uses variable FPS)
+        plt.pause(1.0/fps)
+    
+    # Final cleanup
+    progress_bar.progress(1.0)
+    
+    # Create export directory
+    export_dir = create_export_directory()
+    
+    # Export simulation data
+    export_simulation_data(export_dir, system, t, P, r, psi, q_sum, A, selected_preset, sefirot)
+    
+    # Export visualization
+    fig.savefig(f"{export_dir}/final_state.png", dpi=150)
+    
+    # Export animation with improved settings
+    export_animation(export_dir, frames, fps=fps, quality=animation_quality)
+    
+    st.success(f"Simulation completed and exported to {export_dir}")
+    
+    # Display network structure visualization
+    st.subheader("Network Structure Visualization")
+    fig, ax = plt.subplots(figsize=(8, 6))
+    
+    # Generate a circular layout for the graph
+    pos = nx.circular_layout(G)
+    
+    # Draw the graph with node labels
+    nx.draw(G, pos, with_labels=True, node_color='lightblue', 
+            node_size=500, edge_color='gray', width=1.5, alpha=0.8,
+            labels={i: sefirot[i] for i in range(N)}, font_size=8, font_weight='bold',
+            ax=ax)
+    
+    st.pyplot(fig)
+    
+    # Display final statistics
+    st.subheader("Simulation Statistics")
+    final_order = r[-1]
+    st.metric("Final Order Parameter", f"{final_order:.4f}", 
+             delta=f"{final_order - r[0]:.4f}", 
+             delta_color="normal")
+    
+    # Create rich club metric
+    rich_club = rich_club_metric(A, 3)  # Nodes with degree >= 3
+    st.metric("Rich Club Coefficient (k≥3)", f"{rich_club:.4f}")

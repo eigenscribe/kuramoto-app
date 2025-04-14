@@ -5,8 +5,10 @@ from matplotlib.animation import FuncAnimation
 import plotly.graph_objects as go
 from io import BytesIO
 import base64
+import json
 from kuramoto_model import KuramotoModel
 import time
+from database import store_simulation, get_simulation, list_simulations
 
 # Set up Matplotlib style for dark theme plots
 plt.style.use('dark_background')
@@ -195,7 +197,7 @@ time_step = st.sidebar.slider(
 random_seed = st.sidebar.number_input("Random Seed", value=42, help="Seed for reproducibility")
 
 # Create tabs for different visualizations
-tab1, tab2, tab3 = st.tabs(["Simulation Results", "Animated Visualization", "Phase Distribution"])
+tab1, tab2, tab3, tab4 = st.tabs(["Simulation Results", "Animated Visualization", "Phase Distribution", "Database"])
 
 # Function to simulate model
 @st.cache_data(ttl=300)
@@ -360,98 +362,233 @@ with tab2:
     st.markdown("<h2 class='gradient_text2'>Animated Visualization</h2>", unsafe_allow_html=True)
     
     # Create oscillator visualization at different time points
-    st.markdown("### Oscillators on Unit Circle")
+    st.markdown("<h3 class='gradient_text1'>Interactive Visualization</h3>", unsafe_allow_html=True)
     
-    time_index = st.slider(
-        "Time Index",
-        min_value=0,
-        max_value=len(times)-1,
-        value=0,
-        format="t = %.2f" % times[0]
-    )
+    # Add a play button for animation
+    col1, col2 = st.columns([3, 1])
     
-    # Display time and order parameter
-    current_time = times[time_index]
-    current_r = order_parameter[time_index]
+    with col2:
+        st.subheader("Animation Controls")
+        animation_speed = st.slider(
+            "Animation Speed",
+            min_value=1,
+            max_value=10,
+            value=5,
+            step=1,
+            help="Control how fast the animation plays"
+        )
+        animate = st.button("Play Animation", use_container_width=True)
+        stop_animation = st.button("Stop", use_container_width=True)
     
-    st.markdown(f"**Time:** {current_time:.2f}  |  **Order Parameter:** {current_r:.3f}")
+    with col1:
+        time_index = st.slider(
+            "Time Index",
+            min_value=0,
+            max_value=len(times)-1,
+            value=0,
+            format="t = %.2f" % times[0]
+        )
+        
+        # Display time and order parameter
+        current_time = times[time_index]
+        current_r = order_parameter[time_index]
+        
+        st.markdown(f"**Time:** {current_time:.2f}  |  **Order Parameter:** {current_r:.3f}")
     
-    # Create visualization with enhanced visuals for dark theme
-    fig_circle = plt.figure(figsize=(8, 8))
-    ax_circle = fig_circle.add_subplot(111)
+    # Create two columns for side-by-side visualization
+    viz_col1, viz_col2 = st.columns(2)
     
-    # Add background glow effect
-    bg_circle = plt.Circle((0, 0), 1.1, fill=True, color='#121a24', alpha=0.6, zorder=1)
-    ax_circle.add_patch(bg_circle)
+    # Function to create the phase visualization
+    def create_phase_plot(time_idx):
+        # Create visualization with enhanced visuals for dark theme
+        fig_circle = plt.figure(figsize=(6, 6))
+        ax_circle = fig_circle.add_subplot(111)
+        
+        # Add background glow effect
+        bg_circle = plt.Circle((0, 0), 1.1, fill=True, color='#121a24', alpha=0.6, zorder=1)
+        ax_circle.add_patch(bg_circle)
+        
+        # Add subtle circle rings for reference
+        for radius in [0.25, 0.5, 0.75]:
+            ring = plt.Circle((0, 0), radius, fill=False, color='#334455', 
+                             linestyle=':', alpha=0.5, zorder=2)
+            ax_circle.add_patch(ring)
+        
+        # Draw unit circle with glow effect
+        circle_glow = plt.Circle((0, 0), 1.02, fill=False, color='#4488aa', alpha=0.3, linewidth=3, zorder=3)
+        ax_circle.add_patch(circle_glow)
+        
+        circle = plt.Circle((0, 0), 1, fill=False, color='#66ccff', linestyle='-', 
+                           linewidth=1.5, alpha=0.8, zorder=4)
+        ax_circle.add_patch(circle)
+        
+        # Plot oscillators
+        phases_at_time = phases[:, time_idx]
+        x = np.cos(phases_at_time)
+        y = np.sin(phases_at_time)
+        
+        # Create custom colormap that matches our gradient theme
+        custom_cmap = LinearSegmentedColormap.from_list("kuramoto_colors", 
+                                                     ["#00ffee", "#27aaff", "#14a5ff", "#8138ff"], 
+                                                     N=256)
+        
+        # Color oscillators by their natural frequency with enhanced visuals
+        sc = ax_circle.scatter(x, y, c=frequencies, cmap=custom_cmap, s=120, 
+                              alpha=0.9, edgecolor='white', linewidth=1, zorder=10)
+        cbar = plt.colorbar(sc, ax=ax_circle, label='Natural Frequency')
+        cbar.ax.yaxis.label.set_color('white')
+        
+        # Calculate and show order parameter
+        r = order_parameter[time_idx]
+        psi = np.angle(np.sum(np.exp(1j * phases_at_time)))
+        
+        # Draw arrow showing mean field with glow effect
+        # First add glow/shadow
+        ax_circle.arrow(0, 0, r * np.cos(psi), r * np.sin(psi), 
+                       head_width=0.07, head_length=0.12, fc='#ff6655', ec='#ff6655', 
+                       width=0.03, alpha=0.3, zorder=5)
+        
+        # Then add main arrow
+        ax_circle.arrow(0, 0, r * np.cos(psi), r * np.sin(psi), 
+                       head_width=0.05, head_length=0.1, fc='#ff3322', ec='#ff3322', 
+                       width=0.02, zorder=6)
+        
+        # Draw axes
+        ax_circle.axhline(y=0, color='#555555', linestyle='-', alpha=0.5, zorder=0)
+        ax_circle.axvline(x=0, color='#555555', linestyle='-', alpha=0.5, zorder=0)
+        
+        ax_circle.set_xlim(-1.2, 1.2)
+        ax_circle.set_ylim(-1.2, 1.2)
+        ax_circle.set_aspect('equal')
+        
+        # Add subtle grid
+        ax_circle.grid(True, color='#333333', alpha=0.4, linestyle=':')
+        
+        # Enhance title
+        ax_circle.set_title(f'Oscillators at t={times[time_idx]:.2f}', 
+                           color='white', fontsize=14, pad=15)
+        
+        return fig_circle
     
-    # Add subtle circle rings for reference
-    for radius in [0.25, 0.5, 0.75]:
-        ring = plt.Circle((0, 0), radius, fill=False, color='#334455', 
-                         linestyle=':', alpha=0.5, zorder=2)
-        ax_circle.add_patch(ring)
+    # Function to create the phase distribution histogram
+    def create_phase_distribution(time_idx):
+        fig_phase, ax_phase = plt.subplots(figsize=(6, 6))
+        
+        phases_at_t = phases[:, time_idx] % (2 * np.pi)
+        
+        # Create a beautiful gradient for the histogram
+        # Use a gradient colormap for the histogram
+        n_bins = 15
+        counts, bin_edges = np.histogram(phases_at_t, bins=n_bins)
+        
+        # Create custom colormap that matches our gradient theme
+        custom_cmap = LinearSegmentedColormap.from_list("kuramoto_colors", 
+                                                  ["#00ffee", "#27aaff", "#14a5ff", "#8138ff"], 
+                                                  N=256)
+        
+        # Create custom colors with a gradient effect that matches our theme
+        colors = custom_cmap(np.linspace(0.1, 0.9, n_bins))
+        
+        # Plot the histogram with gradient colors and outline
+        bars = ax_phase.bar(
+            (bin_edges[:-1] + bin_edges[1:]) / 2, 
+            counts, 
+            width=(bin_edges[1] - bin_edges[0]) * 0.9,
+            color=colors, 
+            alpha=0.8,
+            edgecolor='white',
+            linewidth=0.5
+        )
+        
+        # Add a soft glow effect behind bars
+        for bar, color in zip(bars, colors):
+            x = bar.get_x()
+            width = bar.get_width()
+            height = bar.get_height()
+            glow = plt.Rectangle(
+                (x - width * 0.05, 0), 
+                width * 1.1, 
+                height, 
+                color=color,
+                alpha=0.3,
+                zorder=-1
+            )
+            ax_phase.add_patch(glow)
+        
+        # Enhance the axes and labels
+        ax_phase.set_facecolor('#1a1a1a')
+        ax_phase.set_xlabel('Phase (mod 2π)', fontsize=12, fontweight='bold', color='white')
+        ax_phase.set_ylabel('Count', fontsize=12, fontweight='bold', color='white')
+        ax_phase.set_title(f'Phase Distribution at t={times[time_idx]:.2f}', 
+                          fontsize=14, fontweight='bold', color='white', pad=15)
+        
+        # Highlight synchronized phases with vertical line if order is high
+        r_at_t = order_parameter[time_idx]
+        if r_at_t > 0.3:
+            psi = np.angle(np.sum(np.exp(1j * phases_at_t))) % (2 * np.pi)
+            ax_phase.axvline(x=psi, color='#ff5555', linestyle='-', linewidth=2, alpha=0.7,
+                           label=f'Mean Phase ψ={psi:.2f}')
+            ax_phase.legend(framealpha=0.7)
+        
+        # Customize grid
+        ax_phase.grid(True, color='#333333', alpha=0.4, linestyle=':')
+        
+        # Add a subtle box around the plot
+        for spine in ax_phase.spines.values():
+            spine.set_edgecolor('#555555')
+            spine.set_linewidth(1)
+            
+        return fig_phase
     
-    # Draw unit circle with glow effect
-    circle_glow = plt.Circle((0, 0), 1.02, fill=False, color='#4488aa', alpha=0.3, linewidth=3, zorder=3)
-    ax_circle.add_patch(circle_glow)
+    # Create placeholders for our plots
+    with viz_col1:
+        phase_plot_placeholder = st.empty()
+        
+    with viz_col2:
+        distribution_placeholder = st.empty()
     
-    circle = plt.Circle((0, 0), 1, fill=False, color='#66ccff', linestyle='-', 
-                       linewidth=1.5, alpha=0.8, zorder=4)
-    ax_circle.add_patch(circle)
+    # Display initial plots
+    phase_plot_placeholder.pyplot(create_phase_plot(time_index))
+    distribution_placeholder.pyplot(create_phase_distribution(time_index))
     
-    # Plot oscillators
-    phases_at_time = phases[:, time_index]
-    x = np.cos(phases_at_time)
-    y = np.sin(phases_at_time)
-    
-    # Create custom colormap that matches our gradient theme
-    custom_cmap = LinearSegmentedColormap.from_list("kuramoto_colors", 
-                                                 ["#00ffee", "#27aaff", "#14a5ff", "#8138ff"], 
-                                                 N=256)
-    
-    # Color oscillators by their natural frequency with enhanced visuals
-    sc = ax_circle.scatter(x, y, c=frequencies, cmap=custom_cmap, s=120, 
-                          alpha=0.9, edgecolor='white', linewidth=1, zorder=10)
-    cbar = plt.colorbar(sc, ax=ax_circle, label='Natural Frequency')
-    cbar.ax.yaxis.label.set_color('white')
-    
-    # Calculate and show order parameter
-    r = order_parameter[time_index]
-    psi = np.angle(np.sum(np.exp(1j * phases_at_time)))
-    
-    # Draw arrow showing mean field with glow effect
-    # First add glow/shadow
-    ax_circle.arrow(0, 0, r * np.cos(psi), r * np.sin(psi), 
-                   head_width=0.07, head_length=0.12, fc='#ff6655', ec='#ff6655', 
-                   width=0.03, alpha=0.3, zorder=5)
-    
-    # Then add main arrow
-    ax_circle.arrow(0, 0, r * np.cos(psi), r * np.sin(psi), 
-                   head_width=0.05, head_length=0.1, fc='#ff3322', ec='#ff3322', 
-                   width=0.02, zorder=6)
-    
-    # Draw axes
-    ax_circle.axhline(y=0, color='#555555', linestyle='-', alpha=0.5, zorder=0)
-    ax_circle.axvline(x=0, color='#555555', linestyle='-', alpha=0.5, zorder=0)
-    
-    ax_circle.set_xlim(-1.2, 1.2)
-    ax_circle.set_ylim(-1.2, 1.2)
-    ax_circle.set_aspect('equal')
-    
-    # Add subtle grid
-    ax_circle.grid(True, color='#333333', alpha=0.4, linestyle=':')
-    
-    # Enhance title
-    ax_circle.set_title(f'Oscillators at time t={times[time_index]:.2f}, r={r:.3f}', 
-                       color='white', fontsize=14, pad=15)
-    
-    st.pyplot(fig_circle)
+    # If animation is triggered
+    if animate:
+        # Store current position to return to after animation
+        current_pos = time_index
+        
+        # Calculate how many frames to skip based on speed
+        frame_skip = max(1, int(11 - animation_speed))
+        
+        # Set up a progress bar
+        progress_bar = st.progress(0)
+        
+        # Animation loop
+        for i in range(0, len(times), frame_skip):
+            # Check if animation should stop
+            if stop_animation:
+                break
+                
+            # Update progress bar
+            progress = i / (len(times) - 1)
+            progress_bar.progress(progress)
+            
+            # Update plots
+            phase_plot_placeholder.pyplot(create_phase_plot(i))
+            distribution_placeholder.pyplot(create_phase_distribution(i))
+            
+            # Add a short pause to control animation speed
+            time.sleep(0.1 / animation_speed)
+        
+        # Clear progress bar after animation
+        progress_bar.empty()
     
     st.markdown("""
     <div class='section'>
-        <h3>Interactive Animation</h3>
-        <p>Drag the slider to see how oscillators evolve over time.</p>
-        <p>Each dot represents an oscillator, with color indicating its natural frequency.</p>
+        <h3>Visualization Guide</h3>
+        <p>The left plot shows oscillators on a unit circle. Each dot represents an oscillator, with color indicating its natural frequency.</p>
         <p>The red arrow shows the mean field vector, with length equal to the order parameter r.</p>
+        <p>The right plot shows the distribution of phases, with peaks forming when oscillators synchronize.</p>
+        <p>Use the slider to manually explore different time points or click "Play Animation" to watch the full simulation.</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -567,6 +704,163 @@ with tab3:
             <p>When synchronized, phases cluster together. When desynchronized, phases spread uniformly.</p>
         </div>
         """, unsafe_allow_html=True)
+
+# Tab 4: Database
+with tab4:
+    st.markdown("<h2 class='gradient_text2'>Database</h2>", unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div class='section'>
+        <h3 class='gradient_text1'>Store and Retrieve Simulations</h3>
+        <p>Save your simulation parameters and results to the database for future reference and comparison.</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Create two columns for saving and loading
+    db_col1, db_col2 = st.columns(2)
+    
+    with db_col1:
+        st.markdown("<h4>Save Current Simulation</h4>", unsafe_allow_html=True)
+        
+        # Get parameters of frequency distribution based on selected type
+        freq_params = {}
+        if freq_type == "Normal":
+            freq_params = {"mean": freq_mean, "std": freq_std}
+        elif freq_type == "Uniform":
+            freq_params = {"min": freq_min, "max": freq_max}
+        elif freq_type == "Bimodal":
+            freq_params = {"peak1": peak1, "peak2": peak2}
+        elif freq_type == "Custom":
+            freq_params = {"custom_values": custom_freqs}
+        
+        # Button to save current simulation
+        if st.button("Save to Database", use_container_width=True):
+            # Store the simulation in the database
+            sim_id = store_simulation(
+                model=model, 
+                times=times, 
+                phases=phases, 
+                order_parameter=order_parameter,
+                frequencies=frequencies,
+                freq_type=freq_type,
+                freq_params=freq_params,
+                adjacency_matrix=None  # No adjacency matrix in this version
+            )
+            
+            if sim_id:
+                st.success(f"Simulation saved successfully with ID: {sim_id}")
+            else:
+                st.error("Failed to save simulation to database.")
+    
+    with db_col2:
+        st.markdown("<h4>Load Saved Simulations</h4>", unsafe_allow_html=True)
+        
+        # Get list of saved simulations
+        simulations = list_simulations()
+        
+        if not simulations:
+            st.info("No saved simulations found in the database.")
+        else:
+            # Create a selection box for the simulations
+            sim_options = [f"ID: {sim['id']} - {sim['n_oscillators']} oscillators, K={sim['coupling_strength']}, {sim['timestamp'].strftime('%Y-%m-%d %H:%M')}" 
+                         for sim in simulations]
+            
+            selected_sim = st.selectbox("Select a simulation to load", sim_options)
+            
+            if selected_sim:
+                # Extract simulation ID from selection
+                sim_id = int(selected_sim.split("ID: ")[1].split(" -")[0])
+                
+                if st.button("Load Simulation", use_container_width=True):
+                    # Load the simulation from the database
+                    sim_data = get_simulation(sim_id)
+                    
+                    if sim_data:
+                        # Display basic information about the loaded simulation
+                        st.markdown(f"""
+                        <div class='section'>
+                            <h4>Simulation Details</h4>
+                            <p><b>ID:</b> {sim_data['id']}</p>
+                            <p><b>Timestamp:</b> {sim_data['timestamp']}</p>
+                            <p><b>Oscillators:</b> {sim_data['n_oscillators']}</p>
+                            <p><b>Coupling Strength:</b> {sim_data['coupling_strength']}</p>
+                            <p><b>Frequency Distribution:</b> {sim_data['frequency_distribution']}</p>
+                        </div>
+                        """, unsafe_allow_html=True)
+                        
+                        # Create visualization of the loaded simulation
+                        st.markdown("<h4>Order Parameter</h4>", unsafe_allow_html=True)
+                        
+                        fig, ax = plt.subplots(figsize=(8, 4))
+                        ax.set_facecolor('#1a1a1a')
+                        
+                        # Create custom colormap
+                        cmap = LinearSegmentedColormap.from_list("order_param", 
+                                                            ["#00ffee", "#27aaff", "#14a5ff", "#8138ff"], 
+                                                            N=256)
+                        
+                        # Plot order parameter
+                        ax.plot(range(len(sim_data['order_parameter']['r'])), 
+                              sim_data['order_parameter']['r'], 
+                              color=cmap(0.5), linewidth=3)
+                        
+                        ax.set_xlabel('Time Index', fontsize=12, fontweight='bold', color='white')
+                        ax.set_ylabel('Order Parameter r(t)', fontsize=12, fontweight='bold', color='white')
+                        ax.set_title('Phase Synchronization', fontsize=14, fontweight='bold', color='white')
+                        ax.grid(True, color='#333333', alpha=0.4, linestyle=':')
+                        
+                        # Add a subtle box around the plot
+                        for spine in ax.spines.values():
+                            spine.set_edgecolor('#555555')
+                            spine.set_linewidth(1)
+                        
+                        st.pyplot(fig)
+                    else:
+                        st.error("Failed to load simulation from database.")
+    
+    # Add section for database management
+    st.markdown("""
+    <div class='section'>
+        <h3 class='gradient_text1'>Database Management</h3>
+        <p>Manage your saved simulations and keep your database organized.</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Display all simulations in a table
+    if simulations:
+        st.markdown("<h4>Saved Simulations</h4>", unsafe_allow_html=True)
+        
+        # Create a DataFrame for display
+        import pandas as pd
+        sim_df = pd.DataFrame([
+            {
+                "ID": sim["id"],
+                "Date": sim["timestamp"].strftime("%Y-%m-%d"),
+                "Time": sim["timestamp"].strftime("%H:%M:%S"),
+                "Oscillators": sim["n_oscillators"],
+                "Coupling": f"{sim['coupling_strength']:.2f}",
+                "Distribution": sim["frequency_distribution"]
+            } for sim in simulations
+        ])
+        
+        st.dataframe(sim_df, use_container_width=True)
+        
+        # Delete simulation functionality
+        st.markdown("<h4>Delete Simulation</h4>", unsafe_allow_html=True)
+        
+        delete_id = st.number_input("Enter Simulation ID to Delete", min_value=1, step=1)
+        
+        if st.button("Delete", use_container_width=True):
+            # Confirm before deletion
+            if delete_id in [sim["id"] for sim in simulations]:
+                success = delete_simulation(delete_id)
+                if success:
+                    st.success(f"Simulation with ID {delete_id} was deleted successfully.")
+                    st.rerun()  # Refresh the page to update the list
+                else:
+                    st.error("Failed to delete simulation.")
+            else:
+                st.warning(f"No simulation found with ID {delete_id}.")
 
 # Display info about Kuramoto model applications
 st.markdown("""

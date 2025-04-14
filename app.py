@@ -427,11 +427,13 @@ with tab1:
     # Create oscillator visualization below the histograms
     st.markdown("<h3 class='gradient_text1'>Interactive Visualization</h3>", unsafe_allow_html=True)
     
-    # Add a play button for animation
-    col1, col2 = st.columns([3, 1])
+    # Add animation controls with full width
+    st.subheader("Animation Controls")
     
-    with col2:
-        st.subheader("Animation Controls")
+    # Create three columns for animation controls with better spacing
+    ctrl_col1, ctrl_col2, ctrl_col3 = st.columns([2, 1, 1])
+    
+    with ctrl_col1:
         animation_speed = st.slider(
             "Animation Speed",
             min_value=1,
@@ -440,16 +442,19 @@ with tab1:
             step=1,
             help="Control how fast the animation plays"
         )
+    
+    with ctrl_col2:
         animate = st.button("Play Animation", use_container_width=True)
+    
+    with ctrl_col3:
         stop_animation = st.button("Stop", use_container_width=True)
     
-    with col1:
-        # Initialize time_index to 0 (instead of using a slider)
-        time_index = 0
-        
-        # Display time and order parameter
-        current_time = times[time_index]
-        current_r = order_parameter[time_index]
+    # Initialize time_index to 0 (instead of using a slider)
+    time_index = 0
+    
+    # Get time and order parameter values
+    current_time = times[time_index]
+    current_r = order_parameter[time_index]
     
     # Import needed module
     from matplotlib.collections import LineCollection

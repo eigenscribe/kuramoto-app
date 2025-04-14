@@ -1161,6 +1161,6 @@ with tab3:
 # Add footer
 st.markdown("""
 <div style='text-align: center; margin-top: 30px; padding: 10px; font-size: 0.8em;'>
-    <p>Kuramoto Model Simulator © 2023 | Interactive Application</p>
+    <p>© 2025 Lauren Shriver. All rights reserved.</p>
 </div>
 """, unsafe_allow_html=True)

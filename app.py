@@ -214,7 +214,7 @@ with tab1:
         st.markdown("<h4>Natural Frequency Distribution</h4>", unsafe_allow_html=True)
         
         # Create frequency distribution histogram
-        fig_freq, ax_freq = plt.subplots(figsize=(6, 5))
+        fig_freq, ax_freq = plt.subplots(figsize=(4, 3))
         
         # Use a gradient colormap for the histogram
         n_bins = 15
@@ -291,7 +291,7 @@ with tab1:
         st.markdown("<h4>Initial Phase Distribution</h4>", unsafe_allow_html=True)
         
         # Create initial phase distribution histogram
-        fig_init_phase, ax_init_phase = plt.subplots(figsize=(6, 5))
+        fig_init_phase, ax_init_phase = plt.subplots(figsize=(4, 3))
         
         initial_phases = phases[:, 0] % (2 * np.pi)
         
@@ -440,10 +440,16 @@ with tab1:
                                                      ["#14a5ff", "#8138ff"], 
                                                      N=256)
         
+        # Create color normalization
+        norm = plt.Normalize(min(frequencies), max(frequencies))
+        
         # Color oscillators by their natural frequency with enhanced visuals - hollow dots
-        sc = ax_circle.scatter(x, y, c=frequencies, cmap=custom_cmap, s=180, 
-                              alpha=0.9, edgecolor='white', linewidth=2, 
-                              facecolors='none', zorder=10)
+        colors = [custom_cmap(norm(f)) for f in frequencies]
+        sc = ax_circle.scatter(x, y, facecolors='none', edgecolor=colors, s=180, 
+                              alpha=0.9, linewidth=2, zorder=10)
+        # Add a colorbar for reference
+        sm = plt.cm.ScalarMappable(cmap=custom_cmap, norm=norm)
+        sm.set_array([])
         cbar = plt.colorbar(sc, ax=ax_circle, label='Natural Frequency')
         cbar.ax.yaxis.label.set_color('white')
         
@@ -564,10 +570,10 @@ with tab1:
                                               N=256)
         
         # Plot order parameter with hollow gradient dots
-        scatter = ax.scatter(times[:time_idx+1], order_parameter[:time_idx+1], 
-                           c=order_parameter[:time_idx+1], cmap=cmap,
-                           s=70, alpha=0.9, facecolors='none', 
-                           edgecolor=None, linewidth=1.5, zorder=10)
+        colors = [cmap(r) for r in order_parameter[:time_idx+1]]
+        scatter = ax.scatter(times[:time_idx+1], order_parameter[:time_idx+1],
+                           facecolors='none', edgecolor=colors,
+                           s=70, alpha=0.9, linewidth=1.5, zorder=10)
         
         # Add a connecting line with low opacity
         ax.plot(times[:time_idx+1], order_parameter[:time_idx+1], 

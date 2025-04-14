@@ -462,7 +462,7 @@ with tab1:
     # Function to create the phase visualization
     def create_phase_plot(time_idx):
         # Create visualization with enhanced visuals for dark theme
-        fig_circle = plt.figure(figsize=(7, 7))
+        fig_circle = plt.figure(figsize=(5, 5))
         ax_circle = fig_circle.add_subplot(111)
         
         # Add background glow effect
@@ -545,7 +545,7 @@ with tab1:
     
     # Function to create oscillator phases over time plot (as dots)
     def create_oscillator_phases_plot(time_idx):
-        fig, ax = plt.subplots(figsize=(8, 4))
+        fig, ax = plt.subplots(figsize=(12, 3.5))
         
         # Add background
         ax.set_facecolor('#1a1a1a')
@@ -617,7 +617,7 @@ with tab1:
     
     # Create a function to create order parameter plot over time (as a dot plot)
     def create_order_parameter_plot(time_idx):
-        fig, ax = plt.subplots(figsize=(8, 4))
+        fig, ax = plt.subplots(figsize=(5, 5))
         
         # Add background gradient
         ax.set_facecolor('#1a1a1a')
@@ -678,16 +678,16 @@ with tab1:
             
         return fig
     
-    # Create a more space-efficient layout with columns
-    # First row: Circle plot in its own row (since it's square-shaped)
-    circle_plot_placeholder = st.empty()
-    circle_plot_placeholder.pyplot(create_phase_plot(time_index))
+    # Create a more space-efficient layout 
+    # First row: Oscillator phases plot (wider view)
+    phases_plot_placeholder = st.empty()
+    phases_plot_placeholder.pyplot(create_oscillator_phases_plot(time_index))
     
-    # Second row: Two side-by-side plots
+    # Second row: Circle plot and order parameter side by side
     col1, col2 = st.columns(2)
     with col1:
-        phases_plot_placeholder = st.empty()
-        phases_plot_placeholder.pyplot(create_oscillator_phases_plot(time_index))
+        circle_plot_placeholder = st.empty()
+        circle_plot_placeholder.pyplot(create_phase_plot(time_index))
     
     with col2:
         order_plot_placeholder = st.empty()
@@ -728,9 +728,9 @@ with tab1:
     st.markdown("""
     <div class='section'>
         <h3 class='gradient_text1'>Visualization Guide</h3>
-        <p>The <b>top plot</b> shows oscillators on a unit circle. Each colored dot represents an oscillator at its current phase position, with colors based on the oscillator's natural frequency ordering. The orange arrow shows the mean field vector, with length equal to the order parameter r.</p>
-        <p>The <b>left plot</b> shows oscillator phases over time as dots. Each horizontal trace represents one oscillator's phase trajectory with consistent coloring.</p>
-        <p>The <b>right plot</b> shows the order parameter over time, with color-coded dots showing the synchronization level.</p>
+        <p>The <b>top plot</b> shows oscillator phases over time. Each horizontal trace represents one oscillator's phase trajectory with consistent coloring based on the oscillator's natural frequency.</p>
+        <p>The <b>bottom left plot</b> shows oscillators on a unit circle. Each colored dot represents an oscillator at its current phase position. The orange arrow shows the mean field vector, with length equal to the order parameter r.</p>
+        <p>The <b>bottom right plot</b> shows the order parameter over time, with color-coded dots showing the synchronization level from 0 (no synchronization) to 1 (complete synchronization).</p>
         <p>Use the slider to manually explore different time points or click "Play Animation" to watch all three visualizations animate together.</p>
     </div>
     """, unsafe_allow_html=True)

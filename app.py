@@ -740,7 +740,7 @@ with tab2:
         
         # Create custom colormap that matches our gradient theme
         custom_cmap = LinearSegmentedColormap.from_list("kuramoto_colors", 
-                                                  ["#00ffee", "#27aaff", "#14a5ff", "#8138ff"], 
+                                                  ["#00ffee", "#27aaff"], 
                                                   N=256)
         
         # Create custom colors with a gradient effect that matches our theme
@@ -974,7 +974,7 @@ with tab3:
                         
                         # Create custom colormap
                         cmap = LinearSegmentedColormap.from_list("order_param", 
-                                                            ["#00ffee", "#27aaff", "#14a5ff", "#8138ff"], 
+                                                            ["#00ffee", "#27aaff"], 
                                                             N=256)
                         
                         # Plot order parameter

@@ -224,152 +224,9 @@ model, times, phases, order_parameter = run_simulation(
     random_seed=random_seed
 )
 
-# Tab 1: Simulation Results
+# Tab 1: Simulation
 with tab1:
-    st.markdown("<h2 class='gradient_text2'>Simulation Results</h2>", unsafe_allow_html=True)
-    
-    # Enhanced order parameter plot
-    fig1, ax1 = plt.subplots(figsize=(10, 6))
-    
-    # Add background gradient
-    ax1.set_facecolor('#1a1a1a')
-    
-    # Add subtle horizontal bands for visual reference
-    for y in np.linspace(0, 1, 6):
-        ax1.axhspan(y-0.05, y+0.05, color='#222233', alpha=0.3, zorder=0)
-    
-    # Plot order parameter with gradient line effect
-    from matplotlib.collections import LineCollection
-    from matplotlib.colors import LinearSegmentedColormap
-    
-    # Create points and segments
-    points = np.array([times, order_parameter]).T.reshape(-1, 1, 2)
-    segments = np.concatenate([points[:-1], points[1:]], axis=1)
-    
-    # Create a custom colormap that uses our primary gradients
-    cmap = LinearSegmentedColormap.from_list("order_param", 
-                                           ["#00ffee", "#27aaff", "#14a5ff", "#8138ff"], 
-                                           N=256)
-    
-    # Create the line collection with gradient coloring based on order parameter value
-    lc = LineCollection(segments, cmap=cmap, linewidth=3, zorder=5)
-    lc.set_array(order_parameter)
-    ax1.add_collection(lc)
-    
-    # Add highlights at important thresholds
-    ax1.axhline(y=0.5, color='#aaaaaa', linestyle='--', alpha=0.5, zorder=1, 
-               label='Partial Synchronization (r=0.5)')
-    ax1.axhline(y=0.8, color='#ffffff', linestyle='--', alpha=0.5, zorder=1,
-               label='Strong Synchronization (r=0.8)')
-    
-    # Enhance the plot appearance
-    ax1.set_xlim(times.min(), times.max())
-    ax1.set_ylim(0, 1.05)
-    ax1.set_xlabel('Time', fontsize=13, fontweight='bold', color='white')
-    ax1.set_ylabel('Order Parameter r(t)', fontsize=13, fontweight='bold', color='white')
-    ax1.set_title('Phase Synchronization in Kuramoto Model', 
-                 fontsize=15, fontweight='bold', color='white', pad=15)
-    
-    # Create custom grid
-    ax1.grid(True, color='#333333', alpha=0.5, linestyle=':')
-    
-    # Add legend
-    ax1.legend(loc='upper right', framealpha=0.7)
-    
-    # Add subtle box around the plot
-    for spine in ax1.spines.values():
-        spine.set_edgecolor('#555555')
-        spine.set_linewidth(1)
-    
-    # Add explanation annotations
-    if max(order_parameter) > 0.8:
-        max_idx = np.argmax(order_parameter)
-        ax1.annotate('Peak synchronization', 
-                   xy=(times[max_idx], order_parameter[max_idx]),
-                   xytext=(times[max_idx]-1, order_parameter[max_idx]+0.15),
-                   fontsize=11,
-                   color='white',
-                   arrowprops=dict(facecolor='white', shrink=0.05, width=1.5, alpha=0.7))
-    
-    st.pyplot(fig1)
-    
-    st.markdown("""
-    <div class='section'>
-        <h3 class='gradient_text1'>Order Parameter Analysis</h3>
-        <p>The order parameter r(t) measures the degree of synchronization among oscillators:</p>
-        <ul>
-            <li>r = 1: Complete synchronization (all oscillators have the same phase)</li>
-            <li>r = 0: Complete desynchronization (phases are uniformly distributed)</li>
-        </ul>
-        <p>At critical coupling strength (K_c), the system transitions from desynchronized to partially synchronized state.</p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Enhanced phase plot with dot visualization
-    fig2, ax2 = plt.subplots(figsize=(10, 6))
-    
-    # Add background and styling
-    ax2.set_facecolor('#1a1a1a')
-    
-    # Create transparent bands at phase regions
-    for y in [0, np.pi/2, np.pi, 3*np.pi/2, 2*np.pi]:
-        ax2.axhspan(y-0.1, y+0.1, color='#222233', alpha=0.4, zorder=0)
-    
-    # Create custom colormap that matches our gradient theme
-    custom_cmap = LinearSegmentedColormap.from_list("kuramoto_colors", 
-                                                 ["#00ffee", "#27aaff", "#14a5ff", "#8138ff"], 
-                                                 N=256)
-    
-    # Iterate through oscillators to create dot plots with varying colors
-    for i in range(n_oscillators):
-        # Determine color based on oscillator's natural frequency
-        normalized_freq = (frequencies[i] - min(frequencies)) / (max(frequencies) - min(frequencies) + 1e-10)
-        color = custom_cmap(normalized_freq)
-        
-        # Plot oscillator phases as dots with color gradient
-        ax2.scatter(times, phases[i, :] % (2 * np.pi), 
-                   color=color, alpha=0.8, s=25, edgecolor='white', linewidth=0.5, zorder=5)
-        
-        # Add a subtle connecting line with low opacity
-        ax2.plot(times, phases[i, :] % (2 * np.pi), 
-                color=color, alpha=0.2, linewidth=0.8, zorder=2)
-    
-    # Add labels for key phase positions
-    phase_labels = [(0, '0'), (np.pi/2, 'π/2'), (np.pi, 'π'), (3*np.pi/2, '3π/2'), (2*np.pi, '2π')]
-    for y, label in phase_labels:
-        ax2.annotate(label, xy=(-0.5, y), xycoords=('axes fraction', 'data'),
-                   fontsize=11, color='white', ha='center', va='center')
-    
-    # Plot styling
-    ax2.set_xlabel('Time', fontsize=13, fontweight='bold', color='white')
-    ax2.set_ylabel('Phase (mod 2π)', fontsize=13, fontweight='bold', color='white')
-    ax2.set_title('Oscillator Phases Over Time', fontsize=15, fontweight='bold', color='white', pad=15)
-    ax2.set_ylim(0, 2 * np.pi)
-    ax2.set_yticks([0, np.pi/2, np.pi, 3*np.pi/2, 2*np.pi])
-    ax2.set_yticklabels(['0', 'π/2', 'π', '3π/2', '2π'])
-    
-    # Custom grid
-    ax2.grid(True, color='#333333', alpha=0.4, linestyle=':')
-    
-    # Add box around the plot
-    for spine in ax2.spines.values():
-        spine.set_edgecolor('#555555')
-        spine.set_linewidth(1)
-    
-    st.pyplot(fig2)
-    
-    st.markdown("""
-    <div class='section'>
-        <h3 class='gradient_text1'>Phase Evolution</h3>
-        <p>The plot above shows how the phase of each oscillator evolves over time.</p>
-        <p>When synchronized, oscillators will move with similar phases (dots will cluster together).</p>
-        <p>The color of each dot corresponds to the oscillator's natural frequency.</p>
-    </div>
-    """, unsafe_allow_html=True)
-
-# Tab 2: Animated Visualization
-with tab2:
-    st.markdown("<h2 class='gradient_text2'>Animated Visualization</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 class='gradient_text2'>Kuramoto Simulation</h2>", unsafe_allow_html=True)
     
     # Create oscillator visualization at different time points
     st.markdown("<h3 class='gradient_text1'>Interactive Visualization</h3>", unsafe_allow_html=True)
@@ -403,15 +260,20 @@ with tab2:
         current_time = times[time_index]
         current_r = order_parameter[time_index]
         
-        st.markdown(f"**Time:** {current_time:.2f}  |  **Order Parameter:** {current_r:.3f}")
+        st.markdown(f"""
+        <div style='background-color: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px;'>
+            <span style='font-size: 1.2em;'><b>Time:</b> {current_time:.2f} &nbsp;|&nbsp; <b>Order Parameter:</b> {current_r:.3f}</span>
+        </div>
+        """, unsafe_allow_html=True)
     
-    # Create two columns for side-by-side visualization
-    viz_col1, viz_col2 = st.columns(2)
+    # Import needed modules
+    from matplotlib.collections import LineCollection
+    from matplotlib.colors import LinearSegmentedColormap
     
     # Function to create the phase visualization
     def create_phase_plot(time_idx):
         # Create visualization with enhanced visuals for dark theme
-        fig_circle = plt.figure(figsize=(6, 6))
+        fig_circle = plt.figure(figsize=(10, 5))
         ax_circle = fig_circle.add_subplot(111)
         
         # Add background glow effect
@@ -478,139 +340,14 @@ with tab2:
         ax_circle.set_title(f'Oscillators at t={times[time_idx]:.2f}', 
                            color='white', fontsize=14, pad=15)
         
+        # Close any previous figure to avoid memory issues
+        plt.close('all')
+        
         return fig_circle
-    
-    # Function to create the phase distribution histogram
-    def create_phase_distribution(time_idx):
-        fig_phase, ax_phase = plt.subplots(figsize=(6, 6))
-        
-        phases_at_t = phases[:, time_idx] % (2 * np.pi)
-        
-        # Create a beautiful gradient for the histogram
-        # Use a gradient colormap for the histogram
-        n_bins = 15
-        counts, bin_edges = np.histogram(phases_at_t, bins=n_bins)
-        
-        # Create custom colormap that matches our gradient theme
-        custom_cmap = LinearSegmentedColormap.from_list("kuramoto_colors", 
-                                                  ["#00ffee", "#27aaff", "#14a5ff", "#8138ff"], 
-                                                  N=256)
-        
-        # Create custom colors with a gradient effect that matches our theme
-        colors = custom_cmap(np.linspace(0.1, 0.9, n_bins))
-        
-        # Plot the histogram with gradient colors and outline
-        bars = ax_phase.bar(
-            (bin_edges[:-1] + bin_edges[1:]) / 2, 
-            counts, 
-            width=(bin_edges[1] - bin_edges[0]) * 0.9,
-            color=colors, 
-            alpha=0.8,
-            edgecolor='white',
-            linewidth=0.5
-        )
-        
-        # Add a soft glow effect behind bars
-        for bar, color in zip(bars, colors):
-            x = bar.get_x()
-            width = bar.get_width()
-            height = bar.get_height()
-            glow = plt.Rectangle(
-                (x - width * 0.05, 0), 
-                width * 1.1, 
-                height, 
-                color=color,
-                alpha=0.3,
-                zorder=-1
-            )
-            ax_phase.add_patch(glow)
-        
-        # Enhance the axes and labels
-        ax_phase.set_facecolor('#1a1a1a')
-        ax_phase.set_xlabel('Phase (mod 2π)', fontsize=12, fontweight='bold', color='white')
-        ax_phase.set_ylabel('Count', fontsize=12, fontweight='bold', color='white')
-        ax_phase.set_title(f'Phase Distribution at t={times[time_idx]:.2f}', 
-                          fontsize=14, fontweight='bold', color='white', pad=15)
-        
-        # Highlight synchronized phases with vertical line if order is high
-        r_at_t = order_parameter[time_idx]
-        if r_at_t > 0.3:
-            psi = np.angle(np.sum(np.exp(1j * phases_at_t))) % (2 * np.pi)
-            ax_phase.axvline(x=psi, color='#ff5555', linestyle='-', linewidth=2, alpha=0.7,
-                           label=f'Mean Phase ψ={psi:.2f}')
-            ax_phase.legend(framealpha=0.7)
-        
-        # Customize grid
-        ax_phase.grid(True, color='#333333', alpha=0.4, linestyle=':')
-        
-        # Add a subtle box around the plot
-        for spine in ax_phase.spines.values():
-            spine.set_edgecolor('#555555')
-            spine.set_linewidth(1)
-            
-        return fig_phase
-    
-    # Create a function to create order parameter plot over time (as a dot plot)
-    def create_order_parameter_plot(time_idx):
-        fig, ax = plt.subplots(figsize=(6, 6))
-        
-        # Add background gradient
-        ax.set_facecolor('#1a1a1a')
-        
-        # Add subtle horizontal bands for visual reference
-        for y in np.linspace(0, 1, 6):
-            ax.axhspan(y-0.05, y+0.05, color='#222233', alpha=0.3, zorder=0)
-        
-        # Create a custom colormap that uses our primary gradients
-        cmap = LinearSegmentedColormap.from_list("order_param", 
-                                              ["#00ffee", "#27aaff", "#14a5ff", "#8138ff"], 
-                                              N=256)
-        
-        # Plot order parameter with gradient dots
-        scatter = ax.scatter(times[:time_idx+1], order_parameter[:time_idx+1], 
-                           c=order_parameter[:time_idx+1], cmap=cmap,
-                           s=50, alpha=0.8, edgecolor='white', linewidth=0.5, zorder=10)
-        
-        # Add a connecting line with low opacity
-        ax.plot(times[:time_idx+1], order_parameter[:time_idx+1], 
-               color='white', alpha=0.3, linewidth=1, zorder=5)
-        
-        # Highlight current position with a larger marker
-        if time_idx > 0:
-            ax.scatter([times[time_idx]], [order_parameter[time_idx]], 
-                     s=150, color=cmap(order_parameter[time_idx]), 
-                     edgecolor='white', linewidth=2, zorder=15)
-        
-        # Add highlights at important thresholds
-        ax.axhline(y=0.5, color='#aaaaaa', linestyle='--', alpha=0.5, zorder=1, 
-                  label='Partial Synchronization (r=0.5)')
-        ax.axhline(y=0.8, color='#ffffff', linestyle='--', alpha=0.5, zorder=1,
-                  label='Strong Synchronization (r=0.8)')
-        
-        # Enhance the plot appearance
-        ax.set_xlim(times.min(), times.max())
-        ax.set_ylim(0, 1.05)
-        ax.set_xlabel('Time', fontsize=13, fontweight='bold', color='white')
-        ax.set_ylabel('Order Parameter r(t)', fontsize=13, fontweight='bold', color='white')
-        ax.set_title(f'Phase Synchronization at t={times[time_idx]:.2f}', 
-                    fontsize=15, fontweight='bold', color='white', pad=15)
-        
-        # Create custom grid
-        ax.grid(True, color='#333333', alpha=0.5, linestyle=':')
-        
-        # Add legend
-        ax.legend(loc='upper right', framealpha=0.7)
-        
-        # Add subtle box around the plot
-        for spine in ax.spines.values():
-            spine.set_edgecolor('#555555')
-            spine.set_linewidth(1)
-            
-        return fig
     
     # Function to create oscillator phases over time plot (as dots)
     def create_oscillator_phases_plot(time_idx):
-        fig, ax = plt.subplots(figsize=(6, 6))
+        fig, ax = plt.subplots(figsize=(10, 5))
         
         # Add background
         ax.set_facecolor('#1a1a1a')
@@ -666,21 +403,77 @@ with tab2:
         for spine in ax.spines.values():
             spine.set_edgecolor('#555555')
             spine.set_linewidth(1)
+        
+        # Close any previous figure to avoid memory issues
+        plt.close('all')
             
         return fig
     
-    # Create three columns for visualization
-    viz_col1, viz_col2, viz_col3 = st.columns(3)
+    # Create a function to create order parameter plot over time (as a dot plot)
+    def create_order_parameter_plot(time_idx):
+        fig, ax = plt.subplots(figsize=(10, 5))
+        
+        # Add background gradient
+        ax.set_facecolor('#1a1a1a')
+        
+        # Add subtle horizontal bands for visual reference
+        for y in np.linspace(0, 1, 6):
+            ax.axhspan(y-0.05, y+0.05, color='#222233', alpha=0.3, zorder=0)
+        
+        # Create a custom colormap that uses our primary gradients
+        cmap = LinearSegmentedColormap.from_list("order_param", 
+                                              ["#00ffee", "#27aaff", "#14a5ff", "#8138ff"], 
+                                              N=256)
+        
+        # Plot order parameter with gradient dots
+        scatter = ax.scatter(times[:time_idx+1], order_parameter[:time_idx+1], 
+                           c=order_parameter[:time_idx+1], cmap=cmap,
+                           s=50, alpha=0.8, edgecolor='white', linewidth=0.5, zorder=10)
+        
+        # Add a connecting line with low opacity
+        ax.plot(times[:time_idx+1], order_parameter[:time_idx+1], 
+               color='white', alpha=0.3, linewidth=1, zorder=5)
+        
+        # Highlight current position with a larger marker
+        if time_idx > 0:
+            ax.scatter([times[time_idx]], [order_parameter[time_idx]], 
+                     s=150, color=cmap(order_parameter[time_idx]), 
+                     edgecolor='white', linewidth=2, zorder=15)
+        
+        # Add highlights at important thresholds
+        ax.axhline(y=0.5, color='#aaaaaa', linestyle='--', alpha=0.5, zorder=1, 
+                  label='Partial Synchronization (r=0.5)')
+        ax.axhline(y=0.8, color='#ffffff', linestyle='--', alpha=0.5, zorder=1,
+                  label='Strong Synchronization (r=0.8)')
+        
+        # Enhance the plot appearance
+        ax.set_xlim(times.min(), times.max())
+        ax.set_ylim(0, 1.05)
+        ax.set_xlabel('Time', fontsize=13, fontweight='bold', color='white')
+        ax.set_ylabel('Order Parameter r(t)', fontsize=13, fontweight='bold', color='white')
+        ax.set_title(f'Phase Synchronization at t={times[time_idx]:.2f}', 
+                    fontsize=14, fontweight='bold', color='white', pad=15)
+        
+        # Create custom grid
+        ax.grid(True, color='#333333', alpha=0.5, linestyle=':')
+        
+        # Add legend
+        ax.legend(loc='upper right', framealpha=0.7)
+        
+        # Add subtle box around the plot
+        for spine in ax.spines.values():
+            spine.set_edgecolor('#555555')
+            spine.set_linewidth(1)
+        
+        # Close any previous figure to avoid memory issues
+        plt.close('all')
+            
+        return fig
     
-    # Create placeholders for our plots
-    with viz_col1:
-        circle_plot_placeholder = st.empty()
-        
-    with viz_col2:
-        phases_plot_placeholder = st.empty()
-        
-    with viz_col3:
-        order_plot_placeholder = st.empty()
+    # Create three plots stacked vertically
+    circle_plot_placeholder = st.empty()
+    phases_plot_placeholder = st.empty()
+    order_plot_placeholder = st.empty()
     
     # Display initial plots
     circle_plot_placeholder.pyplot(create_phase_plot(time_index))
@@ -722,11 +515,39 @@ with tab2:
     st.markdown("""
     <div class='section'>
         <h3 class='gradient_text1'>Visualization Guide</h3>
-        <p>The <b>left plot</b> shows oscillators on a unit circle. Each dot represents an oscillator, with color indicating its natural frequency.</p>
+        <p>The <b>top plot</b> shows oscillators on a unit circle. Each dot represents an oscillator, with color indicating its natural frequency.</p>
         <p>The <b>middle plot</b> shows oscillator phases over time as dots. Each horizontal trace represents one oscillator's phase trajectory.</p>
-        <p>The <b>right plot</b> shows the order parameter over time, with color-coded dots showing the synchronization level.</p>
+        <p>The <b>bottom plot</b> shows the order parameter over time, with color-coded dots showing the synchronization level.</p>
         <p>The red arrow in the circle plot shows the mean field vector, with length equal to the order parameter r.</p>
         <p>Use the slider to manually explore different time points or click "Play Animation" to watch all three visualizations animate together.</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div class='section'>
+        <h3 class='gradient_text1'>Order Parameter Analysis</h3>
+        <p>The order parameter r(t) measures the degree of synchronization among oscillators:</p>
+        <ul>
+            <li>r = 1: Complete synchronization (all oscillators have the same phase)</li>
+            <li>r = 0: Complete desynchronization (phases are uniformly distributed)</li>
+        </ul>
+        <p>At critical coupling strength (K_c), the system transitions from desynchronized to partially synchronized state.</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+# Tab 2: Initial Distributions
+with tab2:
+    st.markdown("<h2 class='gradient_text2'>Initial Distributions</h2>", unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div class='section'>
+        <h3 class='gradient_text1'>Initial Properties</h3>
+        <p>This tab shows the initial conditions of the simulation:</p>
+        <ul>
+            <li><b>Natural Frequencies</b>: The intrinsic oscillation rates of each oscillator (constant over time)</li>
+            <li><b>Initial Phases</b>: The starting phases of each oscillator at t=0</li>
+        </ul>
+        <p>Natural frequencies are key determinants of the system's final synchronization state.</p>
     </div>
     """, unsafe_allow_html=True)
 

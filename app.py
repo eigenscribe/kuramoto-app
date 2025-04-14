@@ -416,6 +416,14 @@ with tab1:
         </div>
         """, unsafe_allow_html=True)
     
+    # Display simulation information between histograms and interactive visualization
+    st.markdown(f"""
+    <div style='background-color: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px; margin-top: 20px; margin-bottom: 20px;'>
+        <span style='font-size: 1.2em;'><b>Simulation Information</b></span><br>
+        <span><b>Oscillators:</b> {n_oscillators} | <b>Coupling Strength:</b> {coupling_strength} | <b>Network Type:</b> {network_type}</span>
+    </div>
+    """, unsafe_allow_html=True)
+    
     # Create oscillator visualization below the histograms
     st.markdown("<h3 class='gradient_text1'>Interactive Visualization</h3>", unsafe_allow_html=True)
     
@@ -442,13 +450,6 @@ with tab1:
         # Display time and order parameter
         current_time = times[time_index]
         current_r = order_parameter[time_index]
-        
-        st.markdown(f"""
-        <div style='background-color: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px;'>
-            <span style='font-size: 1.2em;'><b>Simulation Information</b></span><br>
-            <span><b>Oscillators:</b> {n_oscillators} | <b>Coupling Strength:</b> {coupling_strength}</span>
-        </div>
-        """, unsafe_allow_html=True)
     
     # Import needed module
     from matplotlib.collections import LineCollection

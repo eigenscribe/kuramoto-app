@@ -40,33 +40,46 @@ st.set_page_config(
 with open("styles.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
+# Get the base64 encoded image
+import base64
+with open("wisp.base64", "r") as f:
+    encoded_image = f.read()
+
 # Add custom background and custom font
-st.markdown("""
+st.markdown(f"""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Aclonica&display=swap');
     
-    .stApp {
+    .stApp {{
         background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
-                         url('static/images/wisp.jpg');
+                         url('data:image/jpeg;base64,{encoded_image}');
         background-size: cover;
         background-repeat: no-repeat;
         background-attachment: fixed;
-    }
+    }}
     
     /* Ensure Aclonica font is applied everywhere */
-    body, div, p, h1, h2, h3, h4, h5, h6, li, span, label, button {
+    body, div, p, h1, h2, h3, h4, h5, h6, li, span, label, button, .sidebar .sidebar-content {{
         font-family: 'Aclonica', sans-serif !important;
-    }
+    }}
     
     /* Fix Streamlit buttons to use Aclonica */
-    button, .stButton button, .stDownloadButton button {
+    button, .stButton button, .stDownloadButton button {{
         font-family: 'Aclonica', sans-serif !important;
-    }
+    }}
     
     /* Fix Streamlit widgets text */
-    .stSlider label, .stSelectbox label, .stNumberInput label {
+    .stSlider label, .stSelectbox label, .stNumberInput label {{
         font-family: 'Aclonica', sans-serif !important;
-    }
+    }}
+    
+    /* Apply gradient_text1 to sidebar labels */
+    .sidebar .sidebar-content label {{
+        background: -webkit-linear-gradient(#14a5ff, #8138ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: bold;
+    }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -97,7 +110,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Create sidebar with parameters
-st.sidebar.markdown("<h2 class='gradient_text2'>Simulation Parameters</h2>", unsafe_allow_html=True)
+st.sidebar.markdown("<h2 class='gradient_text1'>Simulation Parameters</h2>", unsafe_allow_html=True)
 
 # Number of oscillators slider
 n_oscillators = st.sidebar.slider(

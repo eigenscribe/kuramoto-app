@@ -678,15 +678,20 @@ with tab1:
             
         return fig
     
-    # Create three plots stacked vertically
+    # Create a more space-efficient layout with columns
+    # First row: Circle plot in its own row (since it's square-shaped)
     circle_plot_placeholder = st.empty()
-    phases_plot_placeholder = st.empty()
-    order_plot_placeholder = st.empty()
-    
-    # Display initial plots
     circle_plot_placeholder.pyplot(create_phase_plot(time_index))
-    phases_plot_placeholder.pyplot(create_oscillator_phases_plot(time_index))
-    order_plot_placeholder.pyplot(create_order_parameter_plot(time_index))
+    
+    # Second row: Two side-by-side plots
+    col1, col2 = st.columns(2)
+    with col1:
+        phases_plot_placeholder = st.empty()
+        phases_plot_placeholder.pyplot(create_oscillator_phases_plot(time_index))
+    
+    with col2:
+        order_plot_placeholder = st.empty()
+        order_plot_placeholder.pyplot(create_order_parameter_plot(time_index))
     
     # If animation is triggered
     if animate:
@@ -723,10 +728,9 @@ with tab1:
     st.markdown("""
     <div class='section'>
         <h3 class='gradient_text1'>Visualization Guide</h3>
-        <p>The <b>top plot</b> shows oscillators on a unit circle. Each colored dot represents an oscillator at its current phase position, with colors based on the oscillator's natural frequency ordering.</p>
-        <p>The <b>middle plot</b> shows oscillator phases over time as dots. Each horizontal trace represents one oscillator's phase trajectory with consistent coloring.</p>
-        <p>The <b>bottom plot</b> shows the order parameter over time, with color-coded dots showing the synchronization level.</p>
-        <p>The orange arrow in the circle plot shows the mean field vector, with length equal to the order parameter r.</p>
+        <p>The <b>top plot</b> shows oscillators on a unit circle. Each colored dot represents an oscillator at its current phase position, with colors based on the oscillator's natural frequency ordering. The orange arrow shows the mean field vector, with length equal to the order parameter r.</p>
+        <p>The <b>left plot</b> shows oscillator phases over time as dots. Each horizontal trace represents one oscillator's phase trajectory with consistent coloring.</p>
+        <p>The <b>right plot</b> shows the order parameter over time, with color-coded dots showing the synchronization level.</p>
         <p>Use the slider to manually explore different time points or click "Play Animation" to watch all three visualizations animate together.</p>
     </div>
     """, unsafe_allow_html=True)

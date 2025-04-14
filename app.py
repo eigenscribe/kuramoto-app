@@ -488,23 +488,9 @@ with tab1:
         x = np.cos(phases_at_time)
         y = np.sin(phases_at_time)
         
-        # Create custom colormap that matches our gradient theme
-        custom_cmap = LinearSegmentedColormap.from_list("kuramoto_colors", 
-                                                     ["#14a5ff", "#8138ff"], 
-                                                     N=256)
-        
-        # Create color normalization
-        norm = plt.Normalize(min(frequencies), max(frequencies))
-        
-        # Color oscillators by their natural frequency with enhanced visuals - filled dots
-        colors = [custom_cmap(norm(f)) for f in frequencies]
-        sc = ax_circle.scatter(x, y, facecolors=colors, edgecolor='white', s=180, 
+        # Use a consistent color for all oscillators instead of gradient
+        sc = ax_circle.scatter(x, y, facecolors='#14a5ff', edgecolor='white', s=180, 
                               alpha=0.9, linewidth=1.5, zorder=10)
-        # Add a colorbar for reference
-        sm = plt.cm.ScalarMappable(cmap=custom_cmap, norm=norm)
-        sm.set_array([])
-        cbar = plt.colorbar(sc, ax=ax_circle, label='Natural Frequency')
-        cbar.ax.yaxis.label.set_color('white')
         
         # Calculate and show order parameter
         r = order_parameter[time_idx]
@@ -714,7 +700,7 @@ with tab1:
     st.markdown("""
     <div class='section'>
         <h3 class='gradient_text1'>Visualization Guide</h3>
-        <p>The <b>top plot</b> shows oscillators on a unit circle. Each dot represents an oscillator, with color indicating its natural frequency.</p>
+        <p>The <b>top plot</b> shows oscillators on a unit circle. Each blue dot represents an oscillator at its current phase position.</p>
         <p>The <b>middle plot</b> shows oscillator phases over time as dots. Each horizontal trace represents one oscillator's phase trajectory.</p>
         <p>The <b>bottom plot</b> shows the order parameter over time, with color-coded dots showing the synchronization level.</p>
         <p>The red arrow in the circle plot shows the mean field vector, with length equal to the order parameter r.</p>

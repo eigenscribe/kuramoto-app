@@ -197,7 +197,7 @@ time_step = st.sidebar.slider(
 random_seed = st.sidebar.number_input("Random Seed", value=42, help="Seed for reproducibility")
 
 # Create tabs for different visualizations
-tab1, tab2, tab3, tab4 = st.tabs(["Simulation Results", "Animated Visualization", "Phase Distribution", "Database"])
+tab1, tab2, tab3, tab4 = st.tabs(["Simulation Results", "Animated Visualization", "Initial Distributions", "Database"])
 
 # Function to simulate model
 @st.cache_data(ttl=300)
@@ -540,16 +540,74 @@ with tab2:
             
         return fig_phase
     
+    # Create a function to create order parameter plot over time (as a dot plot)
+    def create_order_parameter_plot(time_idx):
+        fig, ax = plt.subplots(figsize=(6, 6))
+        
+        # Add background gradient
+        ax.set_facecolor('#1a1a1a')
+        
+        # Add subtle horizontal bands for visual reference
+        for y in np.linspace(0, 1, 6):
+            ax.axhspan(y-0.05, y+0.05, color='#222233', alpha=0.3, zorder=0)
+        
+        # Create a custom colormap that uses our primary gradients
+        cmap = LinearSegmentedColormap.from_list("order_param", 
+                                              ["#00ffee", "#27aaff", "#14a5ff", "#8138ff"], 
+                                              N=256)
+        
+        # Plot order parameter with gradient dots
+        scatter = ax.scatter(times[:time_idx+1], order_parameter[:time_idx+1], 
+                           c=order_parameter[:time_idx+1], cmap=cmap,
+                           s=50, alpha=0.8, edgecolor='white', linewidth=0.5, zorder=10)
+        
+        # Add a connecting line with low opacity
+        ax.plot(times[:time_idx+1], order_parameter[:time_idx+1], 
+               color='white', alpha=0.3, linewidth=1, zorder=5)
+        
+        # Highlight current position with a larger marker
+        if time_idx > 0:
+            ax.scatter([times[time_idx]], [order_parameter[time_idx]], 
+                     s=150, color=cmap(order_parameter[time_idx]), 
+                     edgecolor='white', linewidth=2, zorder=15)
+        
+        # Add highlights at important thresholds
+        ax.axhline(y=0.5, color='#aaaaaa', linestyle='--', alpha=0.5, zorder=1, 
+                  label='Partial Synchronization (r=0.5)')
+        ax.axhline(y=0.8, color='#ffffff', linestyle='--', alpha=0.5, zorder=1,
+                  label='Strong Synchronization (r=0.8)')
+        
+        # Enhance the plot appearance
+        ax.set_xlim(times.min(), times.max())
+        ax.set_ylim(0, 1.05)
+        ax.set_xlabel('Time', fontsize=13, fontweight='bold', color='white')
+        ax.set_ylabel('Order Parameter r(t)', fontsize=13, fontweight='bold', color='white')
+        ax.set_title(f'Phase Synchronization at t={times[time_idx]:.2f}', 
+                    fontsize=15, fontweight='bold', color='white', pad=15)
+        
+        # Create custom grid
+        ax.grid(True, color='#333333', alpha=0.5, linestyle=':')
+        
+        # Add legend
+        ax.legend(loc='upper right', framealpha=0.7)
+        
+        # Add subtle box around the plot
+        for spine in ax.spines.values():
+            spine.set_edgecolor('#555555')
+            spine.set_linewidth(1)
+            
+        return fig
+    
     # Create placeholders for our plots
     with viz_col1:
         phase_plot_placeholder = st.empty()
         
     with viz_col2:
-        distribution_placeholder = st.empty()
+        order_plot_placeholder = st.empty()
     
     # Display initial plots
     phase_plot_placeholder.pyplot(create_phase_plot(time_index))
-    distribution_placeholder.pyplot(create_phase_distribution(time_index))
+    order_plot_placeholder.pyplot(create_order_parameter_plot(time_index))
     
     # If animation is triggered
     if animate:
@@ -574,7 +632,7 @@ with tab2:
             
             # Update plots
             phase_plot_placeholder.pyplot(create_phase_plot(i))
-            distribution_placeholder.pyplot(create_phase_distribution(i))
+            order_plot_placeholder.pyplot(create_order_parameter_plot(i))
             
             # Add a short pause to control animation speed
             time.sleep(0.1 / animation_speed)
@@ -584,47 +642,42 @@ with tab2:
     
     st.markdown("""
     <div class='section'>
-        <h3>Visualization Guide</h3>
+        <h3 class='gradient_text1'>Visualization Guide</h3>
         <p>The left plot shows oscillators on a unit circle. Each dot represents an oscillator, with color indicating its natural frequency.</p>
         <p>The red arrow shows the mean field vector, with length equal to the order parameter r.</p>
-        <p>The right plot shows the distribution of phases, with peaks forming when oscillators synchronize.</p>
+        <p>The right plot shows the order parameter over time, with color-coded dots showing the synchronization level.</p>
         <p>Use the slider to manually explore different time points or click "Play Animation" to watch the full simulation.</p>
     </div>
     """, unsafe_allow_html=True)
 
-# Tab 3: Phase Distribution
+# Tab 3: Initial Distributions
 with tab3:
-    st.markdown("<h2 class='gradient_text2'>Phase Distribution Analysis</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 class='gradient_text2'>Initial Distributions</h2>", unsafe_allow_html=True)
     
     st.markdown("""
     <div class='section'>
-        <p>The phase distribution shows how oscillator phases are distributed at each moment in time.</p>
-        <p>When oscillators synchronize, their phases cluster together, resulting in peaks in the histogram.</p>
-        <p>Remember that natural frequencies are constant intrinsic properties of each oscillator, while phases evolve over time.</p>
+        <h3 class='gradient_text1'>Initial Properties</h3>
+        <p>This tab shows the initial conditions of the simulation:</p>
+        <ul>
+            <li><b>Natural Frequencies</b>: The intrinsic oscillation rates of each oscillator (constant over time)</li>
+            <li><b>Initial Phases</b>: The starting phases of each oscillator at t=0</li>
+        </ul>
+        <p>Natural frequencies are key determinants of the system's final synchronization state.</p>
     </div>
     """, unsafe_allow_html=True)
     
-    # Plot phase histogram at selected time
-    time_idx_hist = st.slider(
-        "Select Time for Phase Distribution",
-        min_value=0,
-        max_value=len(times)-1,
-        value=len(times)//2,
-        format="t = %.2f" % times[len(times)//2]
-    )
+    # Create two columns for the two distributions
+    dist_col1, dist_col2 = st.columns(2)
     
-    # Two columns for phase histogram and analysis
-    col1, col2 = st.columns([3, 2])
-    
-    with col1:
-        fig_phase, ax_phase = plt.subplots(figsize=(8, 4))
+    with dist_col1:
+        st.markdown("<h3>Natural Frequency Distribution</h3>", unsafe_allow_html=True)
         
-        phases_at_t = phases[:, time_idx_hist] % (2 * np.pi)
+        # Create frequency distribution histogram
+        fig_freq, ax_freq = plt.subplots(figsize=(6, 5))
         
-        # Create a beautiful gradient for the histogram
         # Use a gradient colormap for the histogram
         n_bins = 15
-        counts, bin_edges = np.histogram(phases_at_t, bins=n_bins)
+        counts, bin_edges = np.histogram(frequencies, bins=n_bins)
         
         # Create custom colormap that matches our gradient theme
         custom_cmap = LinearSegmentedColormap.from_list("kuramoto_colors", 
@@ -635,7 +688,7 @@ with tab3:
         colors = custom_cmap(np.linspace(0.1, 0.9, n_bins))
         
         # Plot the histogram with gradient colors and outline
-        bars = ax_phase.bar(
+        bars = ax_freq.bar(
             (bin_edges[:-1] + bin_edges[1:]) / 2, 
             counts, 
             width=(bin_edges[1] - bin_edges[0]) * 0.9,
@@ -658,50 +711,116 @@ with tab3:
                 alpha=0.3,
                 zorder=-1
             )
-            ax_phase.add_patch(glow)
+            ax_freq.add_patch(glow)
         
         # Enhance the axes and labels
-        ax_phase.set_facecolor('#1a1a1a')
-        ax_phase.set_xlabel('Phase (mod 2π)', fontsize=12, fontweight='bold', color='white')
-        ax_phase.set_ylabel('Count', fontsize=12, fontweight='bold', color='white')
-        ax_phase.set_title(f'Phase Distribution at t={times[time_idx_hist]:.2f}', 
-                          fontsize=14, fontweight='bold', color='white', pad=15)
+        ax_freq.set_facecolor('#1a1a1a')
+        ax_freq.set_xlabel('Natural Frequency', fontsize=12, fontweight='bold', color='white')
+        ax_freq.set_ylabel('Count', fontsize=12, fontweight='bold', color='white')
+        ax_freq.set_title(f'Natural Frequency Distribution ({freq_type})', 
+                         fontsize=14, fontweight='bold', color='white', pad=15)
         
-        # Highlight synchronized phases with vertical line if order is high
-        r_at_t = order_parameter[time_idx_hist]
-        if r_at_t > 0.6:
-            psi = np.angle(np.sum(np.exp(1j * phases_at_t))) % (2 * np.pi)
-            ax_phase.axvline(x=psi, color='#ff5555', linestyle='-', linewidth=2, alpha=0.7,
-                           label=f'Mean Phase ψ={psi:.2f}')
-            ax_phase.legend(framealpha=0.7)
+        # Add mean frequency marker
+        mean_freq = np.mean(frequencies)
+        ax_freq.axvline(x=mean_freq, color='#ff5555', linestyle='-', linewidth=2, alpha=0.7,
+                       label=f'Mean: {mean_freq:.2f}')
+        ax_freq.legend(framealpha=0.7)
         
         # Customize grid
-        ax_phase.grid(True, color='#333333', alpha=0.4, linestyle=':')
+        ax_freq.grid(True, color='#333333', alpha=0.4, linestyle=':')
         
         # Add a subtle box around the plot
-        for spine in ax_phase.spines.values():
+        for spine in ax_freq.spines.values():
             spine.set_edgecolor('#555555')
             spine.set_linewidth(1)
         
-        st.pyplot(fig_phase)
-    
-    with col2:
-        # Show order parameter at this time
-        r_at_t = order_parameter[time_idx_hist]
+        st.pyplot(fig_freq)
         
-        if r_at_t > 0.8:
-            sync_status = "Strong synchronization"
-        elif r_at_t > 0.5:
-            sync_status = "Partial synchronization"
-        else:
-            sync_status = "Weak/no synchronization"
-            
+        # Distribution properties description
         st.markdown(f"""
         <div class='section'>
-            <h3>Phase Distribution Analysis</h3>
-            <p>Order parameter at t={times[time_idx_hist]:.2f}: <b>{r_at_t:.3f}</b></p>
-            <p>Status: <b>{sync_status}</b></p>
-            <p>When synchronized, phases cluster together. When desynchronized, phases spread uniformly.</p>
+            <p><b>Mean:</b> {np.mean(frequencies):.4f}</p>
+            <p><b>Standard Deviation:</b> {np.std(frequencies):.4f}</p>
+            <p><b>Min:</b> {np.min(frequencies):.4f}</p>
+            <p><b>Max:</b> {np.max(frequencies):.4f}</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with dist_col2:
+        st.markdown("<h3>Initial Phase Distribution</h3>", unsafe_allow_html=True)
+        
+        # Create initial phase distribution histogram
+        fig_init_phase, ax_init_phase = plt.subplots(figsize=(6, 5))
+        
+        initial_phases = phases[:, 0] % (2 * np.pi)
+        
+        # Use a gradient colormap for the histogram
+        n_bins = 15
+        counts, bin_edges = np.histogram(initial_phases, bins=n_bins)
+        
+        # Create custom colors with a gradient effect that matches our theme
+        colors = custom_cmap(np.linspace(0.1, 0.9, n_bins))
+        
+        # Plot the histogram with gradient colors and outline
+        bars = ax_init_phase.bar(
+            (bin_edges[:-1] + bin_edges[1:]) / 2, 
+            counts, 
+            width=(bin_edges[1] - bin_edges[0]) * 0.9,
+            color=colors, 
+            alpha=0.8,
+            edgecolor='white',
+            linewidth=0.5
+        )
+        
+        # Add a soft glow effect behind bars
+        for bar, color in zip(bars, colors):
+            x = bar.get_x()
+            width = bar.get_width()
+            height = bar.get_height()
+            glow = plt.Rectangle(
+                (x - width * 0.05, 0), 
+                width * 1.1, 
+                height, 
+                color=color,
+                alpha=0.3,
+                zorder=-1
+            )
+            ax_init_phase.add_patch(glow)
+        
+        # Enhance the axes and labels
+        ax_init_phase.set_facecolor('#1a1a1a')
+        ax_init_phase.set_xlabel('Phase (mod 2π)', fontsize=12, fontweight='bold', color='white')
+        ax_init_phase.set_ylabel('Count', fontsize=12, fontweight='bold', color='white')
+        ax_init_phase.set_title('Initial Phase Distribution (t=0)', 
+                               fontsize=14, fontweight='bold', color='white', pad=15)
+        
+        # Calculate initial order parameter
+        initial_r = order_parameter[0]
+        initial_psi = np.angle(np.sum(np.exp(1j * initial_phases))) % (2 * np.pi)
+        
+        # Add mean phase marker if order parameter is significant
+        if initial_r > 0.3:
+            ax_init_phase.axvline(x=initial_psi, color='#ff5555', linestyle='-', linewidth=2, alpha=0.7,
+                                 label=f'Mean Phase: {initial_psi:.2f}')
+            ax_init_phase.legend(framealpha=0.7)
+        
+        # Customize grid
+        ax_init_phase.grid(True, color='#333333', alpha=0.4, linestyle=':')
+        
+        # Add a subtle box around the plot
+        for spine in ax_init_phase.spines.values():
+            spine.set_edgecolor('#555555')
+            spine.set_linewidth(1)
+        
+        st.pyplot(fig_init_phase)
+        
+        # Initial phase properties description
+        st.markdown(f"""
+        <div class='section'>
+            <p><b>Initial Order Parameter:</b> {initial_r:.4f}</p>
+            <p><b>Initial Mean Phase:</b> {initial_psi:.4f}</p>
+            <p>The initial phase distribution affects how quickly the system synchronizes.</p>
+            <p>A higher initial order parameter generally leads to faster synchronization.</p>
         </div>
         """, unsafe_allow_html=True)
 

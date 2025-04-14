@@ -20,6 +20,7 @@ body {
 /* Gradient text styles - THESE TWO SPECIFIC GRADIENTS SHOULD BE USED */
 .gradient_text1 {
     font-weight: bold;
+    background: -webkit-linear-gradient(#14a5ff, #8138ff);
     background-image: -webkit-linear-gradient(#14a5ff, #8138ff);
     background-image: linear-gradient(#14a5ff, #8138ff);
     -webkit-background-clip: text;
@@ -31,6 +32,7 @@ body {
 
 .gradient_text2 {
     font-weight: bold;
+    background: linear-gradient(#00ffee, #27aaff);
     background-image: -webkit-linear-gradient(#00ffee, #27aaff);
     background-image: linear-gradient(#00ffee, #27aaff);
     -webkit-background-clip: text;

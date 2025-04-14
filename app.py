@@ -40,6 +40,13 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
+# Import Aclonica font from Google Fonts
+st.markdown("""
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Aclonica&display=swap" rel="stylesheet">
+""", unsafe_allow_html=True)
+
 # Load custom CSS
 with open("styles.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)

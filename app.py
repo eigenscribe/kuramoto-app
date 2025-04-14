@@ -8,7 +8,7 @@ import base64
 import json
 from kuramoto_model import KuramotoModel
 import time
-from database import store_simulation, get_simulation, list_simulations
+from database import store_simulation, get_simulation, list_simulations, delete_simulation
 
 # Set up Matplotlib style for dark theme plots
 plt.style.use('dark_background')
@@ -551,21 +551,7 @@ with tab2:
     </div>
     """, unsafe_allow_html=True)
 
-# Tab 3: Initial Distributions
-with tab3:
-    st.markdown("<h2 class='gradient_text2'>Initial Distributions</h2>", unsafe_allow_html=True)
-    
-    st.markdown("""
-    <div class='section'>
-        <h3 class='gradient_text1'>Initial Properties</h3>
-        <p>This tab shows the initial conditions of the simulation:</p>
-        <ul>
-            <li><b>Natural Frequencies</b>: The intrinsic oscillation rates of each oscillator (constant over time)</li>
-            <li><b>Initial Phases</b>: The starting phases of each oscillator at t=0</li>
-        </ul>
-        <p>Natural frequencies are key determinants of the system's final synchronization state.</p>
-    </div>
-    """, unsafe_allow_html=True)
+
     
     # Create two columns for the two distributions
     dist_col1, dist_col2 = st.columns(2)

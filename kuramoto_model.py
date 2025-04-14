@@ -8,7 +8,7 @@ class KuramotoModel:
     The Kuramoto model describes the phase dynamics of a system of coupled oscillators.
     """
     def __init__(self, n_oscillators=10, coupling_strength=1.0, frequencies=None, 
-                 simulation_time=10.0, time_step=0.01, random_seed=None):
+                 simulation_time=10.0, time_step=0.01, random_seed=None, adjacency_matrix=None):
         """
         Initialize the Kuramoto model.
         
@@ -26,6 +26,8 @@ class KuramotoModel:
             Time step for simulation
         random_seed : int or None
             Seed for random number generation
+        adjacency_matrix : ndarray or None
+            Adjacency matrix defining the network structure. If None, a fully connected network is used.
         """
         if random_seed is not None:
             np.random.seed(random_seed)

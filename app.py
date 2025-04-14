@@ -443,10 +443,10 @@ with tab1:
         # Create color normalization
         norm = plt.Normalize(min(frequencies), max(frequencies))
         
-        # Color oscillators by their natural frequency with enhanced visuals - hollow dots
+        # Color oscillators by their natural frequency with enhanced visuals - filled dots
         colors = [custom_cmap(norm(f)) for f in frequencies]
-        sc = ax_circle.scatter(x, y, facecolors='none', edgecolor=colors, s=180, 
-                              alpha=0.9, linewidth=2, zorder=10)
+        sc = ax_circle.scatter(x, y, facecolors=colors, edgecolor='white', s=180, 
+                              alpha=0.9, linewidth=1.5, zorder=10)
         # Add a colorbar for reference
         sm = plt.cm.ScalarMappable(cmap=custom_cmap, norm=norm)
         sm.set_array([])

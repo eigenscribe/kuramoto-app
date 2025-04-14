@@ -462,7 +462,7 @@ with tab1:
     # Function to create the phase visualization
     def create_phase_plot(time_idx):
         # Create visualization with enhanced visuals for dark theme
-        fig_circle = plt.figure(figsize=(10, 5))
+        fig_circle = plt.figure(figsize=(7, 7))
         ax_circle = fig_circle.add_subplot(111)
         
         # Add background glow effect
@@ -545,7 +545,7 @@ with tab1:
     
     # Function to create oscillator phases over time plot (as dots)
     def create_oscillator_phases_plot(time_idx):
-        fig, ax = plt.subplots(figsize=(10, 5))
+        fig, ax = plt.subplots(figsize=(8, 4))
         
         # Add background
         ax.set_facecolor('#1a1a1a')
@@ -617,7 +617,7 @@ with tab1:
     
     # Create a function to create order parameter plot over time (as a dot plot)
     def create_order_parameter_plot(time_idx):
-        fig, ax = plt.subplots(figsize=(10, 5))
+        fig, ax = plt.subplots(figsize=(8, 4))
         
         # Add background gradient
         ax.set_facecolor('#1a1a1a')
@@ -748,7 +748,7 @@ with tab1:
         st.markdown("<h3 class='gradient_text2'>Network Structure</h3>", unsafe_allow_html=True)
         
         # Create a network visualization
-        fig, ax = plt.subplots(figsize=(8, 6))
+        fig, ax = plt.subplots(figsize=(7, 5))
         
         # Create a heatmap of the adjacency matrix
         im = ax.imshow(adj_matrix, cmap='viridis')
@@ -931,7 +931,7 @@ with tab3:
                         # Create visualization of the loaded simulation
                         st.markdown("<h4>Order Parameter</h4>", unsafe_allow_html=True)
                         
-                        fig, ax = plt.subplots(figsize=(8, 4))
+                        fig, ax = plt.subplots(figsize=(7, 3.5))
                         ax.set_facecolor('#1a1a1a')
                         
                         # Create custom colormap

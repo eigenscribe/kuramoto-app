@@ -272,29 +272,15 @@ with tab2:
 
 # Tab 3: Phase Distribution
 with tab3:
-    st.markdown("<h2 class='gradient_text2'>Frequency and Phase Distributions</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 class='gradient_text2'>Phase Distribution Analysis</h2>", unsafe_allow_html=True)
     
-    # First show the natural frequency distribution (constant, doesn't change with time)
-    st.markdown("<h3 class='gradient_text2'>Natural Frequency Distribution</h3>", unsafe_allow_html=True)
     st.markdown("""
     <div class='section'>
-        <p>Natural frequencies are <b>intrinsic properties</b> of each oscillator and remain constant throughout the simulation.</p>
-        <p>The distribution of natural frequencies affects how easily oscillators synchronize.</p>
-        <p>A wider distribution requires stronger coupling to achieve synchronization.</p>
+        <p>The phase distribution shows how oscillator phases are distributed at each moment in time.</p>
+        <p>When oscillators synchronize, their phases cluster together, resulting in peaks in the histogram.</p>
+        <p>Remember that natural frequencies are constant intrinsic properties of each oscillator, while phases evolve over time.</p>
     </div>
     """, unsafe_allow_html=True)
-    
-    # Plot natural frequency distribution
-    fig_freq, ax_freq = plt.subplots(figsize=(10, 4))
-    ax_freq.hist(frequencies, bins=15, alpha=0.7, color='blue')
-    ax_freq.set_xlabel('Natural Frequency (ω)', fontsize=12)
-    ax_freq.set_ylabel('Count', fontsize=12)
-    ax_freq.set_title('Natural Frequency Distribution (Constant)', fontsize=14)
-    ax_freq.grid(True, alpha=0.3)
-    st.pyplot(fig_freq)
-    
-    # Separate section for phase distribution (changes with time)
-    st.markdown("<h3 class='gradient_text2'>Phase Distribution Over Time</h3>", unsafe_allow_html=True)
     
     # Plot phase histogram at selected time
     time_idx_hist = st.slider(

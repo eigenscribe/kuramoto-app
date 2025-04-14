@@ -197,7 +197,7 @@ time_step = st.sidebar.slider(
 random_seed = st.sidebar.number_input("Random Seed", value=42, help="Seed for reproducibility")
 
 # Create tabs for different visualizations
-tab1, tab2, tab3, tab4 = st.tabs(["Simulation Results", "Animated Visualization", "Initial Distributions", "Database"])
+tab1, tab2, tab3 = st.tabs(["Simulation", "Initial Distributions", "Database"])
 
 # Function to simulate model
 @st.cache_data(ttl=300)
@@ -904,8 +904,8 @@ with tab3:
         </div>
         """, unsafe_allow_html=True)
 
-# Tab 4: Database
-with tab4:
+# Database tab
+with tab3:
     st.markdown("<h2 class='gradient_text2'>Database</h2>", unsafe_allow_html=True)
     
     st.markdown("""

@@ -437,12 +437,13 @@ with tab1:
         
         # Create custom colormap that matches our gradient theme
         custom_cmap = LinearSegmentedColormap.from_list("kuramoto_colors", 
-                                                     ["#00ffee", "#27aaff"], 
+                                                     ["#14a5ff", "#8138ff"], 
                                                      N=256)
         
-        # Color oscillators by their natural frequency with enhanced visuals
-        sc = ax_circle.scatter(x, y, c=frequencies, cmap=custom_cmap, s=120, 
-                              alpha=0.9, edgecolor='white', linewidth=1, zorder=10)
+        # Color oscillators by their natural frequency with enhanced visuals - hollow dots
+        sc = ax_circle.scatter(x, y, c=frequencies, cmap=custom_cmap, s=180, 
+                              alpha=0.9, edgecolor='white', linewidth=2, 
+                              facecolors='none', zorder=10)
         cbar = plt.colorbar(sc, ax=ax_circle, label='Natural Frequency')
         cbar.ax.yaxis.label.set_color('white')
         
@@ -494,7 +495,7 @@ with tab1:
         
         # Create custom colormap that matches our gradient theme
         custom_cmap = LinearSegmentedColormap.from_list("kuramoto_colors", 
-                                                     ["#00ffee", "#27aaff"], 
+                                                     ["#14a5ff", "#8138ff"], 
                                                      N=256)
         
         # Plot all oscillators as dots up to the current time point
@@ -503,18 +504,19 @@ with tab1:
             normalized_freq = (frequencies[i] - min(frequencies)) / (max(frequencies) - min(frequencies) + 1e-10)
             color = custom_cmap(normalized_freq)
             
-            # Plot oscillator phases as dots with color gradient
+            # Plot oscillator phases as hollow dots with color gradient
             ax.scatter(times[:time_idx+1], phases[i, :time_idx+1] % (2 * np.pi), 
-                      color=color, alpha=0.7, s=30, edgecolor='white', linewidth=0.5, zorder=5)
+                      facecolors='none', edgecolor=color, alpha=0.7, s=50, 
+                      linewidth=1.5, zorder=5)
             
             # Add a subtle connecting line with low opacity
             ax.plot(times[:time_idx+1], phases[i, :time_idx+1] % (2 * np.pi), 
                    color=color, alpha=0.2, linewidth=0.8, zorder=2)
             
-            # Highlight current position with a slightly larger marker
+            # Highlight current position with a larger hollow marker
             ax.scatter([times[time_idx]], [phases[i, time_idx] % (2 * np.pi)], 
-                      s=100, color=color, 
-                      edgecolor='white', linewidth=1.5, zorder=15)
+                      s=140, facecolors='none', edgecolor=color, 
+                      linewidth=2.5, zorder=15)
         
         # Add labels for key phase positions
         phase_labels = [(0, '0'), (np.pi/2, 'π/2'), (np.pi, 'π'), (3*np.pi/2, '3π/2'), (2*np.pi, '2π')]
@@ -561,20 +563,22 @@ with tab1:
                                               ["#00ffee", "#27aaff"], 
                                               N=256)
         
-        # Plot order parameter with gradient dots
+        # Plot order parameter with hollow gradient dots
         scatter = ax.scatter(times[:time_idx+1], order_parameter[:time_idx+1], 
                            c=order_parameter[:time_idx+1], cmap=cmap,
-                           s=50, alpha=0.8, edgecolor='white', linewidth=0.5, zorder=10)
+                           s=70, alpha=0.9, facecolors='none', 
+                           edgecolor=None, linewidth=1.5, zorder=10)
         
         # Add a connecting line with low opacity
         ax.plot(times[:time_idx+1], order_parameter[:time_idx+1], 
                color='white', alpha=0.3, linewidth=1, zorder=5)
         
-        # Highlight current position with a larger marker
+        # Highlight current position with a larger hollow marker
         if time_idx > 0:
             ax.scatter([times[time_idx]], [order_parameter[time_idx]], 
-                     s=150, color=cmap(order_parameter[time_idx]), 
-                     edgecolor='white', linewidth=2, zorder=15)
+                     s=180, facecolors='none', 
+                     edgecolor=cmap(order_parameter[time_idx]), 
+                     linewidth=3, zorder=15)
         
         # Add highlights at important thresholds
         ax.axhline(y=0.5, color='#aaaaaa', linestyle='--', alpha=0.5, zorder=1, 

@@ -274,37 +274,42 @@ with tab2:
 with tab3:
     st.markdown("<h2 class='gradient_text2'>Frequency and Phase Distributions</h2>", unsafe_allow_html=True)
     
-    col1, col2 = st.columns(2)
+    # First show the natural frequency distribution (constant, doesn't change with time)
+    st.markdown("<h3 class='gradient_text2'>Natural Frequency Distribution</h3>", unsafe_allow_html=True)
+    st.markdown("""
+    <div class='section'>
+        <p>Natural frequencies are <b>intrinsic properties</b> of each oscillator and remain constant throughout the simulation.</p>
+        <p>The distribution of natural frequencies affects how easily oscillators synchronize.</p>
+        <p>A wider distribution requires stronger coupling to achieve synchronization.</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Plot natural frequency distribution
+    fig_freq, ax_freq = plt.subplots(figsize=(10, 4))
+    ax_freq.hist(frequencies, bins=15, alpha=0.7, color='blue')
+    ax_freq.set_xlabel('Natural Frequency (ω)', fontsize=12)
+    ax_freq.set_ylabel('Count', fontsize=12)
+    ax_freq.set_title('Natural Frequency Distribution (Constant)', fontsize=14)
+    ax_freq.grid(True, alpha=0.3)
+    st.pyplot(fig_freq)
+    
+    # Separate section for phase distribution (changes with time)
+    st.markdown("<h3 class='gradient_text2'>Phase Distribution Over Time</h3>", unsafe_allow_html=True)
+    
+    # Plot phase histogram at selected time
+    time_idx_hist = st.slider(
+        "Select Time for Phase Distribution",
+        min_value=0,
+        max_value=len(times)-1,
+        value=len(times)//2,
+        format="t = %.2f" % times[len(times)//2]
+    )
+    
+    # Two columns for phase histogram and analysis
+    col1, col2 = st.columns([3, 2])
     
     with col1:
-        # Plot natural frequency distribution
-        fig_freq, ax_freq = plt.subplots(figsize=(6, 4))
-        ax_freq.hist(frequencies, bins=15, alpha=0.7, color='blue')
-        ax_freq.set_xlabel('Natural Frequency (ω)', fontsize=12)
-        ax_freq.set_ylabel('Count', fontsize=12)
-        ax_freq.set_title('Natural Frequency Distribution', fontsize=14)
-        ax_freq.grid(True, alpha=0.3)
-        st.pyplot(fig_freq)
-        
-        st.markdown("""
-        <div class='section'>
-            <h3>Natural Frequencies</h3>
-            <p>The distribution of natural frequencies affects how easily oscillators synchronize.</p>
-            <p>A wider distribution requires stronger coupling to achieve synchronization.</p>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col2:
-        # Plot phase histogram at selected time
-        time_idx_hist = st.slider(
-            "Select Time Index for Phase Histogram",
-            min_value=0,
-            max_value=len(times)-1,
-            value=len(times)//2,
-            format="t = %.2f" % times[len(times)//2]
-        )
-        
-        fig_phase, ax_phase = plt.subplots(figsize=(6, 4))
+        fig_phase, ax_phase = plt.subplots(figsize=(8, 4))
         
         phases_at_t = phases[:, time_idx_hist] % (2 * np.pi)
         ax_phase.hist(phases_at_t, bins=15, alpha=0.7, color='green')
@@ -314,7 +319,8 @@ with tab3:
         ax_phase.grid(True, alpha=0.3)
         
         st.pyplot(fig_phase)
-        
+    
+    with col2:
         # Show order parameter at this time
         r_at_t = order_parameter[time_idx_hist]
         
@@ -328,7 +334,7 @@ with tab3:
         st.markdown(f"""
         <div class='section'>
             <h3>Phase Distribution Analysis</h3>
-            <p>Order parameter at this time: <b>{r_at_t:.3f}</b></p>
+            <p>Order parameter at t={times[time_idx_hist]:.2f}: <b>{r_at_t:.3f}</b></p>
             <p>Status: <b>{sync_status}</b></p>
             <p>When synchronized, phases cluster together. When desynchronized, phases spread uniformly.</p>
         </div>

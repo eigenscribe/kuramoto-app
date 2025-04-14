@@ -436,13 +436,8 @@ with tab1:
         stop_animation = st.button("Stop", use_container_width=True)
     
     with col1:
-        time_index = st.slider(
-            "Time Index",
-            min_value=0,
-            max_value=len(times)-1,
-            value=0,
-            format="t = %.2f" % times[0]
-        )
+        # Initialize time_index to 0 (instead of using a slider)
+        time_index = 0
         
         # Display time and order parameter
         current_time = times[time_index]
@@ -450,7 +445,8 @@ with tab1:
         
         st.markdown(f"""
         <div style='background-color: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px;'>
-            <span style='font-size: 1.2em;'><b>Time:</b> {current_time:.2f} &nbsp;|&nbsp; <b>Order Parameter:</b> {current_r:.3f}</span>
+            <span style='font-size: 1.2em;'><b>Simulation Information</b></span><br>
+            <span><b>Oscillators:</b> {n_oscillators} | <b>Coupling Strength:</b> {coupling_strength}</span>
         </div>
         """, unsafe_allow_html=True)
     
@@ -729,7 +725,7 @@ with tab1:
         <p>The <b>top plot</b> shows oscillator phases over time. Each horizontal trace represents one oscillator's phase trajectory with consistent coloring based on the oscillator's natural frequency.</p>
         <p>The <b>bottom left plot</b> shows oscillators on a unit circle. Each colored dot represents an oscillator at its current phase position. The orange arrow shows the mean field vector, with length equal to the order parameter r.</p>
         <p>The <b>bottom right plot</b> shows the order parameter over time, with color-coded dots showing the synchronization level from 0 (no synchronization) to 1 (complete synchronization).</p>
-        <p>Use the slider to manually explore different time points or click "Play Animation" to watch all three visualizations animate together.</p>
+        <p>Click "Play Animation" to watch all three visualizations animate together to see the synchronization process in real-time.</p>
     </div>
     """, unsafe_allow_html=True)
     
@@ -745,51 +741,72 @@ with tab1:
     </div>
     """, unsafe_allow_html=True)
     
-    # Show network structure if custom adjacency matrix is used
-    if network_type == "Custom Adjacency Matrix" and adj_matrix is not None:
-        st.markdown("<h3 class='gradient_text2'>Network Structure</h3>", unsafe_allow_html=True)
-        
-        # Create a network visualization
-        fig, ax = plt.subplots(figsize=(7, 5))
-        
-        # Create a heatmap of the adjacency matrix
-        im = ax.imshow(adj_matrix, cmap='viridis')
-        plt.colorbar(im, ax=ax, label='Connection Strength')
-        
-        # Add labels and styling
-        ax.set_title('Oscillator Network Connectivity', color='white', fontsize=14)
-        ax.set_xlabel('Oscillator Index', color='white')
-        ax.set_ylabel('Oscillator Index', color='white')
-        
-        # Set background color
-        ax.set_facecolor('#1a1a1a')
-        fig.patch.set_facecolor('#121212')
-        
-        # Add a grid to help distinguish cells
-        ax.grid(False)
-        
-        # Add text annotations for connection strength
-        for i in range(adj_matrix.shape[0]):
-            for j in range(adj_matrix.shape[1]):
-                if adj_matrix[i, j] > 0:
-                    ax.text(j, i, f"{adj_matrix[i, j]:.1f}", 
+    # Show network structure visualization for all network types
+    st.markdown("<h3 class='gradient_text2'>Network Structure</h3>", unsafe_allow_html=True)
+    
+    # Create a network visualization
+    fig, ax = plt.subplots(figsize=(7, 5))
+    
+    # Make sure adj_matrix is defined for all network types
+    if network_type == "All-to-All":
+        # For all-to-all, create a fully connected matrix with uniform coupling
+        network_adj_matrix = np.ones((n_oscillators, n_oscillators))
+        np.fill_diagonal(network_adj_matrix, 0)  # No self-connections
+    elif network_type == "Nearest Neighbor":
+        # For nearest neighbor, create a ring topology
+        network_adj_matrix = np.zeros((n_oscillators, n_oscillators))
+        for i in range(n_oscillators):
+            # Connect to left and right neighbors on the ring
+            network_adj_matrix[i, (i-1) % n_oscillators] = 1
+            network_adj_matrix[i, (i+1) % n_oscillators] = 1
+    elif network_type == "Random":
+        # For random, create random connections with 20% probability
+        np.random.seed(random_seed)  # Use same seed for reproducibility
+        network_adj_matrix = np.random.random((n_oscillators, n_oscillators)) < 0.2
+        network_adj_matrix = network_adj_matrix.astype(float)
+        np.fill_diagonal(network_adj_matrix, 0)  # No self-connections
+    else:  # Custom Adjacency Matrix
+        network_adj_matrix = adj_matrix if adj_matrix is not None else np.ones((n_oscillators, n_oscillators))
+    
+    # Create a heatmap of the adjacency matrix
+    im = ax.imshow(network_adj_matrix, cmap='viridis')
+    plt.colorbar(im, ax=ax, label='Connection Strength')
+    
+    # Add labels and styling
+    ax.set_title(f'Oscillator Network Connectivity ({network_type})', color='white', fontsize=14)
+    ax.set_xlabel('Oscillator Index', color='white')
+    ax.set_ylabel('Oscillator Index', color='white')
+    
+    # Set background color
+    ax.set_facecolor('#1a1a1a')
+    fig.patch.set_facecolor('#121212')
+    
+    # Add a grid to help distinguish cells
+    ax.grid(False)
+    
+    # Add text annotations for connection strength (only for matrices smaller than 15x15)
+    if n_oscillators <= 15:
+        for i in range(network_adj_matrix.shape[0]):
+            for j in range(network_adj_matrix.shape[1]):
+                if network_adj_matrix[i, j] > 0:
+                    ax.text(j, i, f"{network_adj_matrix[i, j]:.1f}", 
                             ha="center", va="center", 
-                            color="white" if adj_matrix[i, j] < 0.7 else "black",
+                            color="white" if network_adj_matrix[i, j] < 0.7 else "black",
                             fontsize=9)
-        
-        st.pyplot(fig)
-        
-        st.markdown("""
-        <div class='section'>
-            <p>The heatmap above shows the connection strength between oscillators, where:</p>
-            <ul>
-                <li>Each cell (i,j) represents the coupling strength from oscillator j to oscillator i</li>
-                <li>Brighter colors indicate stronger coupling</li>
-                <li>Dark/black cells indicate no coupling</li>
-            </ul>
-            <p>The structure of this network affects how synchronization patterns emerge.</p>
-        </div>
-        """, unsafe_allow_html=True)
+    
+    st.pyplot(fig)
+    
+    st.markdown("""
+    <div class='section'>
+        <p>The heatmap above shows the connection strength between oscillators, where:</p>
+        <ul>
+            <li>Each cell (i,j) represents the coupling strength from oscillator j to oscillator i</li>
+            <li>Brighter colors indicate stronger coupling</li>
+            <li>Dark/black cells indicate no coupling</li>
+        </ul>
+        <p>The structure of this network affects how synchronization patterns emerge and propagate through the system.</p>
+    </div>
+    """, unsafe_allow_html=True)
 
 # Tab 2: About
 with tab2:

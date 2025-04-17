@@ -627,10 +627,16 @@ with tab3:
     # Initialize time_index to 0 (for static visualization if animation doesn't run)
     time_index = 0
     
-    # Auto-play animation
-    animate = True
-    stop_animation = False
-    # Set animation speed to a fixed value that works well
+    # Animation button with better spacing
+    col1, col2 = st.columns([3, 1])
+    
+    with col1:
+        st.empty()  # Just to maintain spacing
+    
+    with col2:
+        animate = st.button("Play Animation", use_container_width=True)
+    
+    # Keep fixed animation speed
     animation_speed = 3
     
     # Get time and order parameter values
@@ -887,10 +893,6 @@ with tab3:
         
         # Animation loop
         for i in range(0, len(times), frame_skip):
-            # Check if animation should stop
-            if stop_animation:
-                break
-                
             # Update progress bar
             progress = i / (len(times) - 1)
             progress_bar.progress(progress)
@@ -912,7 +914,7 @@ with tab3:
         <p>The <b>top plot</b> shows oscillator phases over time. Each horizontal trace represents one oscillator's phase trajectory with consistent coloring based on the oscillator's natural frequency.</p>
         <p>The <b>bottom left plot</b> shows oscillators on a unit circle. Each colored dot represents an oscillator at its current phase position. The orange arrow shows the mean field vector, with length equal to the order parameter r.</p>
         <p>The <b>bottom right plot</b> shows the order parameter over time, with color-coded dots showing the synchronization level from 0 (no synchronization) to 1 (complete synchronization).</p>
-        <p>The animation automatically plays when you open this tab, showing the synchronization process in real-time.</p>
+        <p>Click "Play Animation" to watch all three visualizations animate together to see the synchronization process in real-time.</p>
     </div>
     """, unsafe_allow_html=True)
     

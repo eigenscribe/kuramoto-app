@@ -274,6 +274,11 @@ footer {
     margin-bottom: 20px;
 }
 
+/* Progress bar styling with gradient */
+.stProgress > div > div > div {
+    background: linear-gradient(90deg, #14a5ff, #8138ff) !important;
+}
+
 /* Card row layout for horizontal alignment */
 .card-row {
     display: flex;

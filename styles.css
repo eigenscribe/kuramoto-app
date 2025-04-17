@@ -149,7 +149,7 @@ body {
 
 /* Button Styling */
 .btn, .stButton button, button[kind="primary"] {
-    background-image: linear-gradient(to right, #00ffee, #27aaff);
+    background-image: linear-gradient(to right, #00ccc0, #0077cc);
     box-shadow: 0 4px 15px 0 rgba(39, 170, 255, 0.5);
     width: 90%;
     max-width: 200px;
@@ -229,7 +229,7 @@ a:hover {
 
 /* Slider track styling */
 .sidebar .stSlider > div > div {
-    background: linear-gradient(90deg, #00ffee, #27aaff) !important;
+    background: linear-gradient(90deg, #00ccc0, #0077cc) !important;
     opacity: 0.3;
 }
 
@@ -335,7 +335,7 @@ button:hover {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: linear-gradient(45deg, #00ffee, #27aaff);
+    background: linear-gradient(45deg, #00ccc0, #0077cc);
     border-radius: 10px;
     border: 2px solid rgba(0, 0, 0, 0.2);
 }
@@ -346,5 +346,5 @@ button:hover {
 
 /* Radio button styling */
 .st-cx, .st-cy {
-    background: linear-gradient(90deg, #00ffee, #27aaff) !important;
+    background: linear-gradient(90deg, #00ccc0, #0077cc) !important;
 }

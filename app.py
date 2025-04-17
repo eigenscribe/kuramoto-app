@@ -627,14 +627,17 @@ with tab3:
     # Initialize time_index to 0 (for static visualization if animation doesn't run)
     time_index = 0
     
-    # Animation button with better spacing
-    col1, col2 = st.columns([3, 1])
+    # Centered animation button with custom styling
+    col1, col2, col3 = st.columns([1, 3, 1])
     
     with col1:
-        st.empty()  # Just to maintain spacing
+        st.empty()  # Left spacing
     
     with col2:
         animate = st.button("Play Animation", use_container_width=True)
+    
+    with col3:
+        st.empty()  # Right spacing
     
     # Keep fixed animation speed
     animation_speed = 3

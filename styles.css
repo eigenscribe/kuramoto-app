@@ -151,23 +151,23 @@ body {
 .btn, .stButton button, button[kind="primary"] {
     background-image: linear-gradient(to right, #00ccc0, #0077cc);
     box-shadow: 0 4px 15px 0 rgba(39, 170, 255, 0.5);
-    width: 90%;
-    max-width: 200px;
+    width: 100%;
+    min-width: 200px;
     font-size: 16px;
     font-weight: 600;
     color: white;
     cursor: pointer;
     margin: 10px auto;
-    height: 55px;
+    height: 50px;
     text-align: center;
     border: none;
     background-size: 300% 100%;
-    border-radius: 50px;
+    border-radius: 15px;
     transition: all .4s ease-in-out;
     font-family: 'Aclonica', sans-serif;
     display: block;
     text-decoration: none;
-    line-height: 55px;
+    line-height: 50px;
 }
 
 /* Button hover effects */
@@ -277,6 +277,28 @@ footer {
 /* Progress bar styling with gradient */
 .stProgress > div > div > div {
     background: linear-gradient(90deg, #14a5ff, #8138ff) !important;
+}
+
+/* Play Animation button special styling */
+[data-testid="stHorizontalBlock"] [data-testid="column"][data-testid="stVerticalBlock"]:nth-of-type(2) .stButton button {
+    width: 100%;
+    min-width: 250px;
+    height: 55px;
+    line-height: 55px;
+    font-size: 18px;
+    letter-spacing: 0.5px;
+    border-radius: 12px;
+    background-image: linear-gradient(to right, #14a5ff, #8138ff);
+    box-shadow: 0 5px 15px rgba(20, 165, 255, 0.4);
+    transition: all 0.3s ease;
+    text-align: center;
+    margin: 0 auto;
+}
+
+[data-testid="stHorizontalBlock"] [data-testid="column"][data-testid="stVerticalBlock"]:nth-of-type(2) .stButton button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(129, 56, 255, 0.5);
+    background-image: linear-gradient(to right, #00ffee, #27aaff);
 }
 
 /* Card row layout for horizontal alignment */

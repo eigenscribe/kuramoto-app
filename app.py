@@ -624,30 +624,14 @@ with tab3:
     # Create oscillator visualization
     st.markdown("<h3 class='gradient_text1'>Oscillator Synchronization</h3>", unsafe_allow_html=True)
     
-    # Add animation controls with full width
-    st.subheader("Animation Controls")
-    
-    # Create three columns for animation controls with better spacing
-    ctrl_col1, ctrl_col2, ctrl_col3 = st.columns([2, 1, 1])
-    
-    with ctrl_col1:
-        animation_speed = st.slider(
-            "Animation Speed",
-            min_value=1,
-            max_value=10,
-            value=5,
-            step=1,
-            help="Control how fast the animation plays"
-        )
-    
-    with ctrl_col2:
-        animate = st.button("Play Animation", use_container_width=True)
-    
-    with ctrl_col3:
-        stop_animation = st.button("Stop", use_container_width=True)
-    
-    # Initialize time_index to 0 (instead of using a slider)
+    # Initialize time_index to 0 (for static visualization if animation doesn't run)
     time_index = 0
+    
+    # Auto-play animation
+    animate = True
+    stop_animation = False
+    # Set animation speed to a fixed value that works well
+    animation_speed = 3
     
     # Get time and order parameter values
     current_time = times[time_index]
@@ -928,7 +912,7 @@ with tab3:
         <p>The <b>top plot</b> shows oscillator phases over time. Each horizontal trace represents one oscillator's phase trajectory with consistent coloring based on the oscillator's natural frequency.</p>
         <p>The <b>bottom left plot</b> shows oscillators on a unit circle. Each colored dot represents an oscillator at its current phase position. The orange arrow shows the mean field vector, with length equal to the order parameter r.</p>
         <p>The <b>bottom right plot</b> shows the order parameter over time, with color-coded dots showing the synchronization level from 0 (no synchronization) to 1 (complete synchronization).</p>
-        <p>Click "Play Animation" to watch all three visualizations animate together to see the synchronization process in real-time.</p>
+        <p>The animation automatically plays when you open this tab, showing the synchronization process in real-time.</p>
     </div>
     """, unsafe_allow_html=True)
     

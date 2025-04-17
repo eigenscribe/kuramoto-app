@@ -235,7 +235,7 @@ if network_type == "Custom Adjacency Matrix":
             adj_matrix = None
 
 # Create tabs for different visualizations (Network is default tab)
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["Network", "Distributions", "Animation", "About", "Database"])
+tab1, tab2, tab3, tab4 = st.tabs(["Network", "Distributions", "Animation", "Database"])
 
 # Function to simulate model
 @st.cache_data(ttl=300)
@@ -934,86 +934,9 @@ with tab3:
     """, unsafe_allow_html=True)
 
 ########################
-# TAB 4: ABOUT TAB
+# TAB 4: DATABASE TAB
 ########################
 with tab4:
-    st.markdown("<h2 class='gradient_text2'>About the Kuramoto Model</h2>", unsafe_allow_html=True)
-    
-    # Add math explanation with the Kuramoto equation
-    st.markdown("""
-    <div class='section'>
-        <h3 class='gradient_text1'>Mathematical Description</h3>
-        <p>The Kuramoto model is described by the following differential equation for each oscillator:</p>
-        <p style="text-align: center; background-color: rgba(0,0,0,0.3); padding: 15px; border-radius: 5px; font-size: 1.2em;">
-            dθ<sub>i</sub>/dt = ω<sub>i</sub> + (K/N) Σ<sub>j=1</sub><sup>N</sup> A<sub>ij</sub> sin(θ<sub>j</sub> - θ<sub>i</sub>)
-        </p>
-        <p>where A<sub>ij</sub> represents the adjacency matrix element between oscillators i and j.</p>
-        <p>The order parameter r(t) is defined as:</p>
-        <p style="text-align: center; background-color: rgba(0,0,0,0.3); padding: 15px; border-radius: 5px; font-size: 1.2em;">
-            r(t)e<sup>iψ(t)</sup> = (1/N) Σ<sub>j=1</sub><sup>N</sup> e<sup>iθ<sub>j</sub>(t)</sup>
-        </p>
-        <p>where r(t) is the magnitude, indicating the degree of synchronization, and ψ(t) is the mean phase.</p>
-    </div>
-    """, unsafe_allow_html=True)
-
-    st.markdown("""
-    <div class='section'>
-        <div class='section-content'>
-            <p>The Kuramoto model is a mathematical model used to describe synchronization in systems of coupled oscillators.</p>
-            <p>It was first introduced by Yoshiki Kuramoto in 1975 and has applications in neuroscience, chemical oscillators, 
-            power grids, and many other complex systems.</p>
-            <p>The model describes each oscillator by its phase θ, where the dynamics are governed by:</p>
-            <p style='text-align: center; font-size: 1.2em;'>
-                dθ<sub>i</sub>/dt = ω<sub>i</sub> + (K/N) Σ<sub>j=1</sub><sup>N</sup> sin(θ<sub>j</sub> - θ<sub>i</sub>)
-            </p>
-            <p>where:</p>
-            <ul>
-                <li>θ<sub>i</sub> is the phase of oscillator i</li>
-                <li>ω<sub>i</sub> is the natural frequency of oscillator i</li>
-                <li>K is the coupling strength between oscillators</li>
-                <li>N is the total number of oscillators</li>
-            </ul>
-            <p>The order parameter r(t) measures the coherence of the system, with r = 1 indicating complete synchronization.</p>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Applications section
-    st.markdown("""
-    <div class='section'>
-        <h3 class='gradient_text1'>Applications of the Kuramoto Model</h3>
-        <div class='section-content'>
-            <ul>
-                <li><b>Neuroscience</b>: Modeling neural oscillations and brain rhythms</li>
-                <li><b>Power Grids</b>: Synchronization of power generators</li>
-                <li><b>Biology</b>: Circadian rhythms and firefly synchronization</li>
-                <li><b>Chemistry</b>: Coupled chemical oscillators</li>
-                <li><b>Crowd Dynamics</b>: Synchronized clapping after performances</li>
-            </ul>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # References section
-    st.markdown("""
-    <div class='section'>
-        <h3 class='gradient_text1'>References</h3>
-        <div class='section-content'>
-            <ul>
-                <li>Kuramoto, Y. (1975). Self-entrainment of a population of coupled non-linear oscillators.</li>
-                <li>Strogatz, S. H. (2000). From Kuramoto to Crawford: exploring the onset of synchronization in populations of coupled oscillators.</li>
-                <li>Acebrón, J. A., et al. (2005). The Kuramoto model: A simple paradigm for synchronization phenomena.</li>
-            </ul>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # No need for duplicate copyright information here
-
-########################
-# TAB 5: DATABASE TAB
-########################
-with tab5:
     st.markdown("<h2 class='gradient_text2'>Database</h2>", unsafe_allow_html=True)
     
     st.markdown("""

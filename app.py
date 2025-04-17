@@ -442,7 +442,7 @@ with tab2:
     dist_col1, dist_col2 = st.columns(2)
     
     with dist_col1:
-        st.markdown("<h4>Natural Frequency Distribution</h4>", unsafe_allow_html=True)
+        st.markdown("<h4 class='gradient_text2'>Natural Frequency Distribution</h4>", unsafe_allow_html=True)
         
         # Create frequency distribution histogram
         fig_freq, ax_freq = plt.subplots(figsize=(3.5, 2.5))
@@ -519,7 +519,7 @@ with tab2:
         """, unsafe_allow_html=True)
     
     with dist_col2:
-        st.markdown("<h4>Initial Phase Distribution</h4>", unsafe_allow_html=True)
+        st.markdown("<h4 class='gradient_text2'>Initial Phase Distribution</h4>", unsafe_allow_html=True)
         
         # Create initial phase distribution histogram
         fig_init_phase, ax_init_phase = plt.subplots(figsize=(3.5, 2.5))
@@ -1038,7 +1038,7 @@ with tab5:
     db_col1, db_col2 = st.columns(2)
     
     with db_col1:
-        st.markdown("<h4>Save Current Simulation</h4>", unsafe_allow_html=True)
+        st.markdown("<h4 class='gradient_text1'>Save Current Simulation</h4>", unsafe_allow_html=True)
         
         # Get parameters of frequency distribution based on selected type
         freq_params = {}
@@ -1071,7 +1071,7 @@ with tab5:
                 st.error("Failed to save simulation to database.")
     
     with db_col2:
-        st.markdown("<h4>Load Saved Simulations</h4>", unsafe_allow_html=True)
+        st.markdown("<h4 class='gradient_text1'>Load Saved Simulations</h4>", unsafe_allow_html=True)
         
         # Get list of saved simulations
         simulations = list_simulations()
@@ -1097,7 +1097,7 @@ with tab5:
                         # Display basic information about the loaded simulation
                         st.markdown(f"""
                         <div class='section'>
-                            <h4>Simulation Details</h4>
+                            <h4 class='gradient_text2'>Simulation Details</h4>
                             <p><b>ID:</b> {sim_data['id']}</p>
                             <p><b>Timestamp:</b> {sim_data['timestamp']}</p>
                             <p><b>Oscillators:</b> {sim_data['n_oscillators']}</p>
@@ -1107,7 +1107,7 @@ with tab5:
                         """, unsafe_allow_html=True)
                         
                         # Create visualization of the loaded simulation
-                        st.markdown("<h4>Order Parameter</h4>", unsafe_allow_html=True)
+                        st.markdown("<h4 class='gradient_text2'>Order Parameter</h4>", unsafe_allow_html=True)
                         
                         fig, ax = plt.subplots(figsize=(7, 3.5))
                         ax.set_facecolor('#1a1a1a')
@@ -1146,7 +1146,7 @@ with tab5:
     
     # Display all simulations in a table
     if simulations:
-        st.markdown("<h4>Saved Simulations</h4>", unsafe_allow_html=True)
+        st.markdown("<h4 class='gradient_text2'>Saved Simulations</h4>", unsafe_allow_html=True)
         
         # Create a DataFrame for display
         import pandas as pd
@@ -1164,7 +1164,7 @@ with tab5:
         st.dataframe(sim_df, use_container_width=True)
         
         # Delete simulation functionality
-        st.markdown("<h4>Delete Simulation</h4>", unsafe_allow_html=True)
+        st.markdown("<h4 class='gradient_text2'>Delete Simulation</h4>", unsafe_allow_html=True)
         
         delete_id = st.number_input("Enter Simulation ID to Delete", min_value=1, step=1)
         

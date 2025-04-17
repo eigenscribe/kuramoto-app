@@ -165,7 +165,7 @@ else:  # Custom
 simulation_time = st.sidebar.slider(
     "Simulation Time",
     min_value=1.0,
-    max_value=50.0,
+    max_value=100.0,
     value=20.0,
     step=1.0,
     help="Total simulation time"

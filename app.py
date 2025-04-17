@@ -1019,12 +1019,7 @@ with tab4:
     </div>
     """, unsafe_allow_html=True)
     
-    # Add copyright information
-    st.markdown("""
-    <div class='footer'>
-    <p>© 2025 Lauren Shriver. All rights reserved.</p>
-    </div>
-    """, unsafe_allow_html=True)
+    # No need for duplicate copyright information here
 
 ########################
 # TAB 5: DATABASE TAB

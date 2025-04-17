@@ -148,7 +148,7 @@ body {
 }
 
 /* Button Styling */
-.btn {
+.btn, .stButton button, button[kind="primary"] {
     background-image: linear-gradient(to right, #00ffee, #27aaff);
     box-shadow: 0 4px 15px 0 rgba(39, 170, 255, 0.5);
     width: 90%;
@@ -170,8 +170,10 @@ body {
     line-height: 55px;
 }
 
-.btn:hover {
+/* Button hover effects */
+.btn:hover, .stButton button:hover, button[kind="primary"]:hover {
     background-position: 100% 0;
+    background-image: linear-gradient(to right, #14a5ff, #8138ff);
     filter: brightness(1.1);
     transition: all .4s ease-in-out;
 }
@@ -217,12 +219,24 @@ a:hover {
     backdrop-filter: blur(10px);
 }
 
-.sidebar .stSlider > div > div {
-    background-color: rgba(39, 170, 255, 0.3);
+/* Network Connectivity section styling */
+.sidebar h3, .sidebar h3 span {
+    background: -webkit-linear-gradient(#14a5ff, #8138ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: bold !important;
 }
 
+/* Slider track styling */
+.sidebar .stSlider > div > div {
+    background: linear-gradient(90deg, #00ffee, #27aaff) !important;
+    opacity: 0.3;
+}
+
+/* Slider thumb styling */
 .sidebar .stSlider > div > div > div {
-    background-color: #27aaff;
+    background: linear-gradient(90deg, #14a5ff, #8138ff) !important;
+    border: 2px solid white;
 }
 
 /* Override Streamlit defaults */
@@ -307,4 +321,30 @@ button:hover {
 .stNumberInput > div > div > input {
     background-color: #222;
     color: white;
+}
+
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(45deg, #00ffee, #27aaff);
+    border-radius: 10px;
+    border: 2px solid rgba(0, 0, 0, 0.2);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(45deg, #14a5ff, #8138ff);
+}
+
+/* Radio button styling */
+.st-cx, .st-cy {
+    background: linear-gradient(90deg, #00ffee, #27aaff) !important;
 }

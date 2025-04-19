@@ -10,7 +10,9 @@ import base64
 import json
 from kuramoto_model import KuramotoModel
 import time
-from database import store_simulation, get_simulation, list_simulations, delete_simulation
+from database import (store_simulation, get_simulation, list_simulations, delete_simulation,
+                  save_configuration, list_configurations, get_configuration, delete_configuration,
+                  get_configuration_by_name)
 
 # Set up Matplotlib style for dark theme plots
 plt.style.use('dark_background')
@@ -99,14 +101,47 @@ st.markdown("<h1 class='gradient_text1'>Kuramoto Model Simulator</h1>", unsafe_a
 # Create sidebar with parameters
 st.sidebar.markdown("<h2 class='gradient_text1'>Simulation Parameters</h2>", unsafe_allow_html=True)
 
+# Initialize session state for parameters if they don't exist
+if 'n_oscillators' not in st.session_state:
+    st.session_state.n_oscillators = 10
+if 'coupling_strength' not in st.session_state:
+    st.session_state.coupling_strength = 1.0
+if 'freq_type' not in st.session_state:
+    st.session_state.freq_type = "Normal"
+if 'freq_mean' not in st.session_state:
+    st.session_state.freq_mean = 0.0
+if 'freq_std' not in st.session_state:
+    st.session_state.freq_std = 1.0
+if 'freq_min' not in st.session_state:
+    st.session_state.freq_min = -1.0
+if 'freq_max' not in st.session_state:
+    st.session_state.freq_max = 1.0
+if 'peak1' not in st.session_state:
+    st.session_state.peak1 = -1.0
+if 'peak2' not in st.session_state:
+    st.session_state.peak2 = 1.0
+if 'custom_freqs' not in st.session_state:
+    st.session_state.custom_freqs = "0.5, 1.0, 1.5, 2.0, 2.5, 3.0, -0.5, -1.0, -1.5, -2.0"
+if 'simulation_time' not in st.session_state:
+    st.session_state.simulation_time = 20.0
+if 'time_step' not in st.session_state:
+    st.session_state.time_step = 0.05
+if 'random_seed' not in st.session_state:
+    st.session_state.random_seed = 42
+if 'network_type' not in st.session_state:
+    st.session_state.network_type = "All-to-All"
+if 'adj_matrix_input' not in st.session_state:
+    st.session_state.adj_matrix_input = ""
+
 # Number of oscillators slider
 n_oscillators = st.sidebar.slider(
     "Number of Oscillators",
     min_value=2,
     max_value=50,
-    value=10,
+    value=st.session_state.n_oscillators,
     step=1,
-    help="Number of oscillators in the system"
+    help="Number of oscillators in the system",
+    key="n_oscillators"
 )
 
 # Coupling strength slider
@@ -114,32 +149,35 @@ coupling_strength = st.sidebar.slider(
     "Coupling Strength (K)",
     min_value=0.0,
     max_value=10.0,
-    value=1.0,
+    value=st.session_state.coupling_strength,
     step=0.1,
-    help="Strength of coupling between oscillators"
+    help="Strength of coupling between oscillators",
+    key="coupling_strength"
 )
 
 # Frequency distribution type
 freq_type = st.sidebar.selectbox(
     "Frequency Distribution",
     ["Normal", "Uniform", "Bimodal", "Custom"],
-    help="Distribution of natural frequencies"
+    index=["Normal", "Uniform", "Bimodal", "Custom"].index(st.session_state.freq_type),
+    help="Distribution of natural frequencies",
+    key="freq_type"
 )
 
 # Parameters for frequency distribution
 if freq_type == "Normal":
-    freq_mean = st.sidebar.slider("Mean", -2.0, 2.0, 0.0, 0.1)
-    freq_std = st.sidebar.slider("Standard Deviation", 0.1, 3.0, 1.0, 0.1)
+    freq_mean = st.sidebar.slider("Mean", -2.0, 2.0, st.session_state.freq_mean, 0.1, key="freq_mean")
+    freq_std = st.sidebar.slider("Standard Deviation", 0.1, 3.0, st.session_state.freq_std, 0.1, key="freq_std")
     frequencies = np.random.normal(freq_mean, freq_std, n_oscillators)
     
 elif freq_type == "Uniform":
-    freq_min = st.sidebar.slider("Minimum", -5.0, 0.0, -1.0, 0.1)
-    freq_max = st.sidebar.slider("Maximum", 0.0, 5.0, 1.0, 0.1)
+    freq_min = st.sidebar.slider("Minimum", -5.0, 0.0, st.session_state.freq_min, 0.1, key="freq_min")
+    freq_max = st.sidebar.slider("Maximum", 0.0, 5.0, st.session_state.freq_max, 0.1, key="freq_max")
     frequencies = np.random.uniform(freq_min, freq_max, n_oscillators)
     
 elif freq_type == "Bimodal":
-    peak1 = st.sidebar.slider("Peak 1", -5.0, 0.0, -1.0, 0.1)
-    peak2 = st.sidebar.slider("Peak 2", 0.0, 5.0, 1.0, 0.1)
+    peak1 = st.sidebar.slider("Peak 1", -5.0, 0.0, st.session_state.peak1, 0.1, key="peak1")
+    peak2 = st.sidebar.slider("Peak 2", 0.0, 5.0, st.session_state.peak2, 0.1, key="peak2")
     mix = np.random.choice([0, 1], size=n_oscillators)
     freq1 = np.random.normal(peak1, 0.3, n_oscillators)
     freq2 = np.random.normal(peak2, 0.3, n_oscillators)
@@ -148,7 +186,8 @@ elif freq_type == "Bimodal":
 else:  # Custom
     custom_freqs = st.sidebar.text_area(
         "Enter custom frequencies (comma-separated)",
-        "0.5, 1.0, 1.5, 2.0, 2.5, 3.0, -0.5, -1.0, -1.5, -2.0"
+        value=st.session_state.custom_freqs,
+        key="custom_freqs"
     )
     try:
         frequencies = np.array([float(x.strip()) for x in custom_freqs.split(',')])
@@ -166,29 +205,38 @@ simulation_time = st.sidebar.slider(
     "Simulation Time",
     min_value=1.0,
     max_value=100.0,
-    value=20.0,
+    value=st.session_state.simulation_time,
     step=1.0,
-    help="Total simulation time"
+    help="Total simulation time",
+    key="simulation_time"
 )
 
 time_step = st.sidebar.slider(
     "Time Step",
     min_value=0.01,
     max_value=0.1,
-    value=0.05,
+    value=st.session_state.time_step,
     step=0.01,
-    help="Time step for simulation"
+    help="Time step for simulation",
+    key="time_step"
 )
 
 # Initialize model with specified parameters
-random_seed = st.sidebar.number_input("Random Seed", value=42, help="Seed for reproducibility")
+random_seed = st.sidebar.number_input(
+    "Random Seed", 
+    value=st.session_state.random_seed, 
+    help="Seed for reproducibility",
+    key="random_seed"
+)
 
 # Network Connectivity Configuration
 st.sidebar.markdown("<h3 class='gradient_text1'>Network Connectivity</h3>", unsafe_allow_html=True)
 network_type = st.sidebar.radio(
     "Network Type",
     options=["All-to-All", "Nearest Neighbor", "Random", "Custom Adjacency Matrix"],
-    help="Define how oscillators are connected to each other"
+    index=["All-to-All", "Nearest Neighbor", "Random", "Custom Adjacency Matrix"].index(st.session_state.network_type),
+    help="Define how oscillators are connected to each other",
+    key="network_type"
 )
 
 # Custom adjacency matrix input
@@ -207,8 +255,10 @@ if network_type == "Custom Adjacency Matrix":
     
     adj_matrix_input = st.sidebar.text_area(
         "Adjacency Matrix",
+        value=st.session_state.adj_matrix_input,
         height=150,
-        help="Enter the adjacency matrix as comma-separated values, each row on a new line"
+        help="Enter the adjacency matrix as comma-separated values, each row on a new line",
+        key="adj_matrix_input"
     )
     
     # Process the input adjacency matrix
@@ -235,7 +285,7 @@ if network_type == "Custom Adjacency Matrix":
             adj_matrix = None
 
 # Create tabs for different visualizations (Network is default tab)
-tab1, tab2, tab3, tab4 = st.tabs(["Network", "Distributions", "Animation", "Database"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["Network", "Distributions", "Animation", "Database", "Configurations"])
 
 # Function to simulate model
 @st.cache_data(ttl=300)
@@ -1093,3 +1143,182 @@ with tab4:
                 st.warning(f"No simulation found with ID {delete_id}.")
 
 # Footer removed as requested
+
+########################
+# TAB 5: CONFIGURATIONS TAB
+########################
+with tab5:
+    st.markdown("<h2 class='gradient_text2'>Save & Load Configurations</h2>", unsafe_allow_html=True)
+    
+    # Display description
+    st.markdown("""
+    <div style='background-color: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; margin-bottom: 20px;'>
+        <p>Save your current simulation configuration for future experiments. This preserves all parameters including:</p>
+        <ul>
+            <li>Number of oscillators and coupling strength</li>
+            <li>Frequency distribution settings</li>
+            <li>Network connectivity type and structure</li>
+            <li>Simulation time and step size</li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Create columns for save and load panels
+    save_col, load_col = st.columns(2)
+    
+    # SAVE CONFIGURATION PANEL
+    with save_col:
+        st.markdown("<h3 class='gradient_text1'>Save Current Configuration</h3>", unsafe_allow_html=True)
+        
+        # Configuration name input
+        config_name = st.text_input("Configuration Name", placeholder="Enter a unique name")
+        
+        # Get frequency parameters based on the selected distribution
+        freq_params = {}
+        if freq_type == "Normal":
+            freq_params = {"mean": freq_mean, "std": freq_std}
+        elif freq_type == "Uniform":
+            freq_params = {"min": freq_min, "max": freq_max}
+        elif freq_type == "Bimodal":
+            freq_params = {"peak1": peak1, "peak2": peak2}
+        elif freq_type == "Custom":
+            freq_params = {"values": custom_freqs}
+        
+        # Save button
+        if st.button("Save Configuration", type="primary"):
+            if not config_name:
+                st.error("Please enter a configuration name.")
+            else:
+                # Determine which adjacency matrix to save
+                if network_type == "Custom Adjacency Matrix":
+                    save_adj_matrix = adj_matrix
+                elif network_type == "All-to-All":
+                    save_adj_matrix = np.ones((n_oscillators, n_oscillators))
+                    np.fill_diagonal(save_adj_matrix, 0)  # No self-connections
+                elif network_type == "Nearest Neighbor":
+                    save_adj_matrix = np.zeros((n_oscillators, n_oscillators))
+                    for i in range(n_oscillators):
+                        save_adj_matrix[i, (i-1) % n_oscillators] = 1
+                        save_adj_matrix[i, (i+1) % n_oscillators] = 1
+                elif network_type == "Random":
+                    np.random.seed(random_seed)
+                    save_adj_matrix = np.random.random((n_oscillators, n_oscillators)) < 0.2
+                    save_adj_matrix = save_adj_matrix.astype(float)
+                    np.fill_diagonal(save_adj_matrix, 0)
+                
+                # Save to database
+                try:
+                    config_id = save_configuration(
+                        name=config_name,
+                        n_oscillators=n_oscillators,
+                        coupling_strength=coupling_strength,
+                        simulation_time=simulation_time,
+                        time_step=time_step,
+                        random_seed=random_seed,
+                        network_type=network_type,
+                        frequency_distribution=freq_type,
+                        frequency_params=freq_params,
+                        adjacency_matrix=save_adj_matrix
+                    )
+                    
+                    if config_id:
+                        st.success(f"Configuration '{config_name}' saved successfully!")
+                    else:
+                        st.error(f"A configuration with the name '{config_name}' already exists.")
+                except Exception as e:
+                    st.error(f"Error saving configuration: {str(e)}")
+    
+    # LOAD CONFIGURATION PANEL
+    with load_col:
+        st.markdown("<h3 class='gradient_text1'>Load Saved Configuration</h3>", unsafe_allow_html=True)
+        
+        # Get list of saved configurations
+        configs = list_configurations()
+        
+        if not configs:
+            st.info("No saved configurations found. Save a configuration first.")
+        else:
+            # Create a dropdown with configuration names
+            config_options = {f"{c['name']} (Oscillators: {c['n_oscillators']}, K: {c['coupling_strength']})": c['id'] for c in configs}
+            selected_config = st.selectbox("Select Configuration", options=list(config_options.keys()))
+            
+            # Load configuration when button is clicked
+            if st.button("Load Configuration", type="primary"):
+                selected_config_id = config_options[selected_config]
+                config = get_configuration(selected_config_id)
+                
+                if config:
+                    # Need to use session state to update all sidebar values
+                    st.session_state.n_oscillators = config['n_oscillators']
+                    st.session_state.coupling_strength = config['coupling_strength']
+                    st.session_state.simulation_time = config['simulation_time']
+                    st.session_state.time_step = config['time_step']
+                    st.session_state.random_seed = config['random_seed']
+                    st.session_state.network_type = config['network_type']
+                    st.session_state.freq_type = config['frequency_distribution']
+                    
+                    # Update frequency distribution parameters
+                    freq_params = config['frequency_params'] if config['frequency_params'] else {}
+                    if config['frequency_distribution'] == "Normal":
+                        st.session_state.freq_mean = freq_params.get('mean', 0.0)
+                        st.session_state.freq_std = freq_params.get('std', 1.0)
+                    elif config['frequency_distribution'] == "Uniform":
+                        st.session_state.freq_min = freq_params.get('min', -1.0)
+                        st.session_state.freq_max = freq_params.get('max', 1.0)
+                    elif config['frequency_distribution'] == "Bimodal":
+                        st.session_state.peak1 = freq_params.get('peak1', -1.0)
+                        st.session_state.peak2 = freq_params.get('peak2', 1.0)
+                    elif config['frequency_distribution'] == "Custom":
+                        st.session_state.custom_freqs = freq_params.get('values', "0.5, 1.0, 1.5")
+                    
+                    # Handling custom adjacency matrix
+                    if config['network_type'] == "Custom Adjacency Matrix" and config['adjacency_matrix'] is not None:
+                        adj_matrix_str = ""
+                        for row in config['adjacency_matrix']:
+                            adj_matrix_str += ", ".join(str(val) for val in row) + "\n"
+                        st.session_state.adj_matrix_input = adj_matrix_str.strip()
+                    
+                    st.success(f"Configuration '{config['name']}' loaded! Refresh the page to apply all settings.")
+                    
+                    # Provide a button to refresh the page
+                    st.markdown("""
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button onclick="window.location.reload();" class="reload-button">
+                            Refresh Page to Apply Settings
+                        </button>
+                    </div>
+                    <style>
+                        .reload-button {
+                            background: linear-gradient(to bottom right, #14a5ff, #7066ff);
+                            color: white;
+                            border: none;
+                            padding: 10px 20px;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            font-weight: bold;
+                            box-shadow: 0 4px 12px rgba(20, 165, 255, 0.4);
+                        }
+                        .reload-button:hover {
+                            background: linear-gradient(to right, #00ffee, #27aaff);
+                            transform: translateY(-2px);
+                            box-shadow: 0 6px 15px rgba(0, 255, 238, 0.5);
+                            transition: all 0.3s ease;
+                        }
+                    </style>
+                    """, unsafe_allow_html=True)
+                else:
+                    st.error("Failed to load the selected configuration.")
+            
+            # Option to delete a configuration
+            with st.expander("Delete Configurations"):
+                st.warning("Warning: Deletion is permanent and cannot be undone.")
+                delete_options = {f"{c['name']} (Created: {c['timestamp'].strftime('%Y-%m-%d %H:%M')})": c['id'] for c in configs}
+                config_to_delete = st.selectbox("Select Configuration to Delete", options=list(delete_options.keys()))
+                
+                if st.button("Delete Selected Configuration", type="primary"):
+                    delete_id = delete_options[config_to_delete]
+                    if delete_configuration(delete_id):
+                        st.success(f"Configuration deleted successfully.")
+                        st.experimental_rerun()  # Refresh the page to update the list
+                    else:
+                        st.error("Failed to delete configuration.")

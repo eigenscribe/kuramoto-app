@@ -100,6 +100,26 @@ class AdjacencyMatrix(Base):
     def __repr__(self):
         return f"<AdjacencyMatrix(simulation_id={self.simulation_id})>"
 
+class Configuration(Base):
+    """Model representing a saved simulation configuration."""
+    __tablename__ = "configurations"
+    
+    id = Column(Integer, primary_key=True)
+    name = Column(String(100), nullable=False, unique=True)
+    timestamp = Column(DateTime, default=datetime.now)
+    n_oscillators = Column(Integer)
+    coupling_strength = Column(Float)
+    simulation_time = Column(Float)
+    time_step = Column(Float)
+    random_seed = Column(Integer)
+    network_type = Column(String(50))
+    frequency_distribution = Column(String(50))
+    frequency_params = Column(Text)  # JSON string of distribution parameters
+    adjacency_matrix = Column(LargeBinary, nullable=True)  # For custom adjacency matrices
+    
+    def __repr__(self):
+        return f"<Configuration(id={self.id}, name='{self.name}')>"
+
 # Create all tables
 Base.metadata.create_all(engine)
 
@@ -314,3 +334,225 @@ def delete_simulation(simulation_id):
     session.close()
     
     return True
+
+def save_configuration(name, n_oscillators, coupling_strength, simulation_time, time_step, 
+                      random_seed, network_type, frequency_distribution, frequency_params,
+                      adjacency_matrix=None):
+    """
+    Save a simulation configuration to the database.
+    
+    Parameters:
+    -----------
+    name : str
+        Name to identify this configuration
+    n_oscillators : int
+        Number of oscillators
+    coupling_strength : float
+        Coupling strength
+    simulation_time : float
+        Total simulation time
+    time_step : float
+        Simulation time step
+    random_seed : int
+        Random seed for reproducibility
+    network_type : str
+        Type of network connectivity
+    frequency_distribution : str
+        Type of frequency distribution
+    frequency_params : dict
+        Parameters of the frequency distribution
+    adjacency_matrix : ndarray, optional
+        Custom adjacency matrix for network connectivity
+        
+    Returns:
+    --------
+    int
+        The ID of the saved configuration, or None if there was an error
+    """
+    session = Session()
+    
+    # Check if a configuration with this name already exists
+    existing = session.query(Configuration).filter_by(name=name).first()
+    if existing:
+        session.close()
+        return None
+    
+    # Prepare the adjacency matrix data if provided
+    adj_matrix_data = None
+    if adjacency_matrix is not None:
+        adj_matrix_data = adjacency_matrix.tobytes()
+    
+    # Create new configuration
+    config = Configuration(
+        name=name,
+        n_oscillators=n_oscillators,
+        coupling_strength=coupling_strength,
+        simulation_time=simulation_time,
+        time_step=time_step,
+        random_seed=random_seed,
+        network_type=network_type,
+        frequency_distribution=frequency_distribution,
+        frequency_params=json.dumps(frequency_params) if frequency_params else None,
+        adjacency_matrix=adj_matrix_data
+    )
+    
+    try:
+        session.add(config)
+        session.commit()
+        config_id = config.id
+        session.close()
+        return config_id
+    except Exception as e:
+        session.rollback()
+        session.close()
+        raise e
+
+def list_configurations():
+    """
+    List all saved configurations.
+    
+    Returns:
+    --------
+    list
+        List of dictionaries containing configuration info
+    """
+    session = Session()
+    
+    configs = session.query(Configuration).all()
+    result = [{
+        'id': config.id,
+        'name': config.name,
+        'timestamp': config.timestamp,
+        'n_oscillators': config.n_oscillators,
+        'coupling_strength': config.coupling_strength,
+        'network_type': config.network_type,
+        'frequency_distribution': config.frequency_distribution
+    } for config in configs]
+    
+    session.close()
+    return result
+
+def get_configuration(config_id):
+    """
+    Retrieve a configuration from the database.
+    
+    Parameters:
+    -----------
+    config_id : int
+        The ID of the configuration to retrieve
+        
+    Returns:
+    --------
+    dict
+        Dictionary containing configuration data
+    """
+    session = Session()
+    
+    config = session.query(Configuration).filter_by(id=config_id).first()
+    if not config:
+        session.close()
+        return None
+    
+    # Process adjacency matrix if it exists
+    adjacency_matrix = None
+    if config.adjacency_matrix:
+        try:
+            adjacency_matrix = np.frombuffer(config.adjacency_matrix).reshape((config.n_oscillators, config.n_oscillators))
+        except:
+            # If there's an error reshaping, just leave as None
+            pass
+    
+    # Create the result dictionary
+    result = {
+        'id': config.id,
+        'name': config.name,
+        'timestamp': config.timestamp,
+        'n_oscillators': config.n_oscillators,
+        'coupling_strength': config.coupling_strength,
+        'simulation_time': config.simulation_time,
+        'time_step': config.time_step,
+        'random_seed': config.random_seed,
+        'network_type': config.network_type,
+        'frequency_distribution': config.frequency_distribution,
+        'frequency_params': json.loads(config.frequency_params) if config.frequency_params else None,
+        'adjacency_matrix': adjacency_matrix
+    }
+    
+    session.close()
+    return result
+
+def delete_configuration(config_id):
+    """
+    Delete a configuration from the database.
+    
+    Parameters:
+    -----------
+    config_id : int
+        The ID of the configuration to delete
+        
+    Returns:
+    --------
+    bool
+        True if deletion was successful, False otherwise
+    """
+    session = Session()
+    
+    config = session.query(Configuration).filter_by(id=config_id).first()
+    if not config:
+        session.close()
+        return False
+    
+    session.delete(config)
+    session.commit()
+    session.close()
+    
+    return True
+
+def get_configuration_by_name(name):
+    """
+    Retrieve a configuration by name.
+    
+    Parameters:
+    -----------
+    name : str
+        The name of the configuration to retrieve
+        
+    Returns:
+    --------
+    dict
+        Dictionary containing configuration data
+    """
+    session = Session()
+    
+    config = session.query(Configuration).filter_by(name=name).first()
+    if not config:
+        session.close()
+        return None
+    
+    # Process adjacency matrix if it exists
+    adjacency_matrix = None
+    if config.adjacency_matrix:
+        try:
+            adjacency_matrix = np.frombuffer(config.adjacency_matrix).reshape((config.n_oscillators, config.n_oscillators))
+        except:
+            # If there's an error reshaping, just leave as None
+            pass
+    
+    # Create the result dictionary
+    result = {
+        'id': config.id,
+        'name': config.name,
+        'timestamp': config.timestamp,
+        'n_oscillators': config.n_oscillators,
+        'coupling_strength': config.coupling_strength,
+        'simulation_time': config.simulation_time,
+        'time_step': config.time_step,
+        'random_seed': config.random_seed,
+        'network_type': config.network_type,
+        'frequency_distribution': config.frequency_distribution,
+        'frequency_params': json.loads(config.frequency_params) if config.frequency_params else None,
+        'adjacency_matrix': adjacency_matrix
+    }
+    
+    session.close()
+    return result

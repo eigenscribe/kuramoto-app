@@ -393,22 +393,25 @@ button:hover {
 .stSelectbox > div[data-baseweb="select"] {
     border: 2px solid;
     border-image: linear-gradient(to bottom right, #00c8ff, #14a5ff, #7066ff, #5e17eb) 1;
-    border-radius: 5px;
+    border-radius: 15px;
+    overflow: hidden;
 }
 
 .stSelectbox > div[data-baseweb="select"] > div {
     background-color: #222;
     color: white;
     border: none;
+    border-radius: 13px;
 }
 
 /* Improve number input appearance for all inputs */
 .stNumberInput > div > div > input {
-    border-radius: 4px;
+    border-radius: 15px;
     background-color: #222;
     color: white;
     border: 2px solid #7851A9 !important; /* Royal Purple border */
     box-shadow: 0 0 5px rgba(120, 81, 169, 0.5);
+    padding: 5px 10px;
 }
 
 /* Custom scrollbar styling */

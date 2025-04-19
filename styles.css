@@ -221,6 +221,29 @@ a:hover {
     backdrop-filter: blur(10px);
 }
 
+/* Sidebar scrollbar styling */
+.sidebar::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom right, #00c8ff, #14a5ff, #7066ff, #5e17eb);
+    border-radius: 10px;
+    border: 2px solid rgba(0, 0, 0, 0.2);
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(to right, #00ffee, #27aaff);
+}
+
+/* Network connectivity input styling */
+.sidebar .stNumberInput > div {
+    background: linear-gradient(to bottom right, #00c8ff, #14a5ff, #7066ff, #5e17eb);
+    padding: 1px;
+    border-radius: 5px;
+}
+
+.sidebar .stNumberInput > div > div > input {
+    border-radius: 4px;
+    background-color: #222;
+}
+
 /* Network Connectivity section styling */
 .sidebar h3, .sidebar h3 span {
     background: linear-gradient(to bottom right, #00c8ff, #14a5ff, #7066ff, #5e17eb) !important;
@@ -344,9 +367,16 @@ button:hover {
 }
 
 /* Improve selectbox appearance */
+.stSelectbox > div {
+    background: linear-gradient(to bottom right, #00c8ff, #14a5ff, #7066ff, #5e17eb);
+    padding: 1px;
+    border-radius: 5px;
+}
+
 .stSelectbox > div[data-baseweb="select"] > div {
     background-color: #222;
     color: white;
+    border-radius: 4px;
 }
 
 /* Improve number input appearance */

@@ -270,13 +270,17 @@ a:hover {
 }
 
 /* Slider styling for the active (colored) part */
-.stSlider [data-baseweb=slider] div[data-type="range"] div:first-child {
+/* This targets the left side of slider (between minimum value and thumb) */
+.stSlider [data-baseweb=slider] div[data-type="range"] div:first-child,
+.stSlider [data-baseweb=slider] [data-testid="stSliderProgress"] {
     background: linear-gradient(to right, #00c8ff, #14a5ff, #7066ff, #5e17eb) !important;
+    height: 4px !important; /* Ensure consistent height */
 }
 
 /* Slider track styling for the inactive (grey) part */
 .stSlider [data-baseweb=slider] div[data-type="range"] div:nth-child(2) {
     background: rgba(255, 255, 255, 0.1) !important;
+    height: 4px !important; /* Ensure consistent height */
 }
 
 /* Slider thumb styling */

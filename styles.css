@@ -269,16 +269,45 @@ a:hover {
     text-align: center;
 }
 
-/* Slider track styling */
+/* Remove default slider styling */
 .stSlider [data-baseweb=slider] > div {
-    background: linear-gradient(to right, #00c8ff, #14a5ff, #7066ff, #5e17eb) !important;
-    opacity: 0.3;
+    background: none !important;
 }
 
-/* Slider thumb styling */
+/* Custom slider track with gradient - the actual track */
+.stSlider [data-baseweb=slider]::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 4px;
+    transform: translateY(-50%);
+    background: linear-gradient(to right, #00c8ff, #14a5ff, #7066ff, #5e17eb);
+    border-radius: 4px;
+    opacity: 0.7;
+    z-index: 0;
+}
+
+/* Slider thumb with gradient - the actual thumb */
 .stSlider [data-baseweb=slider] [role=slider] {
-    background: linear-gradient(to bottom right, #00c8ff, #14a5ff, #7066ff, #5e17eb) !important;
+    background: none !important;
+    border: none !important;
+    position: relative;
+    z-index: 2;
+}
+
+.stSlider [data-baseweb=slider] [role=slider]::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom right, #00c8ff, #14a5ff, #7066ff, #5e17eb);
+    border-radius: 50%;
     border: 2px solid white;
+    box-shadow: 0 0 10px rgba(0, 200, 255, 0.7);
 }
 
 /* Override Streamlit defaults */
@@ -441,13 +470,23 @@ button:hover {
     background: linear-gradient(to right, #00ffee, #27aaff);
 }
 
-/* Radio button styling */
-.stRadio [data-baseweb="radio"] div[data-checked="true"] div {
-    background: linear-gradient(to bottom right, #00c8ff, #14a5ff, #7066ff, #5e17eb) !important;
+/* Clear default radio button styling */
+[data-testid="stRadio"] [data-baseweb="radio"] div[data-checked="true"] div:first-child {
+    background: none !important;
+    border: none !important;
+    position: relative;
 }
 
-/* Radio button circle */
-[data-testid="stRadio"] [data-baseweb="radio"] [data-checked="true"] div:first-child {
-    background: linear-gradient(to bottom right, #00c8ff, #14a5ff, #7066ff, #5e17eb) !important;
-    border-color: white !important;
+/* Custom radio button gradient fill */
+[data-testid="stRadio"] [data-baseweb="radio"] div[data-checked="true"] div:first-child::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom right, #00c8ff, #14a5ff, #7066ff, #5e17eb);
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 0 8px rgba(0, 200, 255, 0.6);
 }

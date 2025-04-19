@@ -234,14 +234,28 @@ a:hover {
 
 /* Network connectivity input styling */
 .sidebar .stNumberInput > div {
+    position: relative;
+    z-index: 1;
+}
+
+.sidebar .stNumberInput > div::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    bottom: -2px;
+    left: -2px;
     background: linear-gradient(to bottom right, #00c8ff, #14a5ff, #7066ff, #5e17eb);
-    padding: 1px;
-    border-radius: 5px;
+    border-radius: 7px;
+    z-index: -1;
 }
 
 .sidebar .stNumberInput > div > div > input {
     border-radius: 4px;
     background-color: #222;
+    border: none;
+    position: relative;
+    z-index: 2;
 }
 
 /* Network Connectivity section styling */
@@ -255,14 +269,14 @@ a:hover {
     text-align: center;
 }
 
-/* Slider track styling - for ALL sliders */
-.stSlider > div > div {
-    background: linear-gradient(to bottom right, #00c8ff, #14a5ff, #7066ff, #5e17eb) !important;
+/* Slider track styling */
+.stSlider [data-baseweb=slider] > div {
+    background: linear-gradient(to right, #00c8ff, #14a5ff, #7066ff, #5e17eb) !important;
     opacity: 0.3;
 }
 
-/* Slider thumb styling - for ALL sliders */
-.stSlider > div > div > div {
+/* Slider thumb styling */
+.stSlider [data-baseweb=slider] [role=slider] {
     background: linear-gradient(to bottom right, #00c8ff, #14a5ff, #7066ff, #5e17eb) !important;
     border: 2px solid white;
 }
@@ -367,22 +381,43 @@ button:hover {
 }
 
 /* Improve selectbox appearance */
-.stSelectbox > div {
-    background: linear-gradient(to bottom right, #00c8ff, #14a5ff, #7066ff, #5e17eb);
-    padding: 1px;
+.stSelectbox > div[data-baseweb="select"] {
+    border: 2px solid;
+    border-image: linear-gradient(to bottom right, #00c8ff, #14a5ff, #7066ff, #5e17eb) 1;
     border-radius: 5px;
 }
 
 .stSelectbox > div[data-baseweb="select"] > div {
     background-color: #222;
     color: white;
-    border-radius: 4px;
+    border: none;
 }
 
-/* Improve number input appearance */
+/* Improve number input appearance for all inputs */
+.stNumberInput > div {
+    position: relative;
+    z-index: 1;
+}
+
+.stNumberInput > div::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    bottom: -2px;
+    left: -2px;
+    background: linear-gradient(to bottom right, #00c8ff, #14a5ff, #7066ff, #5e17eb);
+    border-radius: 7px;
+    z-index: -1;
+}
+
 .stNumberInput > div > div > input {
+    border-radius: 4px;
     background-color: #222;
     color: white;
+    border: none;
+    position: relative;
+    z-index: 2;
 }
 
 /* Custom scrollbar styling */
@@ -407,13 +442,12 @@ button:hover {
 }
 
 /* Radio button styling */
-.st-cx, .st-cy, 
-div[data-testid="stRadio"] label[data-baseweb="radio"] div,
-.stRadio label[data-baseweb="radio"] div {
+.stRadio [data-baseweb="radio"] div[data-checked="true"] div {
     background: linear-gradient(to bottom right, #00c8ff, #14a5ff, #7066ff, #5e17eb) !important;
 }
 
-/* Ensure radio buttons have the right styling across all tabs */
-[role="radiogroup"] [data-baseweb="radio"] [data-testid="stRadio"] div {
+/* Radio button circle */
+[data-testid="stRadio"] [data-baseweb="radio"] [data-checked="true"] div:first-child {
     background: linear-gradient(to bottom right, #00c8ff, #14a5ff, #7066ff, #5e17eb) !important;
+    border-color: white !important;
 }

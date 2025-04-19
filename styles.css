@@ -269,45 +269,21 @@ a:hover {
     text-align: center;
 }
 
-/* Remove default slider styling */
-.stSlider [data-baseweb=slider] > div {
-    background: none !important;
+/* Slider styling for the active (colored) part */
+.stSlider [data-baseweb=slider] div[data-type="range"] div:first-child {
+    background: linear-gradient(to right, #00c8ff, #14a5ff, #7066ff, #5e17eb) !important;
 }
 
-/* Custom slider track with gradient - the actual track */
-.stSlider [data-baseweb=slider]::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 0;
-    right: 0;
-    height: 4px;
-    transform: translateY(-50%);
-    background: linear-gradient(to right, #00c8ff, #14a5ff, #7066ff, #5e17eb);
-    border-radius: 4px;
-    opacity: 0.7;
-    z-index: 0;
+/* Slider track styling for the inactive (grey) part */
+.stSlider [data-baseweb=slider] div[data-type="range"] div:nth-child(2) {
+    background: rgba(255, 255, 255, 0.1) !important;
 }
 
-/* Slider thumb with gradient - the actual thumb */
+/* Slider thumb styling */
 .stSlider [data-baseweb=slider] [role=slider] {
-    background: none !important;
-    border: none !important;
-    position: relative;
-    z-index: 2;
-}
-
-.stSlider [data-baseweb=slider] [role=slider]::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(to bottom right, #00c8ff, #14a5ff, #7066ff, #5e17eb);
-    border-radius: 50%;
-    border: 2px solid white;
-    box-shadow: 0 0 10px rgba(0, 200, 255, 0.7);
+    background: linear-gradient(to bottom right, #00c8ff, #14a5ff, #7066ff, #5e17eb) !important;
+    border: 2px solid white !important;
+    box-shadow: 0 0 8px rgba(94, 23, 235, 0.6) !important;
 }
 
 /* Override Streamlit defaults */

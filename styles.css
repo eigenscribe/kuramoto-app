@@ -86,9 +86,10 @@ body {
 .section h2 {
     font-weight: bold;
     background: linear-gradient(#00ffee, #27aaff);
-    color: transparent;
     -webkit-background-clip: text;
     background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
     margin-top: 0;
     font-size: 1.8rem;
     width: 100%;
@@ -150,7 +151,7 @@ body {
 
 /* Button Styling */
 .btn, .stButton button, button[kind="primary"] {
-    background-image: linear-gradient(to right, #00ccc0, #0077cc);
+    background-image: linear-gradient(to right, #00c8ff, #14a5ff, #7066ff, #5e17eb);
     box-shadow: 0 4px 15px 0 rgba(39, 170, 255, 0.5);
     width: 100%;
     min-width: 200px;
@@ -174,7 +175,7 @@ body {
 /* Button hover effects */
 .btn:hover, .stButton button:hover, button[kind="primary"]:hover {
     background-position: 100% 0;
-    background-image: linear-gradient(to right, #14a5ff, #8138ff);
+    background-image: linear-gradient(to right, #00ffee, #27aaff);
     filter: brightness(1.1);
     transition: all .4s ease-in-out;
 }
@@ -377,5 +378,5 @@ button:hover {
 
 /* Radio button styling */
 .st-cx, .st-cy {
-    background: linear-gradient(90deg, #00ccc0, #0077cc) !important;
+    background: linear-gradient(to right, #00c8ff, #14a5ff, #7066ff, #5e17eb) !important;
 }

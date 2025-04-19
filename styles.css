@@ -325,9 +325,9 @@ footer {
     margin-bottom: 20px;
 }
 
-/* Progress bar styling with solid color */
+/* Progress bar styling with gradient */
 .stProgress > div > div > div {
-    background: #7851A9 !important; /* Royal Purple */
+    background: linear-gradient(to bottom right, #00c8ff, #14a5ff, #7066ff, #5e17eb) !important;
 }
 
 /* Play Animation button special styling */
@@ -391,7 +391,8 @@ button:hover {
 
 /* Improve selectbox appearance */
 .stSelectbox > div[data-baseweb="select"] {
-    border: 2px solid #7851A9 !important; /* Royal Purple border */
+    border: 2px solid;
+    border-image: linear-gradient(to bottom right, #00c8ff, #14a5ff, #7066ff, #5e17eb) 1;
     border-radius: 5px;
 }
 

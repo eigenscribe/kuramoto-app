@@ -24,14 +24,13 @@ body {
 
 /* Gradient text styles - THESE TWO SPECIFIC GRADIENTS SHOULD BE USED */
 .gradient_text1 {
-    font-weight: bold;
-    background: -webkit-linear-gradient(#14a5ff, #8138ff);
-    background-image: -webkit-linear-gradient(#14a5ff, #8138ff);
-    background-image: linear-gradient(#14a5ff, #8138ff);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
+    font-weight: bold !important;
+    background: linear-gradient(to right bottom, #00c8ff, #14a5ff, #7066ff, #5e17eb) !important;
+    background-image: -webkit-linear-gradient(to right bottom, #00c8ff, #14a5ff, #7066ff, #5e17eb) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
     text-align: center;
 }
 
@@ -39,7 +38,6 @@ body {
     font-weight: bold;
     background: linear-gradient(#00ffee, #27aaff);
     background-image: -webkit-linear-gradient(#00ffee, #27aaff);
-    background-image: linear-gradient(#00ffee, #27aaff);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -98,12 +96,14 @@ body {
 }
 
 .section h3 {
-    font-weight: bold;
-    background: -webkit-linear-gradient(#14a5ff, #8138ff);
-    -webkit-background-clip: text;
-    color: transparent;
-    background-clip: text;
+    font-weight: bold !important;
+    background: linear-gradient(to right bottom, #00c8ff, #14a5ff, #7066ff, #5e17eb) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
     font-size: 1.4rem;
+    text-align: center;
 }
 
 /* Feature box styling */
@@ -136,11 +136,12 @@ body {
 }
 
 .feature-box-content h3 {
-    font-weight: bold;
-    background: -webkit-linear-gradient(#14a5ff, #8138ff);
-    -webkit-background-clip: text;
-    color: transparent;
-    background-clip: text;
+    font-weight: bold !important;
+    background: linear-gradient(to right bottom, #00c8ff, #14a5ff, #7066ff, #5e17eb) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
     margin-top: 0;
     font-size: 1.5rem;
     width: 100%;
@@ -221,21 +222,24 @@ a:hover {
 
 /* Network Connectivity section styling */
 .sidebar h3, .sidebar h3 span {
-    background: -webkit-linear-gradient(#14a5ff, #8138ff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    background: linear-gradient(to right bottom, #00c8ff, #14a5ff, #7066ff, #5e17eb) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
     font-weight: bold !important;
+    text-align: center;
 }
 
 /* Slider track styling */
 .sidebar .stSlider > div > div {
-    background: linear-gradient(90deg, #00ccc0, #0077cc) !important;
+    background: linear-gradient(to right, #00c8ff, #14a5ff, #7066ff, #5e17eb) !important;
     opacity: 0.3;
 }
 
 /* Slider thumb styling */
 .sidebar .stSlider > div > div > div {
-    background: linear-gradient(90deg, #14a5ff, #8138ff) !important;
+    background: linear-gradient(to right, #00c8ff, #14a5ff, #7066ff, #5e17eb) !important;
     border: 2px solid white;
 }
 
@@ -276,7 +280,7 @@ footer {
 
 /* Progress bar styling with gradient */
 .stProgress > div > div > div {
-    background: linear-gradient(90deg, #14a5ff, #8138ff) !important;
+    background: linear-gradient(to right, #00c8ff, #14a5ff, #7066ff, #5e17eb) !important;
 }
 
 /* Play Animation button special styling */
@@ -288,7 +292,7 @@ footer {
     font-size: 18px;
     letter-spacing: 0.5px;
     border-radius: 12px;
-    background-image: linear-gradient(to right, #14a5ff, #8138ff);
+    background-image: linear-gradient(to right, #00c8ff, #14a5ff, #7066ff, #5e17eb);
     box-shadow: 0 5px 15px rgba(20, 165, 255, 0.4);
     transition: all 0.3s ease;
     text-align: center;
@@ -362,13 +366,13 @@ button:hover {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: linear-gradient(45deg, #00ccc0, #0077cc);
+    background: linear-gradient(to right, #00c8ff, #14a5ff, #7066ff, #5e17eb);
     border-radius: 10px;
     border: 2px solid rgba(0, 0, 0, 0.2);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(45deg, #14a5ff, #8138ff);
+    background: linear-gradient(to right, #00ffee, #27aaff);
 }
 
 /* Radio button styling */

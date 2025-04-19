@@ -273,7 +273,7 @@ a:hover {
 /* This targets the left side of slider (between minimum value and thumb) */
 .stSlider [data-baseweb=slider] div[data-type="range"] div:first-child,
 .stSlider [data-baseweb=slider] [data-testid="stSliderProgress"] {
-    background: #0047AB !important; /* Cobalt Blue */
+    background: #7851A9 !important; /* Royal Purple */
     height: 4px !important; /* Ensure consistent height */
 }
 
@@ -285,9 +285,9 @@ a:hover {
 
 /* Slider thumb styling */
 .stSlider [data-baseweb=slider] [role=slider] {
-    background: #0047AB !important; /* Cobalt Blue */
+    background: #7851A9 !important; /* Royal Purple */
     border: 2px solid white !important;
-    box-shadow: 0 0 8px rgba(0, 71, 171, 0.7) !important;
+    box-shadow: 0 0 8px rgba(120, 81, 169, 0.7) !important;
 }
 
 /* Override Streamlit defaults */
@@ -325,9 +325,9 @@ footer {
     margin-bottom: 20px;
 }
 
-/* Progress bar styling with gradient */
+/* Progress bar styling with solid color */
 .stProgress > div > div > div {
-    background: linear-gradient(to bottom right, #00c8ff, #14a5ff, #7066ff, #5e17eb) !important;
+    background: #7851A9 !important; /* Royal Purple */
 }
 
 /* Play Animation button special styling */
@@ -391,8 +391,7 @@ button:hover {
 
 /* Improve selectbox appearance */
 .stSelectbox > div[data-baseweb="select"] {
-    border: 2px solid;
-    border-image: linear-gradient(to bottom right, #00c8ff, #14a5ff, #7066ff, #5e17eb) 1;
+    border: 2px solid #7851A9 !important; /* Royal Purple border */
     border-radius: 5px;
 }
 
@@ -407,8 +406,8 @@ button:hover {
     border-radius: 4px;
     background-color: #222;
     color: white;
-    border: 2px solid #0047AB !important; /* Cobalt Blue border */
-    box-shadow: 0 0 5px rgba(0, 71, 171, 0.5);
+    border: 2px solid #7851A9 !important; /* Royal Purple border */
+    box-shadow: 0 0 5px rgba(120, 81, 169, 0.5);
 }
 
 /* Custom scrollbar styling */
@@ -432,9 +431,9 @@ button:hover {
     background: linear-gradient(to right, #00ffee, #27aaff);
 }
 
-/* Radio button styling - using cobalt blue */
+/* Radio button styling - using royal purple */
 [data-testid="stRadio"] [data-baseweb="radio"] div[data-checked="true"] div:first-child {
-    background: #0047AB !important; /* Cobalt Blue */
+    background: #7851A9 !important; /* Royal Purple */
     border: 2px solid white !important;
-    box-shadow: 0 0 5px rgba(0, 71, 171, 0.7) !important;
+    box-shadow: 0 0 5px rgba(120, 81, 169, 0.7) !important;
 }

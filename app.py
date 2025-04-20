@@ -687,10 +687,12 @@ with tab3:
         min_value=0, 
         max_value=len(times)-1, 
         value=st.session_state.time_index,
-        format="t=%.2f" % times[st.session_state.time_index],
         help="Manually select a specific time point to display"
     )
     st.session_state.time_index = time_index
+    
+    # Display the current time
+    playback_container.markdown(f"<div style='text-align: center;'><h4>Current Time: t = {times[time_index]:.3f}</h4></div>", unsafe_allow_html=True)
     
     # Centered animation controls with custom styling
     col1, col2, col3, col4, col5 = st.columns([1, 1, 1, 1, 1])
@@ -742,7 +744,7 @@ with tab3:
             frequencies=frequencies,
             freq_type=freq_type,
             freq_params=freq_params,
-            adjacency_matrix=network_adj_matrix
+            adjacency_matrix=adj_matrix
         )
         
         if sim_id:

@@ -447,9 +447,9 @@ with tab1:
     # Create graph visualization
     ax1.set_facecolor('#121212')
     
-    # Draw the graph
-    edges = nx.draw_networkx_edges(G, pos, ax=ax1, alpha=0.5, 
-                               edge_color='#00ffee', width=1.5)
+    # Draw the graph with dark blue edges to match adjacency matrix
+    edges = nx.draw_networkx_edges(G, pos, ax=ax1, alpha=0.7, 
+                               edge_color='#0070db', width=1.5)
     
     # Convert the RGBA colors to hex for networkx
     node_colors = []

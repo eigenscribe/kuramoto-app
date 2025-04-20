@@ -838,15 +838,15 @@ with tab3:
         r = order_parameter[time_idx]
         psi = np.angle(np.sum(np.exp(1j * phases_at_time)))
         
-        # Draw arrow showing mean field with glow effect - using blue color
+        # Draw arrow showing mean field with glow effect - using bright blue color
         # First add glow/shadow
         ax_circle.arrow(0, 0, r * np.cos(psi), r * np.sin(psi), 
-                       head_width=0.07, head_length=0.12, fc='#1e90ff', ec='#1e90ff', 
+                       head_width=0.07, head_length=0.12, fc='#00c2ff', ec='#00c2ff', 
                        width=0.03, alpha=0.3, zorder=5)
         
         # Then add main arrow
         ax_circle.arrow(0, 0, r * np.cos(psi), r * np.sin(psi), 
-                       head_width=0.05, head_length=0.1, fc='#007bff', ec='#007bff', 
+                       head_width=0.05, head_length=0.1, fc='#00a5ff', ec='#00a5ff', 
                        width=0.02, zorder=6)
         
         # Draw axes

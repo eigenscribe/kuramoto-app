@@ -428,25 +428,22 @@ if network_type == "Custom Adjacency Matrix":
             if adj_matrix.shape[0] != adj_matrix.shape[1]:
                 st.sidebar.error(f"The adjacency matrix must be square. Current shape: {adj_matrix.shape}")
             elif adj_matrix.shape[0] != n_oscillators:
-                # Provide a warning but allow mismatched dimensions for imported configs
-                st.sidebar.warning(f"Matrix dimensions ({adj_matrix.shape[0]}x{adj_matrix.shape[1]}) don't match oscillator count ({n_oscillators}). The network graph may not display correctly.")
+                # New feature: automatically update the number of oscillators to match the matrix dimension
+                matrix_dim = adj_matrix.shape[0]
                 
-                # Log debugging information
-                print(f"Adjacency matrix shape mismatch: matrix is {adj_matrix.shape}, but n_oscillators={n_oscillators}")
+                # Log information
+                print(f"Auto-adjusting oscillator count: matrix is {adj_matrix.shape}, updating n_oscillators from {n_oscillators} to {matrix_dim}")
                 
-                # Try to adapt matrix size if possible
-                if adj_matrix.shape[0] > n_oscillators:
-                    # Truncate to fit current oscillator count
-                    adj_matrix = adj_matrix[:n_oscillators, :n_oscillators]
-                    print(f"Truncated matrix to {adj_matrix.shape}")
-                    st.sidebar.info("Matrix was truncated to match oscillator count.")
-                else:
-                    # Expand matrix with zeros
-                    temp = np.zeros((n_oscillators, n_oscillators))
-                    temp[:adj_matrix.shape[0], :adj_matrix.shape[1]] = adj_matrix
-                    adj_matrix = temp
-                    print(f"Expanded matrix to {adj_matrix.shape}")
-                    st.sidebar.info("Matrix was expanded with zeros to match oscillator count.")
+                # Update session state to reflect the new oscillator count
+                st.session_state.n_oscillators = matrix_dim
+                
+                # Set the local variable as well for the current run
+                n_oscillators = matrix_dim
+                
+                # Show success message
+                st.sidebar.success(f"Number of oscillators automatically updated to {matrix_dim} to match matrix dimensions.")
+                
+                # No need to resize matrix as we're adjusting oscillator count instead
             else:
                 st.sidebar.success("Adjacency matrix validated successfully!")
                 
@@ -567,19 +564,16 @@ with tab1:
             # Make sure we're using a copy of the matrix to avoid modifying the original
             network_adj_matrix = np.array(adj_matrix, copy=True)
             
-            # Make sure dimensions match
+            # Make sure dimensions match - this should actually never happen now 
+            # that we auto-adjust oscillator count, but we keep this as a safety check
             if network_adj_matrix.shape[0] != n_oscillators:
-                print(f"Adjacency matrix dimensions ({network_adj_matrix.shape}) don't match oscillator count ({n_oscillators})")
-                if network_adj_matrix.shape[0] > n_oscillators:
-                    # Truncate the matrix to match oscillator count
-                    network_adj_matrix = network_adj_matrix[:n_oscillators, :n_oscillators]
-                    print(f"Truncated matrix to {network_adj_matrix.shape}")
-                else:
-                    # Expand the matrix with zeros to match oscillator count
-                    temp = np.zeros((n_oscillators, n_oscillators))
-                    temp[:network_adj_matrix.shape[0], :network_adj_matrix.shape[1]] = network_adj_matrix
-                    network_adj_matrix = temp
-                    print(f"Expanded matrix to {network_adj_matrix.shape}")
+                print(f"Matrix dimensions mismatch after auto-adjustment: matrix is {network_adj_matrix.shape} but n_oscillators={n_oscillators}")
+                
+                # Just to be safe, use the matrix dimensions and adjust oscillator count again
+                matrix_dim = network_adj_matrix.shape[0]
+                print(f"Re-adjusting oscillator count to matrix dimension: {matrix_dim}")
+                n_oscillators = matrix_dim
+                st.session_state.n_oscillators = matrix_dim
             
             # Print detailed debug info
             print(f"Using custom adjacency matrix with shape {network_adj_matrix.shape}")

@@ -358,9 +358,24 @@ if network_type == "Custom Adjacency Matrix":
     </div>
     """, unsafe_allow_html=True)
     
+    # Create a default example matrix if no prior matrix exists
+    if not st.session_state.adj_matrix_input:
+        # Create a simple default example for smaller number of oscillators
+        default_matrix = ""
+        for i in range(min(5, n_oscillators)):
+            row = []
+            for j in range(min(5, n_oscillators)):
+                if i == j:
+                    row.append("0")  # No self-connections
+                elif abs(i-j) == 1 or abs(i-j) == min(5, n_oscillators)-1:  # Ring-neighbors
+                    row.append("1")  # Connected
+                else:
+                    row.append("0")  # Not connected
+            default_matrix += ", ".join(row) + "\n"
+                
     adj_matrix_input = st.sidebar.text_area(
         "Adjacency Matrix",
-        value=st.session_state.adj_matrix_input,
+        value=st.session_state.adj_matrix_input if st.session_state.adj_matrix_input else default_matrix,
         height=150,
         help="Enter the adjacency matrix as comma-separated values, each row on a new line",
         key="adj_matrix_input"
@@ -465,10 +480,10 @@ else:
     # If we don't have a custom matrix but the UI type is set to custom,
     # we need to ensure this is communicated clearly
     if network_type == "Custom Adjacency Matrix" and adj_matrix is None:
-        # Use custom styled message with green background instead of the default yellow warning
+        # Use custom styled message with magenta background instead of the default yellow warning
         st.markdown("""
-        <div style="background-color: rgba(0,100,0,0.2); color: #00aa00; 
-                    padding: 10px; border-radius: 5px; border-left: 5px solid #00cc00;">
+        <div style="background-color: rgba(200,0,200,0.15); color: #ff33cc; 
+                    padding: 10px; border-radius: 15px; border-left: 5px solid #ff00ff;">
             <b>Matrix Input:</b> Please enter your custom adjacency matrix in the sidebar.
             The format should be comma-separated values with each row on a new line.
         </div>

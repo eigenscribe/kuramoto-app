@@ -402,9 +402,14 @@ with tab1:
         # Format as hex
         node_colors.append(f"#{int(rgba[0]*255):02x}{int(rgba[1]*255):02x}{int(rgba[2]*255):02x}")
     
+    # Calculate dynamic node size based on number of nodes
+    # Larger size for fewer nodes, smaller size for many nodes
+    n_nodes = len(G.nodes)
+    node_size = max(100, int(1000 * (1 / (0.1 * n_nodes + 0.5))))  # Formula for scaling
+    
     nodes = nx.draw_networkx_nodes(G, pos, ax=ax1, 
                                node_color=node_colors, 
-                               node_size=300, alpha=0.9, 
+                               node_size=node_size, alpha=0.9, 
                                edgecolors='white', linewidths=1.5)
     
     # Add node labels only if there are relatively few nodes

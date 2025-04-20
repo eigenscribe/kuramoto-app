@@ -10,7 +10,9 @@ import base64
 import json
 from kuramoto_model import KuramotoModel
 import time
-from database import store_simulation, get_simulation, list_simulations, delete_simulation
+from database import (store_simulation, get_simulation, list_simulations, delete_simulation,
+                  save_configuration, list_configurations, get_configuration, delete_configuration,
+                  get_configuration_by_name)
 
 # Set up Matplotlib style for dark theme plots
 plt.style.use('dark_background')
@@ -18,17 +20,16 @@ plt.rcParams.update({
     'axes.facecolor': '#1e1e1e',
     'figure.facecolor': '#1e1e1e',
     'savefig.facecolor': '#1e1e1e',
-    'axes.edgecolor': '#757575',
-    'axes.labelcolor': 'white',
     'axes.grid': True,
-    'grid.color': '#333333',
+    'grid.color': '#444444',
+    'grid.alpha': 0.3,
     'grid.linestyle': '--',
-    'grid.alpha': 0.7,
-    'xtick.color': 'white',
-    'ytick.color': 'white',
-    'text.color': 'white',
-    'figure.figsize': (10, 6),
-    'font.size': 12,
+    'axes.edgecolor': '#444444',
+    'xtick.color': '#888888',
+    'ytick.color': '#888888',
+    'text.color': '#ffffff',
+    'axes.labelcolor': '#ffffff',
+    'axes.titlecolor': '#ffffff',
     'lines.linewidth': 2,
 })
 
@@ -100,14 +101,47 @@ st.markdown("<h1 class='gradient_text1'>Kuramoto Model Simulator</h1>", unsafe_a
 # Create sidebar with parameters
 st.sidebar.markdown("<h2 class='gradient_text1'>Simulation Parameters</h2>", unsafe_allow_html=True)
 
+# Initialize session state for parameters if they don't exist
+if 'n_oscillators' not in st.session_state:
+    st.session_state.n_oscillators = 10
+if 'coupling_strength' not in st.session_state:
+    st.session_state.coupling_strength = 1.0
+if 'freq_type' not in st.session_state:
+    st.session_state.freq_type = "Normal"
+if 'freq_mean' not in st.session_state:
+    st.session_state.freq_mean = 0.0
+if 'freq_std' not in st.session_state:
+    st.session_state.freq_std = 1.0
+if 'freq_min' not in st.session_state:
+    st.session_state.freq_min = -1.0
+if 'freq_max' not in st.session_state:
+    st.session_state.freq_max = 1.0
+if 'peak1' not in st.session_state:
+    st.session_state.peak1 = -1.0
+if 'peak2' not in st.session_state:
+    st.session_state.peak2 = 1.0
+if 'custom_freqs' not in st.session_state:
+    st.session_state.custom_freqs = "0.5, 1.0, 1.5, 2.0, 2.5, 3.0, -0.5, -1.0, -1.5, -2.0"
+if 'simulation_time' not in st.session_state:
+    st.session_state.simulation_time = 20.0
+if 'time_step' not in st.session_state:
+    st.session_state.time_step = 0.05
+if 'random_seed' not in st.session_state:
+    st.session_state.random_seed = 42
+if 'network_type' not in st.session_state:
+    st.session_state.network_type = "All-to-All"
+if 'adj_matrix_input' not in st.session_state:
+    st.session_state.adj_matrix_input = ""
+
 # Number of oscillators slider
 n_oscillators = st.sidebar.slider(
     "Number of Oscillators",
     min_value=2,
     max_value=50,
-    value=10,
+    value=st.session_state.n_oscillators,
     step=1,
-    help="Number of oscillators in the system"
+    help="Number of oscillators in the system",
+    key="n_oscillators"
 )
 
 # Coupling strength slider
@@ -115,39 +149,45 @@ coupling_strength = st.sidebar.slider(
     "Coupling Strength (K)",
     min_value=0.0,
     max_value=10.0,
-    value=1.0,
+    value=st.session_state.coupling_strength,
     step=0.1,
-    help="Strength of coupling between oscillators"
+    help="Strength of coupling between oscillators",
+    key="coupling_strength"
 )
 
 # Frequency distribution type
 freq_type = st.sidebar.selectbox(
     "Frequency Distribution",
     ["Normal", "Uniform", "Bimodal", "Custom"],
-    help="Distribution of natural frequencies"
+    index=["Normal", "Uniform", "Bimodal", "Custom"].index(st.session_state.freq_type),
+    help="Distribution of natural frequencies",
+    key="freq_type"
 )
 
 # Parameters for frequency distribution
 if freq_type == "Normal":
-    freq_mean = st.sidebar.slider("Mean", -2.0, 2.0, 0.0, 0.1)
-    freq_std = st.sidebar.slider("Standard Deviation", 0.1, 3.0, 1.0, 0.1)
+    freq_mean = st.sidebar.slider("Mean", -2.0, 2.0, st.session_state.freq_mean, 0.1, key="freq_mean")
+    freq_std = st.sidebar.slider("Standard Deviation", 0.1, 3.0, st.session_state.freq_std, 0.1, key="freq_std")
     frequencies = np.random.normal(freq_mean, freq_std, n_oscillators)
     
 elif freq_type == "Uniform":
-    freq_min = st.sidebar.slider("Minimum", -5.0, 0.0, -1.0, 0.1)
-    freq_max = st.sidebar.slider("Maximum", 0.0, 5.0, 1.0, 0.1)
+    freq_min = st.sidebar.slider("Minimum", -5.0, 0.0, st.session_state.freq_min, 0.1, key="freq_min")
+    freq_max = st.sidebar.slider("Maximum", 0.0, 5.0, st.session_state.freq_max, 0.1, key="freq_max")
     frequencies = np.random.uniform(freq_min, freq_max, n_oscillators)
     
 elif freq_type == "Bimodal":
-    peak1 = st.sidebar.slider("Peak 1", -5.0, 0.0, -1.0, 0.1)
-    peak2 = st.sidebar.slider("Peak 2", 0.0, 5.0, 1.0, 0.1)
+    peak1 = st.sidebar.slider("Peak 1", -5.0, 0.0, st.session_state.peak1, 0.1, key="peak1")
+    peak2 = st.sidebar.slider("Peak 2", 0.0, 5.0, st.session_state.peak2, 0.1, key="peak2")
     mix = np.random.choice([0, 1], size=n_oscillators)
-    frequencies = mix * np.random.normal(peak1, 0.3, n_oscillators) + (1 - mix) * np.random.normal(peak2, 0.3, n_oscillators)
+    freq1 = np.random.normal(peak1, 0.3, n_oscillators)
+    freq2 = np.random.normal(peak2, 0.3, n_oscillators)
+    frequencies = mix * freq1 + (1 - mix) * freq2
     
 else:  # Custom
     custom_freqs = st.sidebar.text_area(
         "Enter custom frequencies (comma-separated)",
-        "0.5, 1.0, 1.5, 2.0, 2.5, 3.0, -0.5, -1.0, -1.5, -2.0"
+        value=st.session_state.custom_freqs,
+        key="custom_freqs"
     )
     try:
         frequencies = np.array([float(x.strip()) for x in custom_freqs.split(',')])
@@ -164,30 +204,39 @@ else:  # Custom
 simulation_time = st.sidebar.slider(
     "Simulation Time",
     min_value=1.0,
-    max_value=50.0,
-    value=20.0,
+    max_value=100.0,
+    value=st.session_state.simulation_time,
     step=1.0,
-    help="Total simulation time"
+    help="Total simulation time",
+    key="simulation_time"
 )
 
 time_step = st.sidebar.slider(
     "Time Step",
     min_value=0.01,
     max_value=0.1,
-    value=0.05,
+    value=st.session_state.time_step,
     step=0.01,
-    help="Time step for simulation"
+    help="Time step for simulation",
+    key="time_step"
 )
 
 # Initialize model with specified parameters
-random_seed = st.sidebar.number_input("Random Seed", value=42, help="Seed for reproducibility")
+random_seed = st.sidebar.number_input(
+    "Random Seed", 
+    value=st.session_state.random_seed, 
+    help="Seed for reproducibility",
+    key="random_seed"
+)
 
 # Network Connectivity Configuration
 st.sidebar.markdown("<h3 class='gradient_text1'>Network Connectivity</h3>", unsafe_allow_html=True)
 network_type = st.sidebar.radio(
     "Network Type",
-    options=["Fully Connected", "Custom Adjacency Matrix"],
-    help="Define how oscillators are connected to each other"
+    options=["All-to-All", "Nearest Neighbor", "Random", "Custom Adjacency Matrix"],
+    index=["All-to-All", "Nearest Neighbor", "Random", "Custom Adjacency Matrix"].index(st.session_state.network_type),
+    help="Define how oscillators are connected to each other",
+    key="network_type"
 )
 
 # Custom adjacency matrix input
@@ -206,8 +255,10 @@ if network_type == "Custom Adjacency Matrix":
     
     adj_matrix_input = st.sidebar.text_area(
         "Adjacency Matrix",
+        value=st.session_state.adj_matrix_input,
         height=150,
-        help="Enter the adjacency matrix as comma-separated values, each row on a new line"
+        help="Enter the adjacency matrix as comma-separated values, each row on a new line",
+        key="adj_matrix_input"
     )
     
     # Process the input adjacency matrix
@@ -233,9 +284,8 @@ if network_type == "Custom Adjacency Matrix":
             st.sidebar.error(f"Error parsing matrix: {str(e)}")
             adj_matrix = None
 
-# Create tabs for different visualizations
-# Create tabs with Network being the default tab
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["Network", "Distributions", "Animation", "About", "Database"])
+# Create tabs for different visualizations (Network is default tab)
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["Network", "Distributions", "Animation", "Database", "Configurations"])
 
 # Function to simulate model
 @st.cache_data(ttl=300)
@@ -264,7 +314,9 @@ model, times, phases, order_parameter = run_simulation(
     adjacency_matrix=adj_matrix
 )
 
-# Tab 1: Network Structure Visualization
+########################
+# TAB 1: NETWORK TAB
+########################
 with tab1:
     st.markdown("<h2 class='gradient_text2'>Network Structure</h2>", unsafe_allow_html=True)
     
@@ -276,7 +328,7 @@ with tab1:
     </div>
     """, unsafe_allow_html=True)
     
-    # Create a network visualization - this code moved from below
+    # Create a network visualization
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5), gridspec_kw={'width_ratios': [2, 1]})
     
     # Import networkx for graph visualization
@@ -337,7 +389,7 @@ with tab1:
     
     # Draw the graph
     edges = nx.draw_networkx_edges(G, pos, ax=ax1, alpha=0.5, 
-                                edge_color='#00ffee', width=1.5)
+                               edge_color='#00ffee', width=1.5)
     
     # Convert the RGBA colors to hex for networkx
     node_colors = []
@@ -347,23 +399,23 @@ with tab1:
             rgba = c.tolist()
         else:  # If it's already a tuple/list
             rgba = c
-        # Format as hex, ensuring we have proper RGB components
+        # Format as hex
         node_colors.append(f"#{int(rgba[0]*255):02x}{int(rgba[1]*255):02x}{int(rgba[2]*255):02x}")
     
     nodes = nx.draw_networkx_nodes(G, pos, ax=ax1, 
-                                node_color=node_colors, 
-                                node_size=300, alpha=0.9, 
-                                edgecolors='white', linewidths=1.5)
+                               node_color=node_colors, 
+                               node_size=300, alpha=0.9, 
+                               edgecolors='white', linewidths=1.5)
     
     # Add node labels only if there are relatively few nodes
     if n_oscillators <= 15:
         labels = {i: str(i) for i in range(n_oscillators)}
         nx.draw_networkx_labels(G, pos, labels=labels, ax=ax1, 
-                            font_color='white', font_weight='bold')
+                           font_color='white', font_weight='bold')
         
     # Add title and styling
     ax1.set_title(f'Oscillator Network Graph ({network_type})', 
-                color='white', fontsize=14, pad=15)
+               color='white', fontsize=14, pad=15)
     ax1.set_axis_off()
     
     # Add a legend explaining node colors
@@ -422,7 +474,9 @@ with tab1:
     </div>
     """, unsafe_allow_html=True)
 
-# Tab 2: Distributions tab
+########################
+# TAB 2: DISTRIBUTIONS TAB
+########################
 with tab2:
     st.markdown("<h2 class='gradient_text2'>Initial Distributions</h2>", unsafe_allow_html=True)
     
@@ -438,7 +492,7 @@ with tab2:
     dist_col1, dist_col2 = st.columns(2)
     
     with dist_col1:
-        st.markdown("<h4>Natural Frequency Distribution</h4>", unsafe_allow_html=True)
+        st.markdown("<h4 class='gradient_text2'>Natural Frequency Distribution</h4>", unsafe_allow_html=True)
         
         # Create frequency distribution histogram
         fig_freq, ax_freq = plt.subplots(figsize=(3.5, 2.5))
@@ -449,8 +503,8 @@ with tab2:
         
         # Create custom colormap that matches our gradient theme
         custom_cmap = LinearSegmentedColormap.from_list("kuramoto_colors", 
-                                                 ["#00ffee", "#27aaff"], 
-                                                 N=256)
+                                                ["#00ffee", "#27aaff"], 
+                                                N=256)
         
         # Create custom colors with a gradient effect that matches our theme
         colors = custom_cmap(np.linspace(0.1, 0.9, n_bins))
@@ -486,12 +540,12 @@ with tab2:
         ax_freq.set_xlabel('Natural Frequency', fontsize=12, fontweight='bold', color='white')
         ax_freq.set_ylabel('Count', fontsize=12, fontweight='bold', color='white')
         ax_freq.set_title(f'Natural Frequency Distribution ({freq_type})', 
-                        fontsize=14, fontweight='bold', color='white', pad=15)
+                       fontsize=14, fontweight='bold', color='white', pad=15)
         
         # Add mean frequency marker
         mean_freq = np.mean(frequencies)
         ax_freq.axvline(x=mean_freq, color='#ff5555', linestyle='-', linewidth=2, alpha=0.7,
-                       label=f'Mean: {mean_freq:.2f}')
+                      label=f'Mean: {mean_freq:.2f}')
         ax_freq.legend(framealpha=0.7)
         
         # Customize grid
@@ -515,7 +569,7 @@ with tab2:
         """, unsafe_allow_html=True)
     
     with dist_col2:
-        st.markdown("<h4>Initial Phase Distribution</h4>", unsafe_allow_html=True)
+        st.markdown("<h4 class='gradient_text2'>Initial Phase Distribution</h4>", unsafe_allow_html=True)
         
         # Create initial phase distribution histogram
         fig_init_phase, ax_init_phase = plt.subplots(figsize=(3.5, 2.5))
@@ -560,7 +614,7 @@ with tab2:
         ax_init_phase.set_xlabel('Phase (mod 2π)', fontsize=12, fontweight='bold', color='white')
         ax_init_phase.set_ylabel('Count', fontsize=12, fontweight='bold', color='white')
         ax_init_phase.set_title('Initial Phase Distribution (t=0)', 
-                              fontsize=14, fontweight='bold', color='white', pad=15)
+                             fontsize=14, fontweight='bold', color='white', pad=15)
         
         # Calculate initial order parameter
         initial_r = order_parameter[0]
@@ -569,7 +623,7 @@ with tab2:
         # Add mean phase marker if order parameter is significant
         if initial_r > 0.3:
             ax_init_phase.axvline(x=initial_psi, color='#ff5555', linestyle='-', linewidth=2, alpha=0.7,
-                                label=f'Mean Phase: {initial_psi:.2f}')
+                               label=f'Mean Phase: {initial_psi:.2f}')
             ax_init_phase.legend(framealpha=0.7)
         
         # Customize grid
@@ -603,7 +657,9 @@ with tab2:
     </div>
     """, unsafe_allow_html=True)
 
-# Tab 3: Animation tab
+########################
+# TAB 3: ANIMATION TAB
+########################
 with tab3:
     st.markdown("<h2 class='gradient_text2'>Interactive Animation</h2>", unsafe_allow_html=True)
     
@@ -618,32 +674,18 @@ with tab3:
     # Create oscillator visualization
     st.markdown("<h3 class='gradient_text1'>Oscillator Synchronization</h3>", unsafe_allow_html=True)
     
-    # Add animation controls with full width
-    st.subheader("Animation Controls")
+    # Initialize time_index in session state if not present
+    if 'time_index' not in st.session_state:
+        st.session_state.time_index = 0
+        
+    # Set time index from session state
+    time_index = st.session_state.time_index
     
-    # Create three columns for animation controls with better spacing
-    ctrl_col1, ctrl_col2, ctrl_col3 = st.columns([2, 1, 1])
+    # Initialize animation variables
+    animate = False
+    animation_speed = 3.0
     
-    with ctrl_col1:
-        animation_speed = st.slider(
-            "Animation Speed",
-            min_value=1,
-            max_value=10,
-            value=5,
-            step=1,
-            help="Control how fast the animation plays"
-        )
-    
-    with ctrl_col2:
-        animate = st.button("Play Animation", use_container_width=True)
-    
-    with ctrl_col3:
-        stop_animation = st.button("Stop", use_container_width=True)
-    
-    # Initialize time_index to 0 (instead of using a slider)
-    time_index = 0
-    
-    # Get time and order parameter values
+    # Get time and order parameter values for the current time index
     current_time = times[time_index]
     current_r = order_parameter[time_index]
     
@@ -663,7 +705,7 @@ with tab3:
         # Add subtle circle rings for reference
         for radius in [0.25, 0.5, 0.75]:
             ring = plt.Circle((0, 0), radius, fill=False, color='#334455', 
-                             linestyle=':', alpha=0.5, zorder=2)
+                            linestyle=':', alpha=0.5, zorder=2)
             ax_circle.add_patch(ring)
         
         # Draw unit circle with glow effect
@@ -671,7 +713,7 @@ with tab3:
         ax_circle.add_patch(circle_glow)
         
         circle = plt.Circle((0, 0), 1, fill=False, color='#66ccff', linestyle='-', 
-                           linewidth=1.5, alpha=0.8, zorder=4)
+                         linewidth=1.5, alpha=0.8, zorder=4)
         ax_circle.add_patch(circle)
         
         # Plot oscillators
@@ -697,7 +739,7 @@ with tab3:
         
         # Scatter plot with oscillator colors
         sc = ax_circle.scatter(x, y, facecolors=oscillator_colors, edgecolor='white', s=180, 
-                              alpha=0.9, linewidth=1.5, zorder=10)
+                             alpha=0.9, linewidth=1.5, zorder=10)
         
         # Calculate and show order parameter
         r = order_parameter[time_idx]
@@ -727,7 +769,7 @@ with tab3:
         
         # Enhance title
         ax_circle.set_title(f'Oscillators at t={times[time_idx]:.2f}', 
-                           color='white', fontsize=14, pad=15)
+                          color='white', fontsize=14, pad=15)
         
         # Close any previous figure to avoid memory issues
         plt.close('all')
@@ -765,29 +807,29 @@ with tab3:
             
             # Plot oscillator phases as filled dots with color gradient
             ax.scatter(times[:time_idx+1], phases[i, :time_idx+1] % (2 * np.pi), 
-                      facecolors=color, edgecolor='white', alpha=0.7, s=50, 
-                      linewidth=0.5, zorder=5)
+                     facecolors=color, edgecolor='white', alpha=0.7, s=50, 
+                     linewidth=0.5, zorder=5)
             
             # Add a subtle connecting line with low opacity
             ax.plot(times[:time_idx+1], phases[i, :time_idx+1] % (2 * np.pi), 
-                   color=color, alpha=0.2, linewidth=0.8, zorder=2)
+                  color=color, alpha=0.2, linewidth=0.8, zorder=2)
             
             # Highlight current position with a larger filled marker
             ax.scatter([times[time_idx]], [phases[i, time_idx] % (2 * np.pi)], 
-                      s=140, facecolors=color, edgecolor='white', 
-                      linewidth=1.5, zorder=15)
+                     s=140, facecolors=color, edgecolor='white', 
+                     linewidth=1.5, zorder=15)
         
         # Add labels for key phase positions
         phase_labels = [(0, '0'), (np.pi/2, 'π/2'), (np.pi, 'π'), (3*np.pi/2, '3π/2'), (2*np.pi, '2π')]
         for y, label in phase_labels:
             ax.annotate(label, xy=(-0.02, y), xycoords=('axes fraction', 'data'),
-                       fontsize=11, color='white', ha='center', va='center')
+                      fontsize=11, color='white', ha='center', va='center')
         
         # Plot styling
         ax.set_xlabel('Time', fontsize=13, fontweight='bold', color='white')
         ax.set_ylabel('Phase (mod 2π)', fontsize=13, fontweight='bold', color='white')
         ax.set_title(f'Oscillator Phases at t={times[time_idx]:.2f}', 
-                    fontsize=14, fontweight='bold', color='white', pad=15)
+                   fontsize=14, fontweight='bold', color='white', pad=15)
         ax.set_ylim(0, 2 * np.pi)
         ax.set_yticks([0, np.pi/2, np.pi, 3*np.pi/2, 2*np.pi])
         ax.set_yticklabels(['0', 'π/2', 'π', '3π/2', '2π'])
@@ -819,18 +861,18 @@ with tab3:
         
         # Create a custom colormap that matches gradient_text2
         cmap = LinearSegmentedColormap.from_list("order_param", 
-                                              ["#00ffee", "#27aaff"], 
-                                              N=256)
+                                             ["#00ffee", "#27aaff"], 
+                                             N=256)
         
         # Plot order parameter with filled gradient dots
         colors = [cmap(r) for r in order_parameter[:time_idx+1]]
         scatter = ax.scatter(times[:time_idx+1], order_parameter[:time_idx+1],
-                           facecolors=colors, edgecolor='white',
-                           s=70, alpha=0.9, linewidth=0.5, zorder=10)
+                          facecolors=colors, edgecolor='white',
+                          s=70, alpha=0.9, linewidth=0.5, zorder=10)
         
         # Add a connecting line with low opacity
         ax.plot(times[:time_idx+1], order_parameter[:time_idx+1], 
-               color='white', alpha=0.3, linewidth=1, zorder=5)
+              color='white', alpha=0.3, linewidth=1, zorder=5)
         
         # Highlight current position with a larger filled marker
         if time_idx > 0:
@@ -841,9 +883,9 @@ with tab3:
         
         # Add highlights at important thresholds
         ax.axhline(y=0.5, color='#aaaaaa', linestyle='--', alpha=0.5, zorder=1, 
-                  label='Partial Synchronization (r=0.5)')
+                 label='Partial Synchronization (r=0.5)')
         ax.axhline(y=0.8, color='#ffffff', linestyle='--', alpha=0.5, zorder=1,
-                  label='Strong Synchronization (r=0.8)')
+                 label='Strong Synchronization (r=0.8)')
         
         # Enhance the plot appearance
         ax.set_xlim(times.min(), times.max())
@@ -851,7 +893,7 @@ with tab3:
         ax.set_xlabel('Time', fontsize=13, fontweight='bold', color='white')
         ax.set_ylabel('Order Parameter r(t)', fontsize=13, fontweight='bold', color='white')
         ax.set_title(f'Phase Synchronization at t={times[time_idx]:.2f}', 
-                    fontsize=14, fontweight='bold', color='white', pad=15)
+                   fontsize=14, fontweight='bold', color='white', pad=15)
         
         # Create custom grid
         ax.grid(True, color='#333333', alpha=0.5, linestyle=':')
@@ -884,10 +926,85 @@ with tab3:
         order_plot_placeholder = st.empty()
         order_plot_placeholder.pyplot(create_order_parameter_plot(time_index))
     
+    # Display the current time
+    st.markdown(f"<div style='text-align: center;'><h4>Current Time: t = {times[time_index]:.3f}</h4></div>", unsafe_allow_html=True)
+    
+    # Playback controls layout - now after the plots
+    playback_container = st.container()
+    
+    # Add a slider to manually control visualization time point
+    time_index = playback_container.slider(
+        "Time Point", 
+        min_value=0, 
+        max_value=len(times)-1, 
+        value=st.session_state.time_index,
+        help="Manually select a specific time point to display"
+    )
+    st.session_state.time_index = time_index
+    
+    # Centered animation controls with custom styling
+    col1, col2, col3, col4, col5 = st.columns([1, 1, 1, 1, 1])
+    
+    # Playback speed control
+    animation_speed = col1.slider(
+        "Speed", 
+        min_value=0.5, 
+        max_value=5.0, 
+        value=3.0, 
+        step=0.5,
+        help="Control how fast the animation plays"
+    )
+    
+    # Previous frame button
+    if col2.button("⏮ Previous", use_container_width=True):
+        if st.session_state.time_index > 0:
+            st.session_state.time_index -= 1
+            st.rerun()
+    
+    # Play Animation button
+    animate = col3.button("▶ Play", use_container_width=True)
+    
+    # Next frame button
+    if col4.button("⏭ Next", use_container_width=True):
+        if st.session_state.time_index < len(times) - 1:
+            st.session_state.time_index += 1
+            st.rerun()
+    
+    # Save simulation button
+    if col5.button("💾 Save", use_container_width=True, type="primary"):
+        # Get frequency parameters based on the selected distribution
+        freq_params = {}
+        if freq_type == "Normal":
+            freq_params = {"mean": freq_mean, "std": freq_std}
+        elif freq_type == "Uniform":
+            freq_params = {"min": freq_min, "max": freq_max}
+        elif freq_type == "Bimodal":
+            freq_params = {"peak1": peak1, "peak2": peak2}
+        elif freq_type == "Custom":
+            freq_params = {"values": custom_freqs}
+        
+        # Save to database
+        sim_id = store_simulation(
+            model=model,
+            times=times,
+            phases=phases,
+            order_parameter=order_parameter,
+            frequencies=frequencies,
+            freq_type=freq_type,
+            freq_params=freq_params,
+            adjacency_matrix=adj_matrix
+        )
+        
+        if sim_id:
+            st.success(f"Simulation data saved successfully with ID: {sim_id}")
+            st.info("You can access this data in the Database tab.")
+        else:
+            st.error("Failed to save simulation data.")
+            
     # If animation is triggered
     if animate:
-        # Store current position to return to after animation
-        current_pos = time_index
+        # Get the current time index as the starting point
+        start_idx = st.session_state.time_index
         
         # Calculate how many frames to skip based on speed
         frame_skip = max(1, int(11 - animation_speed))
@@ -896,13 +1013,12 @@ with tab3:
         progress_bar = st.progress(0)
         
         # Animation loop
-        for i in range(0, len(times), frame_skip):
-            # Check if animation should stop
-            if stop_animation:
-                break
-                
+        for i in range(start_idx, len(times), frame_skip):
+            # Update the session state
+            st.session_state.time_index = i
+            
             # Update progress bar
-            progress = i / (len(times) - 1)
+            progress = (i - start_idx) / (len(times) - 1 - start_idx) if i < len(times) - 1 else 1.0
             progress_bar.progress(progress)
             
             # Update all three plots
@@ -937,89 +1053,11 @@ with tab3:
         <p>At critical coupling strength (K_c), the system transitions from desynchronized to partially synchronized state.</p>
     </div>
     """, unsafe_allow_html=True)
-    
-# Tab 4: About tab
+
+########################
+# TAB 4: DATABASE TAB
+########################
 with tab4:
-    st.markdown("<h2 class='gradient_text2'>About the Kuramoto Model</h2>", unsafe_allow_html=True)
-    
-    # Add math explanation with the Kuramoto equation
-    st.markdown("""
-    <div class='section'>
-        <h3 class='gradient_text1'>Mathematical Description</h3>
-        <p>The Kuramoto model is described by the following differential equation for each oscillator:</p>
-        <p style="text-align: center; background-color: rgba(0,0,0,0.3); padding: 15px; border-radius: 5px; font-size: 1.2em;">
-            dθ<sub>i</sub>/dt = ω<sub>i</sub> + (K/N) Σ<sub>j=1</sub><sup>N</sup> A<sub>ij</sub> sin(θ<sub>j</sub> - θ<sub>i</sub>)
-        </p>
-        <p>where A<sub>ij</sub> represents the adjacency matrix element between oscillators i and j.</p>
-        <p>The order parameter r(t) is defined as:</p>
-        <p style="text-align: center; background-color: rgba(0,0,0,0.3); padding: 15px; border-radius: 5px; font-size: 1.2em;">
-            r(t)e<sup>iψ(t)</sup> = (1/N) Σ<sub>j=1</sub><sup>N</sup> e<sup>iθ<sub>j</sub>(t)</sup>
-        </p>
-        <p>where r(t) is the magnitude, indicating the degree of synchronization, and ψ(t) is the mean phase.</p>
-    </div>
-    """, unsafe_allow_html=True)
-
-    st.markdown("""
-    <div class='section'>
-        <div class='section-content'>
-            <p>The Kuramoto model is a mathematical model used to describe synchronization in systems of coupled oscillators.</p>
-            <p>It was first introduced by Yoshiki Kuramoto in 1975 and has applications in neuroscience, chemical oscillators, 
-            power grids, and many other complex systems.</p>
-            <p>The model describes each oscillator by its phase θ, where the dynamics are governed by:</p>
-            <p style='text-align: center; font-size: 1.2em;'>
-                dθ<sub>i</sub>/dt = ω<sub>i</sub> + (K/N) Σ<sub>j=1</sub><sup>N</sup> sin(θ<sub>j</sub> - θ<sub>i</sub>)
-            </p>
-            <p>where:</p>
-            <ul>
-                <li>θ<sub>i</sub> is the phase of oscillator i</li>
-                <li>ω<sub>i</sub> is the natural frequency of oscillator i</li>
-                <li>K is the coupling strength between oscillators</li>
-                <li>N is the total number of oscillators</li>
-            </ul>
-            <p>The order parameter r(t) measures the coherence of the system, with r = 1 indicating complete synchronization.</p>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Applications section
-    st.markdown("""
-    <div class='section'>
-        <h3 class='gradient_text1'>Applications of the Kuramoto Model</h3>
-        <div class='section-content'>
-            <ul>
-                <li><b>Neuroscience</b>: Modeling neural oscillations and brain rhythms</li>
-                <li><b>Power Grids</b>: Synchronization of power generators</li>
-                <li><b>Biology</b>: Circadian rhythms and firefly synchronization</li>
-                <li><b>Chemistry</b>: Coupled chemical oscillators</li>
-                <li><b>Crowd Dynamics</b>: Synchronized clapping after performances</li>
-            </ul>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # References section
-    st.markdown("""
-    <div class='section'>
-        <h3 class='gradient_text1'>References</h3>
-        <div class='section-content'>
-            <ul>
-                <li>Kuramoto, Y. (1975). Self-entrainment of a population of coupled non-linear oscillators.</li>
-                <li>Strogatz, S. H. (2000). From Kuramoto to Crawford: exploring the onset of synchronization in populations of coupled oscillators.</li>
-                <li>Acebrón, J. A., et al. (2005). The Kuramoto model: A simple paradigm for synchronization phenomena.</li>
-            </ul>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Add copyright information
-    st.markdown("""
-    <div class='footer'>
-    <p>© 2025 Lauren Shriver. All rights reserved.</p>
-    </div>
-    """, unsafe_allow_html=True)
-
-# Tab 5: Database tab
-with tab5:
     st.markdown("<h2 class='gradient_text2'>Database</h2>", unsafe_allow_html=True)
     
     st.markdown("""
@@ -1033,7 +1071,7 @@ with tab5:
     db_col1, db_col2 = st.columns(2)
     
     with db_col1:
-        st.markdown("<h4>Save Current Simulation</h4>", unsafe_allow_html=True)
+        st.markdown("<h4 class='gradient_text1'>Save Current Simulation</h4>", unsafe_allow_html=True)
         
         # Get parameters of frequency distribution based on selected type
         freq_params = {}
@@ -1066,7 +1104,7 @@ with tab5:
                 st.error("Failed to save simulation to database.")
     
     with db_col2:
-        st.markdown("<h4>Load Saved Simulations</h4>", unsafe_allow_html=True)
+        st.markdown("<h4 class='gradient_text1'>Load Saved Simulations</h4>", unsafe_allow_html=True)
         
         # Get list of saved simulations
         simulations = list_simulations()
@@ -1092,7 +1130,7 @@ with tab5:
                         # Display basic information about the loaded simulation
                         st.markdown(f"""
                         <div class='section'>
-                            <h4>Simulation Details</h4>
+                            <h4 class='gradient_text2'>Simulation Details</h4>
                             <p><b>ID:</b> {sim_data['id']}</p>
                             <p><b>Timestamp:</b> {sim_data['timestamp']}</p>
                             <p><b>Oscillators:</b> {sim_data['n_oscillators']}</p>
@@ -1102,7 +1140,7 @@ with tab5:
                         """, unsafe_allow_html=True)
                         
                         # Create visualization of the loaded simulation
-                        st.markdown("<h4>Order Parameter</h4>", unsafe_allow_html=True)
+                        st.markdown("<h4 class='gradient_text2'>Order Parameter</h4>", unsafe_allow_html=True)
                         
                         fig, ax = plt.subplots(figsize=(7, 3.5))
                         ax.set_facecolor('#1a1a1a')
@@ -1141,7 +1179,7 @@ with tab5:
     
     # Display all simulations in a table
     if simulations:
-        st.markdown("<h4>Saved Simulations</h4>", unsafe_allow_html=True)
+        st.markdown("<h4 class='gradient_text2'>Saved Simulations</h4>", unsafe_allow_html=True)
         
         # Create a DataFrame for display
         import pandas as pd
@@ -1159,7 +1197,7 @@ with tab5:
         st.dataframe(sim_df, use_container_width=True)
         
         # Delete simulation functionality
-        st.markdown("<h4>Delete Simulation</h4>", unsafe_allow_html=True)
+        st.markdown("<h4 class='gradient_text2'>Delete Simulation</h4>", unsafe_allow_html=True)
         
         delete_id = st.number_input("Enter Simulation ID to Delete", min_value=1, step=1)
         
@@ -1175,9 +1213,183 @@ with tab5:
             else:
                 st.warning(f"No simulation found with ID {delete_id}.")
 
-# Add footer
-st.markdown("""
-<div style='text-align: center; margin-top: 30px; padding: 10px; font-size: 0.8em;'>
-    <p>© 2025 Lauren Shriver. All rights reserved.</p>
-</div>
-""", unsafe_allow_html=True)
+# Footer removed as requested
+
+########################
+# TAB 5: CONFIGURATIONS TAB
+########################
+with tab5:
+    st.markdown("<h2 class='gradient_text2'>Save & Load Configurations</h2>", unsafe_allow_html=True)
+    
+    # Display description
+    st.markdown("""
+    <div style='background-color: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; margin-bottom: 20px;'>
+        <p>Save your current simulation configuration for future experiments. This preserves all parameters including:</p>
+        <ul>
+            <li>Number of oscillators and coupling strength</li>
+            <li>Frequency distribution settings</li>
+            <li>Network connectivity type and structure</li>
+            <li>Simulation time and step size</li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Create columns for save and load panels
+    save_col, load_col = st.columns(2)
+    
+    # SAVE CONFIGURATION PANEL
+    with save_col:
+        st.markdown("<h3 class='gradient_text1'>Save Current Configuration</h3>", unsafe_allow_html=True)
+        
+        # Configuration name input
+        config_name = st.text_input("Configuration Name", placeholder="Enter a unique name")
+        
+        # Get frequency parameters based on the selected distribution
+        freq_params = {}
+        if freq_type == "Normal":
+            freq_params = {"mean": freq_mean, "std": freq_std}
+        elif freq_type == "Uniform":
+            freq_params = {"min": freq_min, "max": freq_max}
+        elif freq_type == "Bimodal":
+            freq_params = {"peak1": peak1, "peak2": peak2}
+        elif freq_type == "Custom":
+            freq_params = {"values": custom_freqs}
+        
+        # Save button
+        if st.button("Save Configuration", type="primary"):
+            if not config_name:
+                st.error("Please enter a configuration name.")
+            else:
+                # Determine which adjacency matrix to save
+                if network_type == "Custom Adjacency Matrix":
+                    save_adj_matrix = adj_matrix
+                elif network_type == "All-to-All":
+                    save_adj_matrix = np.ones((n_oscillators, n_oscillators))
+                    np.fill_diagonal(save_adj_matrix, 0)  # No self-connections
+                elif network_type == "Nearest Neighbor":
+                    save_adj_matrix = np.zeros((n_oscillators, n_oscillators))
+                    for i in range(n_oscillators):
+                        save_adj_matrix[i, (i-1) % n_oscillators] = 1
+                        save_adj_matrix[i, (i+1) % n_oscillators] = 1
+                elif network_type == "Random":
+                    np.random.seed(random_seed)
+                    save_adj_matrix = np.random.random((n_oscillators, n_oscillators)) < 0.2
+                    save_adj_matrix = save_adj_matrix.astype(float)
+                    np.fill_diagonal(save_adj_matrix, 0)
+                
+                # Save to database
+                try:
+                    config_id = save_configuration(
+                        name=config_name,
+                        n_oscillators=n_oscillators,
+                        coupling_strength=coupling_strength,
+                        simulation_time=simulation_time,
+                        time_step=time_step,
+                        random_seed=random_seed,
+                        network_type=network_type,
+                        frequency_distribution=freq_type,
+                        frequency_params=freq_params,
+                        adjacency_matrix=save_adj_matrix
+                    )
+                    
+                    if config_id:
+                        st.success(f"Configuration '{config_name}' saved successfully!")
+                    else:
+                        st.error(f"A configuration with the name '{config_name}' already exists.")
+                except Exception as e:
+                    st.error(f"Error saving configuration: {str(e)}")
+    
+    # LOAD CONFIGURATION PANEL
+    with load_col:
+        st.markdown("<h3 class='gradient_text1'>Load Saved Configuration</h3>", unsafe_allow_html=True)
+        
+        # Get list of saved configurations
+        configs = list_configurations()
+        
+        if not configs:
+            st.info("No saved configurations found. Save a configuration first.")
+        else:
+            # Create a dropdown with configuration names
+            config_options = {f"{c['name']} (Oscillators: {c['n_oscillators']}, K: {c['coupling_strength']})": c['id'] for c in configs}
+            selected_config = st.selectbox("Select Configuration", options=list(config_options.keys()))
+            
+            # Load configuration when button is clicked
+            if st.button("Load Configuration", type="primary"):
+                selected_config_id = config_options[selected_config]
+                config = get_configuration(selected_config_id)
+                
+                if config:
+                    # Need to use session state to update all sidebar values
+                    st.session_state.n_oscillators = config['n_oscillators']
+                    st.session_state.coupling_strength = config['coupling_strength']
+                    st.session_state.simulation_time = config['simulation_time']
+                    st.session_state.time_step = config['time_step']
+                    st.session_state.random_seed = config['random_seed']
+                    st.session_state.network_type = config['network_type']
+                    st.session_state.freq_type = config['frequency_distribution']
+                    
+                    # Update frequency distribution parameters
+                    freq_params = config['frequency_params'] if config['frequency_params'] else {}
+                    if config['frequency_distribution'] == "Normal":
+                        st.session_state.freq_mean = freq_params.get('mean', 0.0)
+                        st.session_state.freq_std = freq_params.get('std', 1.0)
+                    elif config['frequency_distribution'] == "Uniform":
+                        st.session_state.freq_min = freq_params.get('min', -1.0)
+                        st.session_state.freq_max = freq_params.get('max', 1.0)
+                    elif config['frequency_distribution'] == "Bimodal":
+                        st.session_state.peak1 = freq_params.get('peak1', -1.0)
+                        st.session_state.peak2 = freq_params.get('peak2', 1.0)
+                    elif config['frequency_distribution'] == "Custom":
+                        st.session_state.custom_freqs = freq_params.get('values', "0.5, 1.0, 1.5")
+                    
+                    # Handling custom adjacency matrix
+                    if config['network_type'] == "Custom Adjacency Matrix" and config['adjacency_matrix'] is not None:
+                        adj_matrix_str = ""
+                        for row in config['adjacency_matrix']:
+                            adj_matrix_str += ", ".join(str(val) for val in row) + "\n"
+                        st.session_state.adj_matrix_input = adj_matrix_str.strip()
+                    
+                    st.success(f"Configuration '{config['name']}' loaded! Refresh the page to apply all settings.")
+                    
+                    # Provide a button to refresh the page
+                    st.markdown("""
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button onclick="window.location.reload();" class="reload-button">
+                            Refresh Page to Apply Settings
+                        </button>
+                    </div>
+                    <style>
+                        .reload-button {
+                            background: linear-gradient(to bottom right, #14a5ff, #7066ff);
+                            color: white;
+                            border: none;
+                            padding: 10px 20px;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            font-weight: bold;
+                            box-shadow: 0 4px 12px rgba(20, 165, 255, 0.4);
+                        }
+                        .reload-button:hover {
+                            background: linear-gradient(to right, #00ffee, #27aaff);
+                            transform: translateY(-2px);
+                            box-shadow: 0 6px 15px rgba(0, 255, 238, 0.5);
+                            transition: all 0.3s ease;
+                        }
+                    </style>
+                    """, unsafe_allow_html=True)
+                else:
+                    st.error("Failed to load the selected configuration.")
+            
+            # Option to delete a configuration
+            with st.expander("Delete Configurations"):
+                st.warning("Warning: Deletion is permanent and cannot be undone.")
+                delete_options = {f"{c['name']} (Created: {c['timestamp'].strftime('%Y-%m-%d %H:%M')})": c['id'] for c in configs}
+                config_to_delete = st.selectbox("Select Configuration to Delete", options=list(delete_options.keys()))
+                
+                if st.button("Delete Selected Configuration", type="primary"):
+                    delete_id = delete_options[config_to_delete]
+                    if delete_configuration(delete_id):
+                        st.success(f"Configuration deleted successfully.")
+                        st.experimental_rerun()  # Refresh the page to update the list
+                    else:
+                        st.error("Failed to delete configuration.")

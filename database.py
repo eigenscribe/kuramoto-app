@@ -582,18 +582,27 @@ def export_configuration_to_json(config_id, file_path=None):
     if file_path is None:
         file_path = f"kuramoto_config_{config_dict['name'].replace(' ', '_')}.json"
     
-    # Convert numpy arrays to lists for JSON serialization
-    if config_dict.get('adjacency_matrix') is not None:
-        config_dict['adjacency_matrix'] = config_dict['adjacency_matrix'].tolist()
+    # Process the dictionary to make it JSON serializable
+    json_serializable_dict = {}
+    for key, value in config_dict.items():
+        # Convert datetime objects to ISO format strings
+        if isinstance(value, datetime):
+            json_serializable_dict[key] = value.isoformat()
+        # Convert numpy arrays to lists
+        elif key == 'adjacency_matrix' and value is not None:
+            json_serializable_dict[key] = value.tolist()
+        # Skip any non-serializable objects
+        elif isinstance(value, (int, float, str, bool, list, dict)) or value is None:
+            json_serializable_dict[key] = value
     
     # Add metadata
-    config_dict['export_date'] = datetime.now().isoformat()
-    config_dict['version'] = '1.0'
+    json_serializable_dict['export_date'] = datetime.now().isoformat()
+    json_serializable_dict['version'] = '1.0'
     
     # Save to file
     try:
         with open(file_path, 'w') as f:
-            json.dump(config_dict, f, indent=2)
+            json.dump(json_serializable_dict, f, indent=2)
         return file_path
     except Exception as e:
         print(f"Error exporting configuration: {e}")

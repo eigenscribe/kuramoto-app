@@ -1465,12 +1465,11 @@ with tab5:
             # JSON EXPORT/IMPORT PANEL
             st.markdown("<h3 class='gradient_text1'>JSON Configuration Export/Import</h3>", unsafe_allow_html=True)
             
-            exp_imp_col1, exp_imp_col2 = st.columns(2)
+            # Create two tabs for export and import
+            export_tab, import_tab = st.tabs(["Export Configuration to JSON", "Import Configuration from JSON"])
             
             # Export to JSON section
-            with exp_imp_col1:
-                st.markdown("<h4>Export Configuration to JSON</h4>", unsafe_allow_html=True)
-                
+            with export_tab:
                 if not configs:
                     st.info("No saved configurations to export. Save a configuration first.")
                 else:
@@ -1505,9 +1504,7 @@ with tab5:
                             st.error(f"Error exporting configuration: {str(e)}")
             
             # Import from JSON section
-            with exp_imp_col2:
-                st.markdown("<h4>Import Configuration from JSON</h4>", unsafe_allow_html=True)
-                
+            with import_tab:
                 uploaded_file = st.file_uploader("Upload JSON Configuration", type=["json"])
                 
                 if uploaded_file is not None:
@@ -1521,17 +1518,28 @@ with tab5:
                         with open(temp_filename, 'r') as f:
                             config_preview = json.load(f)
                         
-                        st.write("Configuration Preview:")
+                        st.subheader("Configuration Preview")
+                        preview_col1, preview_col2 = st.columns(2)
+                        
                         preview_data = {
                             "Name": config_preview.get('name', 'Unknown'),
                             "Oscillators": config_preview.get('n_oscillators', 'Unknown'),
                             "Coupling": config_preview.get('coupling_strength', 'Unknown'),
                             "Network Type": config_preview.get('network_type', 'Unknown'),
-                            "Frequency Distribution": config_preview.get('frequency_distribution', 'Unknown')
+                            "Frequency Distribution": config_preview.get('frequency_distribution', 'Unknown'),
+                            "Simulation Time": config_preview.get('simulation_time', 'Unknown'),
+                            "Time Step": config_preview.get('time_step', 'Unknown'),
+                            "Random Seed": config_preview.get('random_seed', 'Unknown')
                         }
                         
-                        for key, value in preview_data.items():
-                            st.write(f"{key}: {value}")
+                        # Display in two columns for better organization
+                        for i, (key, value) in enumerate(preview_data.items()):
+                            if i < len(preview_data) // 2:
+                                preview_col1.write(f"**{key}:** {value}")
+                            else:
+                                preview_col2.write(f"**{key}:** {value}")
+                        
+                        st.markdown("---")
                         
                         # Import options
                         save_to_db = st.checkbox("Save to database", value=True, key="import_save_db")

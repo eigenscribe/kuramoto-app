@@ -1,6 +1,7 @@
 """
 Database module for the Kuramoto Model Simulator.
-This module provides functionality to store and retrieve simulation data.
+This module provides functionality to store and retrieve simulation data,
+as well as import/export configurations as JSON files.
 """
 
 import os
@@ -556,3 +557,113 @@ def get_configuration_by_name(name):
     
     session.close()
     return result
+def export_configuration_to_json(config_id, file_path=None):
+    """
+    Export a saved configuration to a JSON file.
+    
+    Parameters:
+    -----------
+    config_id : int
+        The ID of the configuration to export
+    file_path : str, optional
+        Path where the JSON file should be saved. If None, will use the config name.
+        
+    Returns:
+    --------
+    str
+        Path to the exported JSON file or None if export failed
+    """
+    # Get the configuration
+    config_dict = get_configuration(config_id)
+    if not config_dict:
+        return None
+    
+    # Determine file path if not provided
+    if file_path is None:
+        file_path = f"kuramoto_config_{config_dict['name'].replace(' ', '_')}.json"
+    
+    # Convert numpy arrays to lists for JSON serialization
+    if config_dict.get('adjacency_matrix') is not None:
+        config_dict['adjacency_matrix'] = config_dict['adjacency_matrix'].tolist()
+    
+    # Add metadata
+    config_dict['export_date'] = datetime.now().isoformat()
+    config_dict['version'] = '1.0'
+    
+    # Save to file
+    try:
+        with open(file_path, 'w') as f:
+            json.dump(config_dict, f, indent=2)
+        return file_path
+    except Exception as e:
+        print(f"Error exporting configuration: {e}")
+        return None
+
+def import_configuration_from_json(file_path, save_to_db=True):
+    """
+    Import a configuration from a JSON file and optionally save it to the database.
+    
+    Parameters:
+    -----------
+    file_path : str
+        Path to the JSON configuration file
+    save_to_db : bool
+        Whether to save the imported configuration to the database
+        
+    Returns:
+    --------
+    dict or int
+        Dictionary containing configuration data, or the ID of the saved configuration if save_to_db=True
+    """
+    try:
+        with open(file_path, 'r') as f:
+            config_dict = json.load(f)
+        
+        # Convert lists back to numpy arrays if needed
+        if config_dict.get('adjacency_matrix') is not None:
+            config_dict['adjacency_matrix'] = np.array(config_dict['adjacency_matrix'])
+        
+        # Save to database if requested
+        if save_to_db:
+            # Generate a unique name if needed
+            name = config_dict.get('name', os.path.basename(file_path).split('.')[0])
+            session = Session()
+            existing = session.query(Configuration).filter_by(name=name).first()
+            session.close()
+            
+            if existing:
+                name = f"{name}_{datetime.now().strftime('%Y%m%d%H%M%S')}"
+            
+            # Save to database - prepare frequency_params
+            freq_params = config_dict.get('frequency_params')
+            if isinstance(freq_params, str):
+                try:
+                    freq_params = json.loads(freq_params)
+                except:
+                    pass  # Keep as string if JSON parsing fails
+            
+            # Handle adjacency matrix
+            adj_matrix = config_dict.get('adjacency_matrix')
+            
+            # Call the save_configuration function
+            config_id = save_configuration(
+                name=name,
+                n_oscillators=config_dict.get('n_oscillators'),
+                coupling_strength=config_dict.get('coupling_strength'),
+                simulation_time=config_dict.get('simulation_time'),
+                time_step=config_dict.get('time_step'),
+                random_seed=config_dict.get('random_seed'),
+                network_type=config_dict.get('network_type'),
+                frequency_distribution=config_dict.get('frequency_distribution'),
+                frequency_params=freq_params,
+                adjacency_matrix=adj_matrix
+            )
+            
+            return config_id
+        
+        return config_dict
+    
+    except Exception as e:
+        print(f"Error importing configuration: {e}")
+        return None
+

@@ -830,11 +830,17 @@ with tab3:
             # Make RGB values brighter (closer to white) but preserve alpha
             bright_oscillator_colors[i, :3] = np.minimum(1.0, bright_oscillator_colors[i, :3] * 1.7)  # 70% brighter
         
-        # Add original glow effect for each oscillator (single glow)
+        # Add enhanced two-layer glow effect for each oscillator
         for i in range(n_oscillators):
-            glow = plt.Circle((x[i], y[i]), 0.08, fill=True, 
-                          color=oscillator_colors[i], alpha=0.3, zorder=7)
-            ax_circle.add_patch(glow)
+            # Outer glow (larger, more subtle)
+            outer_glow = plt.Circle((x[i], y[i]), 0.13, fill=True, 
+                               color=oscillator_colors[i], alpha=0.15, zorder=6)
+            ax_circle.add_patch(outer_glow)
+            
+            # Inner glow (smaller, more vibrant)
+            inner_glow = plt.Circle((x[i], y[i]), 0.08, fill=True, 
+                               color=oscillator_colors[i], alpha=0.3, zorder=7)
+            ax_circle.add_patch(inner_glow)
         
         # Use custom edge colors and increased size for main points
         sc = ax_circle.scatter(x, y, facecolors=oscillator_colors, edgecolors=bright_oscillator_colors, s=200, 
@@ -912,6 +918,18 @@ with tab3:
             # Add a subtle connecting line with low opacity
             ax.plot(times[:time_idx+1], phases[i, :time_idx+1] % (2 * np.pi), 
                   color=color, alpha=0.2, linewidth=0.8, zorder=2)
+            
+            # Add minimal glow effect to all data points (very subtle)
+            for t in range(0, time_idx + 1, 3):  # Add glow to every 3rd point to avoid clutter
+                x = times[t]
+                y = phases[i, t] % (2 * np.pi)
+                
+                # Add subtle glow effect using Circle patch
+                mini_glow = plt.Circle((x, y), 0.07, transform=ax.get_xaxis_transform(),
+                                  fill=True, color=color, alpha=0.1, zorder=4)
+                # Need to adjust the y-scale to match the plot coordinates
+                mini_glow.set_radius(0.03 * (2 * np.pi) / ax.get_ylim()[1])
+                ax.add_patch(mini_glow)
             
             # Plot oscillator phases as filled dots with color gradient
             ax.scatter(times[:time_idx+1], phases[i, :time_idx+1] % (2 * np.pi), 
@@ -992,8 +1010,21 @@ with tab3:
         # Add a connecting line with low opacity first (lower z-order)
         ax.plot(times[:time_idx+1], order_parameter[:time_idx+1], 
               color='white', alpha=0.3, linewidth=1, zorder=5)
+              
+        # Add subtle glow to selected points along the order parameter curve
+        for t in range(0, time_idx + 1, 5):  # Add glow to every 5th point to avoid clutter
+            x = times[t]
+            y = order_parameter[t]
+            color = cmap(y)
+            
+            # Add subtle glow effect using Circle patch
+            mini_glow = plt.Circle((x, y), 0.08, transform=ax.get_xaxis_transform(), 
+                           fill=True, color=color, alpha=0.1, zorder=8)
+            # Adjust the y-scale to match the plot coordinates
+            mini_glow.set_radius(0.02 * (1.05) / ax.get_ylim()[1])
+            ax.add_patch(mini_glow)
         
-        # Plot data points
+        # Plot data points on top of glows
         scatter = ax.scatter(times[:time_idx+1], order_parameter[:time_idx+1],
                           facecolors=base_colors, edgecolors=edge_colors,
                           s=70, alpha=0.9, linewidth=0.5, zorder=10)

@@ -961,7 +961,7 @@ with tab3:
     
     # Create a function to create order parameter plot over time (as a dot plot)
     def create_order_parameter_plot(time_idx):
-        fig, ax = plt.subplots(figsize=(5, 5))
+        fig, ax = plt.subplots(figsize=(12, 5))
         
         # Add background gradient
         ax.set_facecolor('#1a1a1a')
@@ -1012,9 +1012,12 @@ with tab3:
         ax.axhline(y=0.8, color='#ffffff', linestyle='--', alpha=0.5, zorder=1,
                  label='Strong Synchronization (r=0.8)')
         
-        # Enhance the plot appearance
+        # Enhance the plot appearance and match x-axis scale with oscillator phases plot
         ax.set_xlim(times.min(), times.max())
         ax.set_ylim(0, 1.05)
+        
+        # Make the width of the plot match the oscillator phases plot
+        fig.set_figwidth(12)  # Match the width of the oscillator phases plot
         ax.set_xlabel('Time', fontsize=13, fontweight='bold', color='white')
         ax.set_ylabel('Order Parameter r(t)', fontsize=13, fontweight='bold', color='white')
         ax.set_title(f'Phase Synchronization at t={times[time_idx]:.2f}', 

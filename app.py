@@ -88,9 +88,9 @@ if st.session_state.loaded_config is not None:
             
             # Store the matrix for later use in this session
             # This ensures the matrix is properly passed to the simulation
-            if 'loaded_adj_matrix' not in st.session_state:
-                st.session_state.loaded_adj_matrix = matrix
-                print("Stored adjacency matrix for use in simulation")
+            # Always update the matrix in session state - force overwrite to ensure latest is used
+            st.session_state.loaded_adj_matrix = matrix
+            print(f"Stored adjacency matrix in session state with shape {matrix.shape}")
                 
         except Exception as e:
             st.warning(f"Could not load custom adjacency matrix: {str(e)}")
@@ -326,11 +326,12 @@ network_type = st.sidebar.radio(
 # Custom adjacency matrix input
 adj_matrix = None
 # Check if we have a loaded adjacency matrix from a configuration
-if 'loaded_adj_matrix' in st.session_state and network_type == "Custom Adjacency Matrix":
+if 'loaded_adj_matrix' in st.session_state:
     adj_matrix = st.session_state.loaded_adj_matrix
-    print("Using pre-loaded adjacency matrix from configuration")
-    # Remove from session state to prevent reuse unless reloaded
-    del st.session_state.loaded_adj_matrix
+    print(f"Using pre-loaded adjacency matrix from configuration with shape {adj_matrix.shape if hasattr(adj_matrix, 'shape') else 'unknown'}")
+    # The matrix is used directly, regardless of the network_type UI selection
+    # This ensures configurations with custom matrices always display correctly
+    # Don't remove from session state yet - we'll do that after one successful use
 
 if network_type == "Custom Adjacency Matrix":
     st.sidebar.markdown("""

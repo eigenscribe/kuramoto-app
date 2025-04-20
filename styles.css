@@ -274,7 +274,7 @@ a:hover {
 /* This targets the left side of slider (between minimum value and thumb) */
 .stSlider [data-baseweb=slider] div[data-type="range"] div:first-child,
 .stSlider [data-baseweb=slider] [data-testid="stSliderProgress"] {
-    background: linear-gradient(to right, #ffbb66, #ff7744, #ff5522) !important; /* Orange-pink gradient */
+    background: linear-gradient(to right, #ffcc88, #ff8855, #ff6633) !important; /* Lighter orange-pink gradient */
     height: 4px !important; /* Ensure consistent height */
 }
 
@@ -291,28 +291,30 @@ a:hover {
     box-shadow: 0 0 8px rgba(255, 119, 68, 0.7) !important;
 }
 
-/* Special styling for the Time Point slider header - green gradient */
+/* Special styling for the Time Point slider header - softer green gradient */
 [data-testid="stVerticalBlock"] > div:nth-of-type(5) .stSlider label {
-    background: linear-gradient(to right, #00ff99, #00cc66, #009933) !important;
+    background: linear-gradient(to right, #66ffaa, #33cc77, #22aa55) !important;
     -webkit-background-clip: text !important;
     background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
     color: transparent !important;
     font-weight: bold !important;
+    letter-spacing: 0.2px !important;
 }
 
-/* Style the min/max values on sliders with blue gradient */
+/* Style the min/max values on sliders with lighter blue gradient */
 .stSlider [data-testid="stTickBar"] {
     color: transparent !important;
 }
 
 .stSlider [data-testid="stTickBar"] > div {
-    background: linear-gradient(to right, #00c2ff, #0070db) !important;
+    background: linear-gradient(to right, #33ccff, #0088ee) !important;
     -webkit-background-clip: text !important;
     background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
     color: transparent !important;
     font-weight: bold !important;
+    letter-spacing: 0.2px !important;
 }
 
 /* Override Streamlit defaults */
@@ -494,13 +496,13 @@ button:hover {
     margin: 5px auto;
 }
 
-/* Animation tab scrollbar styling with green gradient */
+/* Animation tab scrollbar styling with softer green gradient */
 [data-testid="stTabs"] [data-baseweb="tab-panel"]:nth-child(3)::-webkit-scrollbar-thumb {
-    background: linear-gradient(to right bottom, #00ff99, #00cc66, #009933);
+    background: linear-gradient(to right bottom, #66ffaa, #33cc77, #22aa55);
     border-radius: 10px;
     border: 2px solid rgba(0, 0, 0, 0.2);
 }
 
 [data-testid="stTabs"] [data-baseweb="tab-panel"]:nth-child(3)::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(to right, #00ff99, #009933);
+    background: linear-gradient(to right, #77ffbb, #33cc77);
 }

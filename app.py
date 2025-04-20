@@ -515,8 +515,7 @@ with tab1:
     nodes = nx.draw_networkx_nodes(G, pos, ax=ax1, 
                                node_color=node_colors, 
                                node_size=node_size, alpha=0.9, 
-                               edgecolors=bright_node_colors, linewidths=1.0,
-                               zorder=3)
+                               edgecolors=bright_node_colors, linewidths=1.0)
     
     # Add node labels only if there are relatively few nodes
     if n_oscillators <= 15:

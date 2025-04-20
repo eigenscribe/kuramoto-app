@@ -1,0 +1,63 @@
+/* Orange-pink gradient styling saved for potential future use */
+
+/* Lighter orange-pink gradient for text */
+.orange-pink-text {
+    background: linear-gradient(to right, #ffcc88, #ff8855, #ff6633) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
+    font-weight: bold !important;
+    letter-spacing: 0.2px !important;
+}
+
+/* Orange-pink gradient for backgrounds */
+.orange-pink-bg {
+    background: linear-gradient(to right bottom, #ffcc88, #ff8855, #ff6633) !important;
+}
+
+/* Orange-pink gradient for borders */
+.orange-pink-border {
+    border: 2px solid;
+    border-image: linear-gradient(to right, #ffcc88, #ff8855, #ff6633) 1 !important;
+}
+
+/* Orange-pink gradient for slider tracks */
+.orange-pink-slider [data-baseweb=slider] div[data-type="range"] div:first-child,
+.orange-pink-slider [data-testid="stSliderProgress"] {
+    background: linear-gradient(to right, #ffcc88, #ff8855, #ff6633) !important;
+    height: 4px !important;
+}
+
+/* Orange-pink gradient for slider thumbs */
+.orange-pink-slider [data-baseweb=slider] [role=slider] {
+    background: #ff7744 !important;
+    border: 2px solid white !important;
+    box-shadow: 0 0 8px rgba(255, 119, 68, 0.7) !important;
+}
+
+/* Orange-pink gradient for scrollbars */
+.orange-pink-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(to right bottom, #ffcc88, #ff8855, #ff6633);
+    border-radius: 10px;
+    border: 2px solid rgba(0, 0, 0, 0.2);
+}
+
+.orange-pink-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(to right, #ffdd99, #ff7744);
+}
+
+/* Orange-pink gradient for input borders */
+.orange-pink-input > div > div > input {
+    border-radius: 15px;
+    background-color: #222;
+    color: white;
+    border: 2px solid #ff7744 !important;
+    box-shadow: 0 0 5px rgba(255, 119, 68, 0.5);
+    padding: 5px 10px;
+}
+
+/* Orange-pink glow effect */
+.orange-pink-glow {
+    box-shadow: 0 0 10px rgba(255, 119, 68, 0.7) !important;
+}

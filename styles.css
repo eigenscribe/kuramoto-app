@@ -154,13 +154,13 @@ body {
     background-image: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb);
     box-shadow: 0 4px 15px 0 rgba(39, 170, 255, 0.5);
     width: 100%;
-    min-width: 120px;
-    font-size: 14px;
+    min-width: 100px;
+    font-size: 13px;
     font-weight: 600;
     color: white;
     cursor: pointer;
     margin: 10px auto;
-    height: 40px;
+    height: 35px;
     text-align: center;
     border: none;
     background-size: 300% 100%;
@@ -169,7 +169,7 @@ body {
     font-family: 'Aclonica', sans-serif;
     display: block;
     text-decoration: none;
-    line-height: 40px;
+    line-height: 35px;
 }
 
 /* Button hover effects */
@@ -333,22 +333,22 @@ footer {
 /* Play Animation button special styling */
 [data-testid="stHorizontalBlock"] [data-testid="column"][data-testid="stVerticalBlock"]:nth-of-type(2) .stButton button {
     width: 100%;
-    min-width: 150px;
-    height: 40px;
-    line-height: 40px;
-    font-size: 14px;
+    min-width: 120px;
+    height: 32px;
+    line-height: 32px;
+    font-size: 12px;
     letter-spacing: 0.5px;
-    border-radius: 12px;
+    border-radius: 10px;
     background-image: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb);
-    box-shadow: 0 3px 10px rgba(20, 165, 255, 0.4);
+    box-shadow: 0 2px 8px rgba(20, 165, 255, 0.4);
     transition: all 0.3s ease;
     text-align: center;
     margin: 0 auto;
 }
 
 [data-testid="stHorizontalBlock"] [data-testid="column"][data-testid="stVerticalBlock"]:nth-of-type(2) .stButton button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(20, 181, 255, 0.5);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(20, 181, 255, 0.5);
     background-image: linear-gradient(to right, #00e8ff, #0070eb);
 }
 
@@ -440,4 +440,14 @@ button:hover {
     background: #14b5ff !important; /* Blue from our gradient */
     border: 2px solid white !important;
     box-shadow: 0 0 5px rgba(20, 181, 255, 0.7) !important;
+}
+
+/* Animation tab button styling - make them smaller */
+[data-testid="stTabs"] [data-baseweb="tab-panel"]:nth-child(3) .stButton button {
+    min-width: 80px;
+    height: 30px;
+    line-height: 30px;
+    font-size: 11px;
+    padding: 0 10px;
+    margin: 5px auto;
 }

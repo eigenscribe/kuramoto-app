@@ -9,7 +9,7 @@ body {
 /* Adjust Streamlit default elements */
 .stApp {
     background-color: #121212;
-    background-image: url('wisp.jpg');
+    background-image: url('../images/wisp.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -31,598 +31,395 @@ body {
     background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
     color: transparent !important;
-    text-align: center;
 }
 
 .gradient_text2 {
-    font-weight: bold;
-    background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb);
-    background-image: -webkit-linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-}
-
-/* Add semi-transparent overlay for better content visibility */
-.main::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    z-index: -1;
-}
-
-/* Section styles */
-.section {
-    background: rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    padding: 25px;
-    margin-bottom: 30px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    backdrop-filter: blur(5px);
-}
-
-.section:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-}
-
-.section-content {
-    color: white;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    justify-content: space-between;
-    text-align: left;
-    align-items: flex-start;
-    padding: 15px;
-}
-
-.section h2 {
-    font-weight: bold;
-    background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-    margin-top: 0;
-    font-size: 1.8rem;
-    width: 100%;
-    text-align: center;
-}
-
-.section h3 {
     font-weight: bold !important;
-    background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb) !important;
+    background: linear-gradient(to right bottom, #ff8a00, #ff5e62, #ff2f92) !important;
+    background-image: -webkit-linear-gradient(to right bottom, #ff8a00, #ff5e62, #ff2f92) !important;
     -webkit-background-clip: text !important;
     background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
     color: transparent !important;
-    font-size: 1.4rem;
-    text-align: center;
 }
 
-/* Feature box styling */
-.feature-box {
-    background: rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+/* Custom animation for oscillator visualization */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+}
+
+/* Glow effects for various elements */
+.glow {
+    box-shadow: 0 0 10px 2px rgba(0, 232, 255, 0.7),
+                0 0 20px 4px rgba(20, 165, 255, 0.5),
+                0 0 30px 6px rgba(129, 56, 255, 0.3);
     border-radius: 10px;
-    padding: 25px;
-    margin-bottom: 20px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    backdrop-filter: blur(5px);
-    display: flex;
-    flex-direction: column;
-    height: 100%;
 }
 
-.feature-box:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+.glow_text {
+    text-shadow: 0 0 5px rgba(0, 232, 255, 0.7),
+                 0 0 10px rgba(20, 165, 255, 0.5),
+                 0 0 15px rgba(129, 56, 255, 0.3);
 }
 
-.feature-box-content {
-    color: white;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    justify-content: space-between;
-    text-align: left;
-    align-items: flex-start;
+.glow_orange {
+    box-shadow: 0 0 10px 2px rgba(255, 138, 0, 0.7),
+                0 0 20px 4px rgba(255, 94, 98, 0.5),
+                0 0 30px 6px rgba(255, 47, 146, 0.3);
+    border-radius: 10px;
 }
 
-.feature-box-content h3 {
-    font-weight: bold !important;
-    background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb) !important;
-    -webkit-background-clip: text !important;
-    background-clip: text !important;
-    -webkit-text-fill-color: transparent !important;
-    color: transparent !important;
-    margin-top: 0;
-    font-size: 1.5rem;
-    width: 100%;
-    text-align: center;
+.glow_text_orange {
+    text-shadow: 0 0 5px rgba(255, 138, 0, 0.7),
+                 0 0 10px rgba(255, 94, 98, 0.5),
+                 0 0 15px rgba(255, 47, 146, 0.3);
 }
 
-/* Button Styling */
-.btn, .stButton button, button[kind="primary"] {
-    background-image: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb);
-    box-shadow: 0 4px 15px 0 rgba(39, 170, 255, 0.5);
-    width: 100%;
-    min-width: 100px;
-    font-size: 13px;
-    font-weight: 600;
-    color: white;
-    cursor: pointer;
-    margin: 10px auto;
-    height: 35px;
-    text-align: center;
-    border: none;
-    background-size: 300% 100%;
-    border-radius: 15px;
-    transition: all .4s ease-in-out;
-    font-family: 'Aclonica', sans-serif;
-    display: block;
-    text-decoration: none;
-    line-height: 35px;
+.glow_green {
+    box-shadow: 0 0 10px 2px rgba(102, 255, 170, 0.7),
+                0 0 20px 4px rgba(51, 204, 119, 0.5),
+                0 0 30px 6px rgba(34, 170, 85, 0.3);
+    border-radius: 10px;
 }
 
-/* Button hover effects */
-.btn:hover, .stButton button:hover, button[kind="primary"]:hover {
-    background-position: 100% 0;
-    background-image: linear-gradient(to right, #00e8ff, #0070eb);
-    filter: brightness(1.1);
-    transition: all .4s ease-in-out;
+.glow_text_green {
+    text-shadow: 0 0 5px rgba(102, 255, 170, 0.7),
+                 0 0 10px rgba(51, 204, 119, 0.5),
+                 0 0 15px rgba(34, 170, 85, 0.3);
 }
 
-/* Typography improvements */
-h1, h2, h3, h4, p, div, span, a, button, input, textarea, select {
-    font-family: 'Aclonica', sans-serif;
-}
-
-/* Links */
-a {
-    color: #14b5ff;
-    text-decoration: none;
-    transition: color 0.3s;
-}
-
-a:hover {
-    color: #00e8ff;
-}
-
-/* Streamlit specific styles */
+/* Custom styling for tabs */
 .stTabs [data-baseweb="tab-list"] {
-    gap: 10px;
+    gap: 5px;
 }
 
 .stTabs [data-baseweb="tab"] {
-    background-color: rgba(20, 165, 255, 0.1);
-    border-radius: 4px 4px 0 0;
-    padding: 10px 20px;
-    border: 1px solid rgba(20, 165, 255, 0.3);
+    background-color: rgba(30, 30, 30, 0.6) !important;
+    border-radius: 15px 15px 0px 0px !important;
+    padding: 5px 20px !important;
     color: white !important;
+    transition: all 0.3s ease !important;
 }
 
-.stTabs [aria-selected="true"] {
-    background-color: rgba(20, 181, 255, 0.2);
-    border-bottom: 3px solid #14b5ff;
-    color: white !important;
+.stTabs [data-baseweb="tab-highlight"] {
+    background: linear-gradient(to right, #00e8ff, #14a5ff, #8138ff) !important;
+    border-radius: 15px 15px 0px 0px !important;
+    height: 4px !important;
 }
 
-/* Sidebar customization */
-.css-1d391kg, .css-1lcbmhc {
-    background-color: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(10px);
+.stTabs [data-baseweb="tab-panel"] {
+    background-color: rgba(30, 30, 30, 0.8) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border-radius: 0px 15px 15px 15px !important;
+    padding: 20px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3) !important;
 }
 
-/* Sidebar scrollbar styling - green gradient */
-.sidebar::-webkit-scrollbar-thumb {
-    background: linear-gradient(to right bottom, #66ffaa, #33cc77, #22aa55);
-    border-radius: 10px;
-    border: 2px solid rgba(0, 0, 0, 0.2);
+/* Sidebar styling */
+[data-testid="stSidebar"] {
+    background-color: rgba(20, 20, 20, 0.8) !important;
+    backdrop-filter: blur(15px) !important;
+    -webkit-backdrop-filter: blur(15px) !important;
+    border-right: 1px solid rgba(80, 80, 80, 0.2) !important;
 }
 
-.sidebar::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(to right, #77ffbb, #33cc77);
-}
-
-/* Network connectivity input styling - green gradient */
-.sidebar .stNumberInput > div {
-    position: relative;
-    z-index: 1;
-}
-
-.sidebar .stNumberInput > div::before {
-    content: '';
-    position: absolute;
-    top: -2px;
-    right: -2px;
-    bottom: -2px;
-    left: -2px;
-    background: linear-gradient(to right bottom, #66ffaa, #33cc77, #22aa55);
-    border-radius: 7px;
-    z-index: -1;
-}
-
-.sidebar .stNumberInput > div > div > input {
-    border-radius: 4px;
-    background-color: #222;
-    border: none;
-    position: relative;
-    z-index: 2;
-}
-
-/* Network Connectivity section styling - green gradient */
-.sidebar h3, .sidebar h3 span {
-    background: linear-gradient(to right bottom, #66ffaa, #33cc77, #22aa55) !important;
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h1,
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h2,
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h3 {
+    background: linear-gradient(to right, #00e8ff, #14a5ff, #8138ff) !important;
     -webkit-background-clip: text !important;
     background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
     color: transparent !important;
     font-weight: bold !important;
-    text-align: center;
-    letter-spacing: 0.2px !important;
 }
 
-/* Slider styling for the active (colored) part */
-/* This targets the left side of slider (between minimum value and thumb) */
-.stSlider [data-baseweb=slider] div[data-type="range"] div:first-child,
-.stSlider [data-baseweb=slider] [data-testid="stSliderProgress"] {
-    background: linear-gradient(to right, #ffcc88, #ff8855, #ff6633) !important; /* Lighter orange-pink gradient */
-    height: 4px !important; /* Ensure consistent height */
+[data-testid="stSidebar"] hr {
+    margin: 15px 0 !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
 }
 
-/* Slider track styling for the inactive (grey) part */
-.stSlider [data-baseweb=slider] div[data-type="range"] div:nth-child(2) {
-    background: rgba(255, 255, 255, 0.1) !important;
-    height: 4px !important; /* Ensure consistent height */
+/* Color-coordinated parameter groups in the sidebar */
+/* Network parameters - blue gradient */
+[data-testid="stSidebar"] [data-testid="stForm"] > div:nth-child(1) label,
+[data-testid="stSidebar"] [data-testid="stForm"] > div:nth-child(2) label,
+[data-testid="stSidebar"] [data-testid="stForm"] > div:nth-child(3) label,
+[data-testid="stSidebar"] [data-testid="stForm"] > div:nth-child(4) label {
+    background: linear-gradient(to right, #00e8ff, #14a5ff, #8138ff) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
+    font-weight: bold !important;
 }
 
-/* Slider thumb styling */
-.stSlider [data-baseweb=slider] [role=slider] {
-    background: #ff7744 !important; /* Orange-pink */
-    border: 2px solid white !important;
-    box-shadow: 0 0 8px rgba(255, 119, 68, 0.7) !important;
-}
-
-/* Special styling for the Time Point slider header - softer green gradient */
-[data-testid="stVerticalBlock"] > div:nth-of-type(5) .stSlider label {
+/* Time parameters - green gradient */
+[data-testid="stSidebar"] [data-testid="stForm"] > div:nth-child(5) label,
+[data-testid="stSidebar"] [data-testid="stForm"] > div:nth-child(6) label {
     background: linear-gradient(to right, #66ffaa, #33cc77, #22aa55) !important;
     -webkit-background-clip: text !important;
     background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
     color: transparent !important;
     font-weight: bold !important;
-    letter-spacing: 0.2px !important;
 }
 
-/* Style the min/max values on sliders with lighter blue gradient */
-.stSlider [data-testid="stTickBar"] {
-    color: transparent !important;
-}
-
-.stSlider [data-testid="stTickBar"] > div {
-    background: linear-gradient(to right, #33ccff, #0088ee) !important;
+/* Oscillator parameters - orange gradient */
+[data-testid="stSidebar"] [data-testid="stForm"] > div:nth-child(7) label,
+[data-testid="stSidebar"] [data-testid="stForm"] > div:nth-child(8) label {
+    background: linear-gradient(to right, #ff8a00, #ff5e62, #ff2f92) !important;
     -webkit-background-clip: text !important;
     background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
     color: transparent !important;
     font-weight: bold !important;
-    letter-spacing: 0.2px !important;
 }
 
-/* Override Streamlit defaults */
-.stMarkdown {
-    color: white;
+/* Slider thumbs for different parameter groups */
+/* Network parameter sliders - blue thumbs */
+[data-testid="stSidebar"] [data-testid="stForm"] > div:nth-child(1) [data-baseweb="slider"] [role="slider"],
+[data-testid="stSidebar"] [data-testid="stForm"] > div:nth-child(2) [data-baseweb="slider"] [role="slider"],
+[data-testid="stSidebar"] [data-testid="stForm"] > div:nth-child(3) [data-baseweb="slider"] [role="slider"],
+[data-testid="stSidebar"] [data-testid="stForm"] > div:nth-child(4) [data-baseweb="slider"] [role="slider"] {
+    background: linear-gradient(to bottom, #00e8ff, #14a5ff, #8138ff) !important;
+    box-shadow: 0 0 10px rgba(20, 165, 255, 0.7) !important;
 }
 
-/* Footer style */
-footer {
-    text-align: center;
-    margin-top: 30px;
-    padding: 10px;
-    font-size: 0.8em;
-    color: rgba(255, 255, 255, 0.7);
+/* Time parameter sliders - green thumbs */
+[data-testid="stSidebar"] [data-testid="stForm"] > div:nth-child(5) [data-baseweb="slider"] [role="slider"],
+[data-testid="stSidebar"] [data-testid="stForm"] > div:nth-child(6) [data-baseweb="slider"] [role="slider"] {
+    background: linear-gradient(to bottom, #66ffaa, #33cc77, #22aa55) !important;
+    box-shadow: 0 0 10px rgba(34, 170, 85, 0.7) !important;
 }
 
-/* Custom footer for copyright */
-.footer {
-    text-align: center;
-    margin-top: 30px;
-    padding: 15px;
-    font-size: 0.9em;
-    color: white;
-    background: rgba(0, 0, 0, 0.4);
-    border-radius: 8px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(5px);
+/* Oscillator parameter sliders - orange thumbs */
+[data-testid="stSidebar"] [data-testid="stForm"] > div:nth-child(7) [data-baseweb="slider"] [role="slider"],
+[data-testid="stSidebar"] [data-testid="stForm"] > div:nth-child(8) [data-baseweb="slider"] [role="slider"] {
+    background: linear-gradient(to bottom, #ff8a00, #ff5e62, #ff2f92) !important;
+    box-shadow: 0 0 10px rgba(255, 94, 98, 0.7) !important;
 }
 
-/* Make plots more visible */
-.stPlot {
-    background-color: rgba(255, 255, 255, 0.9);
-    border-radius: 8px;
-    padding: 15px;
-    margin-bottom: 20px;
+/* Slider progress bars for different parameter groups */
+/* Network parameter sliders - blue progress bars */
+[data-testid="stSidebar"] [data-testid="stForm"] > div:nth-child(1) [data-baseweb="slider"] div[role="progressbar"],
+[data-testid="stSidebar"] [data-testid="stForm"] > div:nth-child(2) [data-baseweb="slider"] div[role="progressbar"],
+[data-testid="stSidebar"] [data-testid="stForm"] > div:nth-child(3) [data-baseweb="slider"] div[role="progressbar"],
+[data-testid="stSidebar"] [data-testid="stForm"] > div:nth-child(4) [data-baseweb="slider"] div[role="progressbar"] {
+    background: linear-gradient(to right, #00e8ff, #8138ff) !important;
 }
 
-/* Progress bar styling with gradient */
-.stProgress > div > div > div {
-    background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb) !important;
-}
-
-/* Play Animation button special styling */
-[data-testid="stHorizontalBlock"] [data-testid="column"][data-testid="stVerticalBlock"]:nth-of-type(2) .stButton button {
-    width: 100%;
-    min-width: 120px;
-    height: 32px;
-    line-height: 32px;
-    font-size: 12px;
-    letter-spacing: 0.5px;
-    border-radius: 10px;
-    background-image: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb);
-    box-shadow: 0 2px 8px rgba(20, 165, 255, 0.4);
-    transition: all 0.3s ease;
-    text-align: center;
-    margin: 0 auto;
-}
-
-[data-testid="stHorizontalBlock"] [data-testid="column"][data-testid="stVerticalBlock"]:nth-of-type(2) .stButton button:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 3px 10px rgba(20, 181, 255, 0.5);
-    background-image: linear-gradient(to right, #00e8ff, #0070eb);
-}
-
-/* Card row layout for horizontal alignment */
-.card-row {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
-    margin-bottom: 30px;
-}
-
-/* Tech tag styling */
-.tech-tag {
-    display: inline-block;
-    background: linear-gradient(130deg, rgba(0, 232, 255, 0.2), rgba(0, 112, 235, 0.2));
-    border: 1px solid rgba(20, 181, 255, 0.3);
-    border-radius: 15px;
-    padding: 3px 10px;
-    margin: 3px;
-    font-size: 0.8rem;
-    color: white;
-}
-
-/* Dark theme adjustments */
-button, select, input, textarea {
-    background-color: #222;
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-button:hover {
-    border-color: #14b5ff;
-}
-
-/* Orange-pink gradient text for all slider labels (variables) - lighter */
-.stSlider label {
-    background: linear-gradient(to right, #ffcc88, #ff8855, #ff6633) !important;
-    -webkit-background-clip: text !important;
-    background-clip: text !important;
-    -webkit-text-fill-color: transparent !important;
-    color: transparent !important;
-    font-weight: bold !important;
-    letter-spacing: 0.2px !important;
-}
-
-/* Improve selectbox appearance */
-.stSelectbox > div[data-baseweb="select"] {
-    border: 2px solid;
-    border-image: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb) 1;
-    border-radius: 15px;
-    overflow: hidden;
-}
-
-.stSelectbox > div[data-baseweb="select"] > div {
-    background-color: #222;
-    color: white;
-    border: none;
-    border-radius: 13px;
-}
-
-/* Selectbox labels */
-.stSelectbox label {
-    background: linear-gradient(to right, #ffcc88, #ff8855, #ff6633) !important;
-    -webkit-background-clip: text !important;
-    background-clip: text !important;
-    -webkit-text-fill-color: transparent !important;
-    color: transparent !important;
-    font-weight: bold !important;
-    letter-spacing: 0.2px !important;
-}
-
-/* Default selector - will be overridden by more specific ones */
-.sidebar .stSelectbox label {
-    /* Already defined in our systematic color structure */
-}
-
-/* Improve number input appearance for all inputs */
-.stNumberInput > div > div > input {
-    border-radius: 15px;
-    background-color: #222;
-    color: white;
-    border: 2px solid #ff7744 !important; /* Orange-pink */
-    box-shadow: 0 0 5px rgba(255, 119, 68, 0.5);
-    padding: 5px 10px;
-}
-
-/* Apply orange-pink gradient to number input labels - lighter */
-.stNumberInput label {
-    background: linear-gradient(to right, #ffcc88, #ff8855, #ff6633) !important;
-    -webkit-background-clip: text !important;
-    background-clip: text !important;
-    -webkit-text-fill-color: transparent !important;
-    color: transparent !important;
-    font-weight: bold !important;
-    letter-spacing: 0.2px !important;
-}
-
-/* Systematic sidebar coloring structure */
-
-/* Base settings for all sidebar inputs - shared properties */
-.sidebar .stNumberInput label,
-.sidebar .stSlider label,
-.sidebar .stSelectbox label,
-.sidebar .stRadio label {
-    -webkit-background-clip: text !important;
-    background-clip: text !important;
-    -webkit-text-fill-color: transparent !important;
-    color: transparent !important;
-    font-weight: bold !important;
-    letter-spacing: 0.2px !important;
-}
-
-/* System parameters - Orange-pink gradient for Oscillators and Coupling */
-.sidebar .stSlider[data-testid*="oscillators"] label,
-.sidebar .stSlider[data-testid*="coupling"] label {
-    background: linear-gradient(to right, #ffcc88, #ff8855, #ff6633) !important;
-}
-
-/* Orange-pink slider styling for oscillator and coupling parameters */
-.sidebar .stSlider[data-testid*="oscillators"] [data-baseweb="slider"] div[role="slider"],
-.sidebar .stSlider[data-testid*="coupling"] [data-baseweb="slider"] div[role="slider"] {
-    background: linear-gradient(to right, #ffcc88, #ff6633) !important;
-    border-color: #ff6633 !important;
-    box-shadow: 0 0 5px rgba(255, 102, 51, 0.5) !important;
-}
-
-/* Frequency parameters - Blue gradient */
-.sidebar .stSelectbox label,
-.sidebar .stSlider[data-testid*="mean"] label,
-.sidebar .stSlider[data-testid*="standard_deviation"] label,
-.sidebar .stSlider[data-testid*="minimum"] label,
-.sidebar .stSlider[data-testid*="maximum"] label,
-.sidebar .stSlider[data-testid*="peak"] label,
-.sidebar .stTextArea label {
-    background: linear-gradient(to right, #33ccff, #0088ee) !important;
-}
-
-/* Blue slider styling for frequency parameters */
-.sidebar .stSlider[data-testid*="mean"] [data-baseweb="slider"] div[role="slider"],
-.sidebar .stSlider[data-testid*="standard_deviation"] [data-baseweb="slider"] div[role="slider"],
-.sidebar .stSlider[data-testid*="minimum"] [data-baseweb="slider"] div[role="slider"],
-.sidebar .stSlider[data-testid*="maximum"] [data-baseweb="slider"] div[role="slider"],
-.sidebar .stSlider[data-testid*="peak"] [data-baseweb="slider"] div[role="slider"] {
-    background: linear-gradient(to right, #33ccff, #0066dd) !important;
-    border-color: #0066dd !important;
-    box-shadow: 0 0 5px rgba(0, 136, 238, 0.5) !important;
-}
-
-/* Time parameters - Green gradient */
-.sidebar .stSlider[data-testid*="simulation_time"] label,
-.sidebar .stSlider[data-testid*="time_step"] label,
-.sidebar .stNumberInput[data-testid*="random_seed"] label,
-.sidebar .stRadio label {
-    background: linear-gradient(to right, #66ffaa, #33cc77, #22aa55) !important;
-}
-
-/* Green slider styling for time parameters */
-.sidebar .stSlider[data-testid*="simulation_time"] [data-baseweb="slider"] div[role="slider"],
-.sidebar .stSlider[data-testid*="time_step"] [data-baseweb="slider"] div[role="slider"] {
-    background: linear-gradient(to right, #66ffaa, #22aa55) !important;
-    border-color: #22aa55 !important;
-    box-shadow: 0 0 5px rgba(51, 204, 119, 0.5) !important;
-}
-
-/* Custom scrollbar styling */
-::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
-}
-
-::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 10px;
-}
-
-/* Green scrollbar for time-related elements */
-.sidebar .stSlider[data-testid*="time"] ~ div::-webkit-scrollbar-thumb,
-.sidebar .stSlider[data-testid*="simulation_time"] ~ div::-webkit-scrollbar-thumb,
-.sidebar .stSlider[data-testid*="time_step"] ~ div::-webkit-scrollbar-thumb {
-    background: linear-gradient(to right bottom, #66ffaa, #33cc77, #22aa55) !important;
-    border-radius: 10px;
-    border: 2px solid rgba(0, 0, 0, 0.2);
-}
-
-.sidebar .stSlider[data-testid*="time"] ~ div::-webkit-scrollbar-thumb:hover,
-.sidebar .stSlider[data-testid*="simulation_time"] ~ div::-webkit-scrollbar-thumb:hover,
-.sidebar .stSlider[data-testid*="time_step"] ~ div::-webkit-scrollbar-thumb:hover {
+/* Time parameter sliders - green progress bars */
+[data-testid="stSidebar"] [data-testid="stForm"] > div:nth-child(5) [data-baseweb="slider"] div[role="progressbar"],
+[data-testid="stSidebar"] [data-testid="stForm"] > div:nth-child(6) [data-baseweb="slider"] div[role="progressbar"] {
     background: linear-gradient(to right, #66ffaa, #22aa55) !important;
 }
 
-/* Default scrollbar styling */
-::-webkit-scrollbar-thumb {
-    background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb);
-    border-radius: 10px;
-    border: 2px solid rgba(0, 0, 0, 0.2);
+/* Oscillator parameter sliders - orange progress bars */
+[data-testid="stSidebar"] [data-testid="stForm"] > div:nth-child(7) [data-baseweb="slider"] div[role="progressbar"],
+[data-testid="stSidebar"] [data-testid="stForm"] > div:nth-child(8) [data-baseweb="slider"] div[role="progressbar"] {
+    background: linear-gradient(to right, #ff8a00, #ff2f92) !important;
 }
 
-::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(to right, #00e8ff, #0070eb);
+/* Custom button styles */
+div.stButton > button:first-child {
+    background: linear-gradient(45deg, #00e8ff, #14a5ff, #8138ff) !important;
+    color: white !important;
+    font-weight: bold !important;
+    border: none !important;
+    border-radius: 15px !important;
+    padding: 10px 24px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 0 15px rgba(20, 165, 255, 0.5) !important;
 }
 
-/* Radio button styling - using blue from our gradient */
-[data-testid="stRadio"] [data-baseweb="radio"] div[data-checked="true"] div:first-child {
-    background: #14b5ff !important; /* Blue from our gradient */
-    border: 2px solid white !important;
-    box-shadow: 0 0 5px rgba(20, 181, 255, 0.7) !important;
+div.stButton > button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 5px 20px rgba(20, 165, 255, 0.7) !important;
 }
 
-/* Animation tab button styling - make them smaller */
-[data-testid="stTabs"] [data-baseweb="tab-panel"]:nth-child(3) .stButton button {
-    min-width: 80px;
-    height: 30px;
-    line-height: 30px;
-    font-size: 11px;
-    padding: 0 10px;
-    margin: 5px auto;
+div.stButton > button:active {
+    transform: translateY(1px) !important;
+    box-shadow: 0 2px 10px rgba(20, 165, 255, 0.6) !important;
 }
 
-/* Animation tab scrollbar styling with softer green gradient */
-[data-testid="stTabs"] [data-baseweb="tab-panel"]:nth-child(3)::-webkit-scrollbar-thumb {
-    background: linear-gradient(to right bottom, #66ffaa, #33cc77, #22aa55);
-    border-radius: 10px;
-    border: 2px solid rgba(0, 0, 0, 0.2);
+/* Expander styling */
+.streamlit-expanderHeader {
+    background-color: rgba(40, 40, 40, 0.4) !important;
+    border-radius: 15px !important;
+    color: white !important;
+    padding: 10px 15px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
-[data-testid="stTabs"] [data-baseweb="tab-panel"]:nth-child(3)::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(to right, #77ffbb, #33cc77);
+.streamlit-expanderContent {
+    background-color: rgba(30, 30, 30, 0.4) !important;
+    border-radius: 0 0 15px 15px !important;
+    padding: 10px 20px !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    border-top: none !important;
 }
 
-/* Animation tab time point slider styling with green gradient - specific key targeting */
-[data-testid*="time_point_slider"] [data-baseweb="slider"] div[role="slider"],
-[data-testid="stTabs"] [data-baseweb="tab-panel"]:nth-child(3) [data-testid*="stSlider"] [data-baseweb="slider"] div[role="slider"] {
-    background: linear-gradient(to right, #66ffaa, #22aa55) !important;
-    border-color: #22aa55 !important;
-    box-shadow: 0 0 8px rgba(51, 204, 119, 0.7) !important;
+/* Plot styling */
+[data-testid="stImage"] img {
+    border-radius: 15px !important;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3) !important;
 }
 
-/* Animation tab slider track styling */
-[data-testid*="time_point_slider"] [data-baseweb="slider"] div[data-testid="stTickBar"],
-[data-testid="stTabs"] [data-baseweb="tab-panel"]:nth-child(3) [data-testid*="stSlider"] [data-baseweb="slider"] div[data-testid="stTickBar"] {
-    background: linear-gradient(to right, rgba(102, 255, 170, 0.3), rgba(34, 170, 85, 0.3)) !important;
+/* Select box styling */
+[data-baseweb="select"] {
+    background-color: rgba(40, 40, 40, 0.6) !important;
+    border-radius: 10px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
-/* Animation tab slider progress bar */
-[data-testid*="time_point_slider"] [data-baseweb="slider"] div[role="progressbar"],
-[data-testid="stTabs"] [data-baseweb="tab-panel"]:nth-child(3) [data-testid*="stSlider"] [data-baseweb="slider"] div[role="progressbar"] {
+[data-baseweb="select"] > div {
+    background-color: transparent !important;
+    color: white !important;
+    font-weight: bold !important;
+}
+
+[data-baseweb="popover"] {
+    background-color: #1e1e1e !important;
+    border-radius: 10px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-baseweb="menu"] {
+    background-color: #1e1e1e !important;
+}
+
+[data-baseweb="menu"] div[role="option"] {
+    color: white !important;
+}
+
+[data-baseweb="menu"] div[role="option"]:hover {
+    background-color: #333333 !important;
+}
+
+/* Input field styling */
+[data-baseweb="input"] {
+    background-color: rgba(40, 40, 40, 0.6) !important;
+    border-radius: 10px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-baseweb="input"] input {
+    color: white !important;
+    font-weight: bold !important;
+}
+
+/* Adjusting tooltip appearance */
+[data-baseweb="tooltip"] {
+    background-color: #1e1e1e !important;
+    border-radius: 10px !important;
+    border: 1px solid #333 !important;
+    color: white !important;
+    max-width: 300px !important;
+    padding: 10px !important;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Custom DataTable styling */
+[data-testid="StyledTable"] {
+    border-radius: 15px !important;
+    overflow: hidden !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-testid="StyledTable"] th {
+    background-color: #1a1a1a !important;
+    color: white !important;
+    padding: 12px 15px !important;
+    text-align: left !important;
+    font-weight: bold !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-testid="StyledTable"] td {
+    background-color: #2a2a2a !important;
+    color: #e0e0e0 !important;
+    padding: 10px 15px !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+[data-testid="StyledTable"] tr:nth-child(even) td {
+    background-color: #252525 !important;
+}
+
+/* Main title and subtitle styling */
+h1, h2, h3 {
+    font-family: 'Aclonica', sans-serif !important;
+    letter-spacing: 1px !important;
+}
+
+h1 {
+    font-size: 2.5rem !important;
+    margin-bottom: 0.5rem !important;
+    font-weight: 800 !important;
+    letter-spacing: -1px !important;
+}
+
+h2 {
+    font-size: 1.8rem !important;
+    margin-bottom: 0.5rem !important;
+    font-weight: 700 !important;
+}
+
+h3 {
+    font-size: 1.4rem !important;
+    margin-bottom: 0.5rem !important;
+    font-weight: 600 !important;
+}
+
+/* Network visualization styling */
+.network_container {
+    background-color: rgba(20, 20, 30, 0.7) !important;
+    border-radius: 15px !important;
+    padding: 20px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Create a two-layer glow effect for network nodes */
+.network_node {
+    filter: drop-shadow(0 0 8px rgba(0, 232, 255, 0.7)) drop-shadow(0 0 16px rgba(129, 56, 255, 0.5));
+}
+
+/* Animation control styling */
+.animation_controls {
+    background-color: rgba(20, 20, 30, 0.7) !important;
+    border-radius: 15px !important;
+    padding: 15px !important;
+    margin-top: 20px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 15px !important;
+}
+
+/* Time slider styling in animation tab */
+[data-testid="stTabs"] [data-baseweb="tab-panel"]:nth-child(3) [data-testid*="stSlider"] [role="slider"] {
+    background: linear-gradient(to bottom, #66ffaa, #33cc77, #22aa55) !important;
+    box-shadow: 0 0 10px rgba(34, 170, 85, 0.7) !important;
+}
+
+[data-testid="stTabs"] [data-baseweb="tab-panel"]:nth-child(3) [data-testid*="stSlider"] div[role="progressbar"] {
     background: linear-gradient(to right, #66ffaa, #22aa55) !important;
 }
 
@@ -635,4 +432,137 @@ button:hover {
     -webkit-text-fill-color: transparent !important;
     color: transparent !important;
     font-weight: bold !important;
+}
+
+/* Animation button styling */
+.play_button {
+    background: linear-gradient(45deg, #66ffaa, #33cc77, #22aa55) !important;
+    color: white !important;
+    font-weight: bold !important;
+    border: none !important;
+    border-radius: 15px !important;
+    padding: 10px 30px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 0 15px rgba(34, 170, 85, 0.5) !important;
+    margin: 0 auto !important;
+    display: block !important;
+    width: 80% !important;
+}
+
+.play_button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 5px 20px rgba(34, 170, 85, 0.7) !important;
+}
+
+.play_button:active {
+    transform: translateY(1px) !important;
+    box-shadow: 0 2px 10px rgba(34, 170, 85, 0.6) !important;
+}
+
+/* Improve metric styling */
+.metric_container {
+    background-color: rgba(20, 20, 30, 0.7) !important;
+    border-radius: 15px !important;
+    padding: 15px !important;
+    margin-bottom: 20px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.metric_value {
+    font-size: 2rem !important;
+    font-weight: bold !important;
+    text-align: center !important;
+}
+
+.metric_label {
+    font-size: 1rem !important;
+    text-align: center !important;
+    color: #aaa !important;
+}
+
+/* File uploader styling */
+[data-testid="stFileUploader"] {
+    background-color: rgba(40, 40, 40, 0.6) !important;
+    border-radius: 15px !important;
+    padding: 15px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-testid="stFileUploader"] span {
+    color: white !important;
+}
+
+/* Database tab styling */
+.database_container {
+    background-color: rgba(20, 20, 30, 0.7) !important;
+    border-radius: 15px !important;
+    padding: 20px !important;
+    margin-bottom: 20px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Statistics section styling */
+.stats_text {
+    font-size: 0.9rem !important;
+    color: #bbbbbb !important;
+    line-height: 1.4 !important;
+}
+
+/* Histogram styling */
+.histogram {
+    background-color: rgba(20, 20, 30, 0.7) !important;
+    border-radius: 15px !important;
+    padding: 15px !important;
+    margin-bottom: 20px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    height: 300px !important; /* Consistent height */
+}
+
+/* Checkbox styling */
+[data-testid="stCheckbox"] {
+    background-color: rgba(40, 40, 40, 0.6) !important;
+    border-radius: 10px !important;
+    padding: 10px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Notification styling */
+[data-testid="stNotification"] {
+    background-color: #1e1e1e !important;
+    border-radius: 15px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: white !important;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Loading spinner styling */
+[data-testid="stSpinner"] {
+    color: #14a5ff !important;
+}
+
+/* Global font adjustment */
+body, button, input, optgroup, select, textarea {
+    font-family: 'Aclonica', sans-serif !important;
+}
+
+/* Make all containers more rounded with 15px border-radius */
+[data-testid="stContainer"],
+[data-testid="stMarkdown"],
+[data-testid="stImage"],
+[data-testid="stText"],
+[data-testid="stButton"],
+[data-testid="stFileUploader"],
+[data-testid="stSelectbox"],
+[data-testid="stTextInput"],
+[data-testid="stNumberInput"],
+[data-testid="stSlider"],
+[data-testid="stCheckbox"] {
+    border-radius: 15px !important;
+}
+
+/* Adjusted footer styling */
+footer {
+    visibility: hidden;
 }

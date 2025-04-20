@@ -767,17 +767,18 @@ with tab3:
         bg_circle = plt.Circle((0, 0), 1.1, fill=True, color='#121a24', alpha=0.6, zorder=1)
         ax_circle.add_patch(bg_circle)
         
-        # Add subtle circle rings for reference
+        # Add subtle circle rings for reference in a complementary orange color
         for radius in [0.25, 0.5, 0.75]:
-            ring = plt.Circle((0, 0), radius, fill=False, color='#334455', 
-                            linestyle=':', alpha=0.5, zorder=2)
+            ring = plt.Circle((0, 0), radius, fill=False, color='#aa6633', 
+                            linestyle=':', alpha=0.4, zorder=2)
             ax_circle.add_patch(ring)
         
-        # Draw unit circle with glow effect
-        circle_glow = plt.Circle((0, 0), 1.02, fill=False, color='#4488aa', alpha=0.3, linewidth=3, zorder=3)
+        # Draw unit circle with glow effect - using light orange that complements the arrow
+        circle_glow = plt.Circle((0, 0), 1.02, fill=False, color='#ffaa66', alpha=0.3, linewidth=3, zorder=3)
         ax_circle.add_patch(circle_glow)
         
-        circle = plt.Circle((0, 0), 1, fill=False, color='#66ccff', linestyle='-', 
+        # Main unit circle in light orange
+        circle = plt.Circle((0, 0), 1, fill=False, color='#ff9955', linestyle='-', 
                          linewidth=1.5, alpha=0.8, zorder=4)
         ax_circle.add_patch(circle)
         

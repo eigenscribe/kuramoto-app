@@ -448,15 +448,9 @@ button:hover {
     letter-spacing: 0.2px !important;
 }
 
-/* Apply green gradient to sidebar selectbox labels */
+/* Default selector - will be overridden by more specific ones */
 .sidebar .stSelectbox label {
-    background: linear-gradient(to right, #66ffaa, #33cc77, #22aa55) !important;
-    -webkit-background-clip: text !important;
-    background-clip: text !important;
-    -webkit-text-fill-color: transparent !important;
-    color: transparent !important;
-    font-weight: bold !important;
-    letter-spacing: 0.2px !important;
+    /* Already defined in our systematic color structure */
 }
 
 /* Improve number input appearance for all inputs */
@@ -480,15 +474,43 @@ button:hover {
     letter-spacing: 0.2px !important;
 }
 
-/* Apply green gradient to sidebar number input labels */
-.sidebar .stNumberInput label {
-    background: linear-gradient(to right, #66ffaa, #33cc77, #22aa55) !important;
+/* Systematic sidebar coloring structure */
+
+/* Base settings for all sidebar inputs - shared properties */
+.sidebar .stNumberInput label,
+.sidebar .stSlider label,
+.sidebar .stSelectbox label,
+.sidebar .stRadio label {
     -webkit-background-clip: text !important;
     background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
     color: transparent !important;
     font-weight: bold !important;
     letter-spacing: 0.2px !important;
+}
+
+/* System parameters - Orange-pink gradient for Oscillators and Coupling */
+.sidebar .stSlider label[for*="oscillators"],
+.sidebar .stSlider label[for*="coupling"] {
+    background: linear-gradient(to right, #ffcc88, #ff8855, #ff6633) !important;
+}
+
+/* Frequency parameters - Blue gradient */
+.sidebar .stSelectbox label,
+.sidebar .stSlider label[for*="mean"],
+.sidebar .stSlider label[for*="standard_deviation"],
+.sidebar .stSlider label[for*="minimum"],
+.sidebar .stSlider label[for*="maximum"],
+.sidebar .stSlider label[for*="peak"],
+.sidebar .stTextArea label {
+    background: linear-gradient(to right, #33ccff, #0088ee) !important;
+}
+
+/* Time parameters - Green gradient */
+.sidebar .stSlider label[for*="time"],
+.sidebar .stNumberInput label[for*="seed"],
+.sidebar .stRadio label {
+    background: linear-gradient(to right, #66ffaa, #33cc77, #22aa55) !important;
 }
 
 /* Custom scrollbar styling */

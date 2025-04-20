@@ -159,7 +159,7 @@ st.markdown(f"""
 st.markdown("<h1 class='gradient_text1'>Kuramoto Model Simulator</h1>", unsafe_allow_html=True)
 
 # Create sidebar with parameters
-st.sidebar.markdown("<h2 style='background: linear-gradient(to right, #66ffaa, #33cc77, #22aa55); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold;'>Simulation Parameters</h2>", unsafe_allow_html=True)
+st.sidebar.markdown("<h2 style='background: linear-gradient(to right, #ffcc88, #ff8855, #ff6633); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold;'>Simulation Parameters</h2>", unsafe_allow_html=True)
 
 # Initialize session state for parameters if they don't exist
 if 'n_oscillators' not in st.session_state:
@@ -290,7 +290,7 @@ random_seed = st.sidebar.number_input(
 )
 
 # Network Connectivity Configuration
-st.sidebar.markdown("<h3 style='background: linear-gradient(to right, #66ffaa, #33cc77, #22aa55); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold;'>Network Connectivity</h3>", unsafe_allow_html=True)
+st.sidebar.markdown("<h3 style='background: linear-gradient(to right, #33ccff, #0088ee, #0066dd); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold;'>Network Connectivity</h3>", unsafe_allow_html=True)
 network_type = st.sidebar.radio(
     "Network Type",
     options=["All-to-All", "Nearest Neighbor", "Random", "Custom Adjacency Matrix"],

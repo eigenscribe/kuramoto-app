@@ -480,10 +480,43 @@ with tab1:
         b = min(255, int(b * 1.5))
         bright_node_colors.append(f"#{r:02x}{g:02x}{b:02x}")
     
+    # Add glow effects for nodes (similar to animation tab)
+    # Import matplotlib.patches for Circle
+    import matplotlib.patches as patches
+    
+    # First layer of glow (larger, more transparent)
+    for i, (node, node_pos) in enumerate(pos.items()):
+        # Extract original color components
+        r = int(node_colors[i][1:3], 16) / 255.0
+        g = int(node_colors[i][3:5], 16) / 255.0
+        b = int(node_colors[i][5:7], 16) / 255.0
+        
+        # Outer glow (larger, more transparent)
+        outer_glow = patches.Circle(
+            node_pos, 
+            radius=np.sqrt(node_size) / 40, 
+            color=(r, g, b, 0.15),  # Lower alpha for outer glow
+            fill=True,
+            zorder=1
+        )
+        ax1.add_patch(outer_glow)
+        
+        # Inner glow (smaller, more opaque)
+        inner_glow = patches.Circle(
+            node_pos, 
+            radius=np.sqrt(node_size) / 50, 
+            color=(r, g, b, 0.3),  # Higher alpha for inner glow
+            fill=True,
+            zorder=2
+        )
+        ax1.add_patch(inner_glow)
+    
+    # Draw the main nodes on top of glow effects
     nodes = nx.draw_networkx_nodes(G, pos, ax=ax1, 
                                node_color=node_colors, 
                                node_size=node_size, alpha=0.9, 
-                               edgecolors=bright_node_colors, linewidths=1.0)
+                               edgecolors=bright_node_colors, linewidths=1.0,
+                               zorder=3)
     
     # Add node labels only if there are relatively few nodes
     if n_oscillators <= 15:

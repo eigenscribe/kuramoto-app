@@ -273,7 +273,7 @@ a:hover {
 /* This targets the left side of slider (between minimum value and thumb) */
 .stSlider [data-baseweb=slider] div[data-type="range"] div:first-child,
 .stSlider [data-baseweb=slider] [data-testid="stSliderProgress"] {
-    background: #7851A9 !important; /* Royal Purple */
+    background: #3a98ff !important; /* Blue from our gradient */
     height: 4px !important; /* Ensure consistent height */
 }
 
@@ -285,9 +285,9 @@ a:hover {
 
 /* Slider thumb styling */
 .stSlider [data-baseweb=slider] [role=slider] {
-    background: #7851A9 !important; /* Royal Purple */
+    background: #14b5ff !important; /* Blue from our gradient */
     border: 2px solid white !important;
-    box-shadow: 0 0 8px rgba(120, 81, 169, 0.7) !important;
+    box-shadow: 0 0 8px rgba(20, 181, 255, 0.7) !important;
 }
 
 /* Override Streamlit defaults */
@@ -339,7 +339,7 @@ footer {
     font-size: 18px;
     letter-spacing: 0.5px;
     border-radius: 12px;
-    background-image: linear-gradient(to bottom right, #00c8ff, #14a5ff, #7066ff, #5e17eb);
+    background-image: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb);
     box-shadow: 0 5px 15px rgba(20, 165, 255, 0.4);
     transition: all 0.3s ease;
     text-align: center;
@@ -392,7 +392,7 @@ button:hover {
 /* Improve selectbox appearance */
 .stSelectbox > div[data-baseweb="select"] {
     border: 2px solid;
-    border-image: linear-gradient(to bottom right, #00c8ff, #14a5ff, #7066ff, #5e17eb) 1;
+    border-image: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb) 1;
     border-radius: 15px;
     overflow: hidden;
 }
@@ -409,8 +409,8 @@ button:hover {
     border-radius: 15px;
     background-color: #222;
     color: white;
-    border: 2px solid #7851A9 !important; /* Royal Purple border */
-    box-shadow: 0 0 5px rgba(120, 81, 169, 0.5);
+    border: 2px solid #3a98ff !important; /* Blue from our gradient */
+    box-shadow: 0 0 5px rgba(58, 152, 255, 0.5);
     padding: 5px 10px;
 }
 
@@ -426,7 +426,7 @@ button:hover {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: linear-gradient(to bottom right, #00c8ff, #14a5ff, #7066ff, #5e17eb);
+    background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb);
     border-radius: 10px;
     border: 2px solid rgba(0, 0, 0, 0.2);
 }
@@ -435,9 +435,9 @@ button:hover {
     background: linear-gradient(to right, #00ffee, #27aaff);
 }
 
-/* Radio button styling - using royal purple */
+/* Radio button styling - using blue from our gradient */
 [data-testid="stRadio"] [data-baseweb="radio"] div[data-checked="true"] div:first-child {
-    background: #7851A9 !important; /* Royal Purple */
+    background: #14b5ff !important; /* Blue from our gradient */
     border: 2px solid white !important;
-    box-shadow: 0 0 5px rgba(120, 81, 169, 0.7) !important;
+    box-shadow: 0 0 5px rgba(20, 181, 255, 0.7) !important;
 }

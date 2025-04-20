@@ -490,25 +490,26 @@ button:hover {
 }
 
 /* System parameters - Orange-pink gradient for Oscillators and Coupling */
-.sidebar .stSlider label[for*="oscillators"],
-.sidebar .stSlider label[for*="coupling"] {
+.sidebar .stSlider[data-testid*="oscillators"] label,
+.sidebar .stSlider[data-testid*="coupling"] label {
     background: linear-gradient(to right, #ffcc88, #ff8855, #ff6633) !important;
 }
 
 /* Frequency parameters - Blue gradient */
 .sidebar .stSelectbox label,
-.sidebar .stSlider label[for*="mean"],
-.sidebar .stSlider label[for*="standard_deviation"],
-.sidebar .stSlider label[for*="minimum"],
-.sidebar .stSlider label[for*="maximum"],
-.sidebar .stSlider label[for*="peak"],
+.sidebar .stSlider[data-testid*="mean"] label,
+.sidebar .stSlider[data-testid*="standard_deviation"] label,
+.sidebar .stSlider[data-testid*="minimum"] label,
+.sidebar .stSlider[data-testid*="maximum"] label,
+.sidebar .stSlider[data-testid*="peak"] label,
 .sidebar .stTextArea label {
     background: linear-gradient(to right, #33ccff, #0088ee) !important;
 }
 
 /* Time parameters - Green gradient */
-.sidebar .stSlider label[for*="time"],
-.sidebar .stNumberInput label[for*="seed"],
+.sidebar .stSlider[data-testid*="simulation_time"] label,
+.sidebar .stSlider[data-testid*="time_step"] label,
+.sidebar .stNumberInput[data-testid*="random_seed"] label,
 .sidebar .stRadio label {
     background: linear-gradient(to right, #66ffaa, #33cc77, #22aa55) !important;
 }

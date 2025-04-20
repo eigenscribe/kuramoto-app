@@ -392,6 +392,17 @@ if network_type == "Custom Adjacency Matrix":
 # Create tabs for different visualizations (Network is default tab)
 tab1, tab2, tab3, tab4, tab5 = st.tabs(["Network", "Distributions", "Animation", "Database", "Configurations"])
 
+# Determine the effective network type for display and matrix creation
+# Force network type to "Custom Adjacency Matrix" if adjacency matrix is provided
+# This ensures we're really using the user-defined matrix, not a built-in type
+if adj_matrix is not None:
+    print(f"Detected adjacency matrix - forcing network type to Custom")
+    # Don't change the UI selection, but use the matrix for visualization
+    network_type_internal = "Custom Adjacency Matrix"
+else:
+    # Use the selected network type
+    network_type_internal = network_type
+
 # Function to simulate model
 @st.cache_data(ttl=300)
 def run_simulation(n_oscillators, coupling_strength, frequencies, simulation_time, time_step, random_seed, adjacency_matrix=None):
@@ -429,7 +440,7 @@ with tab1:
     st.markdown(f"""
     <div style='background-color: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px; margin-bottom: 20px;'>
         <span style='font-size: 1.2em;'><b>Simulation Information</b></span><br>
-        <span><b>Oscillators:</b> {n_oscillators} | <b>Coupling Strength:</b> {coupling_strength} | <b>Network Type:</b> {network_type}</span>
+        <span><b>Oscillators:</b> {n_oscillators} | <b>Coupling Strength:</b> {coupling_strength} | <b>Network Type:</b> {network_type_internal}</span>
     </div>
     """, unsafe_allow_html=True)
     
@@ -440,18 +451,18 @@ with tab1:
     import networkx as nx
     
     # Make sure adj_matrix is defined for all network types
-    if network_type == "All-to-All":
+    if network_type_internal == "All-to-All":
         # For all-to-all, create a fully connected matrix with uniform coupling
         network_adj_matrix = np.ones((n_oscillators, n_oscillators))
         np.fill_diagonal(network_adj_matrix, 0)  # No self-connections
-    elif network_type == "Nearest Neighbor":
+    elif network_type_internal == "Nearest Neighbor":
         # For nearest neighbor, create a ring topology
         network_adj_matrix = np.zeros((n_oscillators, n_oscillators))
         for i in range(n_oscillators):
             # Connect to left and right neighbors on the ring
             network_adj_matrix[i, (i-1) % n_oscillators] = 1
             network_adj_matrix[i, (i+1) % n_oscillators] = 1
-    elif network_type == "Random":
+    elif network_type_internal == "Random":
         # For random, create random connections with 20% probability
         np.random.seed(random_seed)  # Use same seed for reproducibility
         network_adj_matrix = np.random.random((n_oscillators, n_oscillators)) < 0.2
@@ -583,7 +594,7 @@ with tab1:
                            font_color='white', font_weight='bold')
         
     # Add title and styling
-    ax1.set_title(f'Oscillator Network Graph ({network_type})', 
+    ax1.set_title(f'Oscillator Network Graph ({network_type_internal})', 
                color='white', fontsize=14, pad=15)
     ax1.set_axis_off()
     

@@ -590,7 +590,26 @@ def export_configuration_to_json(config_id, file_path=None):
             json_serializable_dict[key] = value.isoformat()
         # Convert numpy arrays to lists
         elif key == 'adjacency_matrix' and value is not None:
-            json_serializable_dict[key] = value.tolist()
+            # Special handling for adjacency matrix
+            if hasattr(value, 'tolist'):
+                adj_list = value.tolist()
+                
+                # Debug info about the matrix being exported
+                print(f"Exporting adjacency matrix:")
+                print(f"- Original shape: {value.shape}")
+                print(f"- Sum of elements: {np.sum(value)}")
+                print(f"- Non-zero elements: {np.count_nonzero(value)}")
+                
+                # Ensure we're not exporting a fully connected matrix by mistake
+                # (Check if all off-diagonal elements are 1)
+                n = value.shape[0]
+                if np.sum(value) == n * (n - 1) and np.all(np.diag(value) == 0):
+                    print("WARNING: Matrix appears to be fully connected! This might be a mistake.")
+                
+                json_serializable_dict[key] = adj_list
+            else:
+                print(f"Warning: adjacency_matrix has no tolist() method, type={type(value)}")
+                json_serializable_dict[key] = value
         # Skip any non-serializable objects
         elif isinstance(value, (int, float, str, bool, list, dict)) or value is None:
             json_serializable_dict[key] = value

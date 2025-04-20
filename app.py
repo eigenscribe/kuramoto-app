@@ -496,8 +496,13 @@ with tab1:
             frameon=True, framealpha=0.7, facecolor='#121212', 
             edgecolor='#555555', labelcolor='white')
     
-    # Create a heatmap of the adjacency matrix on the right side
-    im = ax2.imshow(network_adj_matrix, cmap='viridis')
+    # Create a heatmap of the adjacency matrix using blue gradient
+    # Create a custom blue colormap for the adjacency matrix
+    blue_cmap = LinearSegmentedColormap.from_list("adj_matrix_blue", 
+                                             ["#0070eb", "#14b5ff", "#00e8ff"], 
+                                             N=256)
+    # Apply custom colormap - dark blue for 0s, light blue for 1s
+    im = ax2.imshow(network_adj_matrix, cmap=blue_cmap)
     plt.colorbar(im, ax=ax2, label='Connection Strength')
     
     # Add labels and styling

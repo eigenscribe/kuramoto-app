@@ -677,7 +677,7 @@ with tab3:
     """, unsafe_allow_html=True)
     
     # Create oscillator visualization
-    st.markdown("<h3 class='gradient_text1'>Oscillator Synchronization</h3>", unsafe_allow_html=True)
+    # Removed "Oscillator Synchronization" header as requested
     
     # Initialize time_index in session state if not present
     if 'time_index' not in st.session_state:
@@ -931,8 +931,7 @@ with tab3:
         order_plot_placeholder = st.empty()
         order_plot_placeholder.pyplot(create_order_parameter_plot(time_index))
     
-    # Display the current time
-    st.markdown(f"<div style='text-align: center;'><h4>Current Time: t = {times[time_index]:.3f}</h4></div>", unsafe_allow_html=True)
+    # Removed "Current Time" display as requested
     
     # Playback controls layout - now after the plots
     playback_container = st.container()

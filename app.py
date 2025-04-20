@@ -459,6 +459,12 @@ if network_type == "Custom Adjacency Matrix":
             else:
                 st.sidebar.success("Adjacency matrix validated successfully!")
                 
+                # Add a dedicated button to force network visualization refresh
+                if st.sidebar.button("Refresh Network Visualization", key="force_refresh_btn"):
+                    st.session_state.refresh_network = True
+                    print("Network refresh requested via button")
+                    st.rerun()
+                
             # Store in session state for persistence
             st.session_state.loaded_adj_matrix = adj_matrix
             print(f"Updated adjacency matrix in session state with shape {adj_matrix.shape}")

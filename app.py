@@ -12,7 +12,7 @@ from kuramoto_model import KuramotoModel
 import time
 from database import (store_simulation, get_simulation, list_simulations, delete_simulation,
                   save_configuration, list_configurations, get_configuration, delete_configuration,
-                  get_configuration_by_name)
+                  get_configuration_by_name, export_configuration_to_json, import_configuration_from_json)
 
 # Initialize session state for configuration loading
 if 'loaded_config' not in st.session_state:
@@ -1461,3 +1461,117 @@ with tab5:
                         st.rerun()  # Refresh the page to update the list
                     else:
                         st.error("Failed to delete configuration.")
+            
+            # JSON EXPORT/IMPORT PANEL
+            st.markdown("<h3 class='gradient_text1'>JSON Configuration Export/Import</h3>", unsafe_allow_html=True)
+            
+            exp_imp_col1, exp_imp_col2 = st.columns(2)
+            
+            # Export to JSON section
+            with exp_imp_col1:
+                st.markdown("<h4>Export Configuration to JSON</h4>", unsafe_allow_html=True)
+                
+                if not configs:
+                    st.info("No saved configurations to export. Save a configuration first.")
+                else:
+                    # Create a dropdown with configuration names for export
+                    export_options = {f"{c['name']} (Oscillators: {c['n_oscillators']}, K: {c['coupling_strength']})": c['id'] for c in configs}
+                    export_config = st.selectbox("Select Configuration to Export", options=list(export_options.keys()), key="export_select")
+                    
+                    json_filename = st.text_input("Filename", value="kuramoto_config.json", key="export_filename")
+                    
+                    if st.button("Export to JSON", type="primary", key="export_button"):
+                        try:
+                            export_id = export_options[export_config]
+                            file_path = export_configuration_to_json(export_id, json_filename)
+                            
+                            if file_path:
+                                # Read the file content for download
+                                with open(file_path, 'rb') as f:
+                                    file_content = f.read()
+                                
+                                # Provide download button
+                                st.download_button(
+                                    label="Download JSON file",
+                                    data=file_content,
+                                    file_name=json_filename,
+                                    mime="application/json"
+                                )
+                                
+                                st.success(f"Configuration exported successfully to {file_path}")
+                            else:
+                                st.error("Failed to export configuration to JSON.")
+                        except Exception as e:
+                            st.error(f"Error exporting configuration: {str(e)}")
+            
+            # Import from JSON section
+            with exp_imp_col2:
+                st.markdown("<h4>Import Configuration from JSON</h4>", unsafe_allow_html=True)
+                
+                uploaded_file = st.file_uploader("Upload JSON Configuration", type=["json"])
+                
+                if uploaded_file is not None:
+                    # Save the uploaded file temporarily
+                    temp_filename = f"temp_import_{int(time.time())}.json"
+                    with open(temp_filename, 'wb') as f:
+                        f.write(uploaded_file.getvalue())
+                    
+                    # Show preview of the configuration
+                    try:
+                        with open(temp_filename, 'r') as f:
+                            config_preview = json.load(f)
+                        
+                        st.write("Configuration Preview:")
+                        preview_data = {
+                            "Name": config_preview.get('name', 'Unknown'),
+                            "Oscillators": config_preview.get('n_oscillators', 'Unknown'),
+                            "Coupling": config_preview.get('coupling_strength', 'Unknown'),
+                            "Network Type": config_preview.get('network_type', 'Unknown'),
+                            "Frequency Distribution": config_preview.get('frequency_distribution', 'Unknown')
+                        }
+                        
+                        for key, value in preview_data.items():
+                            st.write(f"{key}: {value}")
+                        
+                        # Import options
+                        save_to_db = st.checkbox("Save to database", value=True, key="import_save_db")
+                        custom_name = st.text_input("Configuration name (if saving to database)", 
+                                                  value=config_preview.get('name', 'Imported Configuration'),
+                                                  key="import_name")
+                        
+                        if st.button("Import Configuration", type="primary", key="import_button"):
+                            try:
+                                # Update the name in the file if custom name provided
+                                if save_to_db and custom_name != config_preview.get('name', ''):
+                                    config_preview['name'] = custom_name
+                                    with open(temp_filename, 'w') as f:
+                                        json.dump(config_preview, f)
+                                
+                                # Import the configuration
+                                result = import_configuration_from_json(temp_filename, save_to_db=save_to_db)
+                                
+                                if isinstance(result, int) and save_to_db:
+                                    st.success(f"Configuration imported and saved to database with ID: {result}")
+                                    # Ask to load the imported configuration
+                                    if st.button("Load this configuration now", key="load_imported"):
+                                        config = get_configuration(result)
+                                        if config:
+                                            st.session_state.loaded_config = config
+                                            st.success("Configuration loaded! Applying settings...")
+                                            st.rerun()
+                                else:
+                                    st.success("Configuration imported successfully!")
+                                    # Store directly in session state for immediate use
+                                    if not save_to_db and st.button("Use this configuration now", key="use_imported"):
+                                        st.session_state.loaded_config = result
+                                        st.success("Applying imported settings...")
+                                        st.rerun()
+                            except Exception as e:
+                                st.error(f"Error importing configuration: {str(e)}")
+                            finally:
+                                # Clean up temporary file
+                                import os
+                                if os.path.exists(temp_filename):
+                                    os.remove(temp_filename)
+                    except Exception as e:
+                        st.error(f"Error parsing JSON file: {str(e)}")

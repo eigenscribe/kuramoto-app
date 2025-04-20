@@ -290,9 +290,23 @@ a:hover {
     box-shadow: 0 0 8px rgba(0, 204, 102, 0.7) !important;
 }
 
-/* Special styling for the Time Point slider only */
+/* Special styling for the Time Point slider header only */
 [data-testid="stVerticalBlock"] > div:nth-of-type(5) .stSlider label {
     background: linear-gradient(to right, #00ff88, #00aa44) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
+    font-weight: bold !important;
+}
+
+/* Style the min/max values on sliders with blue gradient */
+.stSlider [data-testid="stTickBar"] {
+    color: transparent !important;
+}
+
+.stSlider [data-testid="stTickBar"] > div {
+    background: linear-gradient(to right, #00c2ff, #0070db) !important;
     -webkit-background-clip: text !important;
     background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
@@ -394,9 +408,14 @@ button:hover {
     border-color: #14b5ff;
 }
 
-/* Fix slider text */
+/* Green gradient text for all slider labels (variables) */
 .stSlider label {
-    color: white !important;
+    background: linear-gradient(to right, #00ff88, #00aa44) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
+    font-weight: bold !important;
 }
 
 /* Improve selectbox appearance */
@@ -419,9 +438,19 @@ button:hover {
     border-radius: 15px;
     background-color: #222;
     color: white;
-    border: 2px solid #3a98ff !important; /* Blue from our gradient */
-    box-shadow: 0 0 5px rgba(58, 152, 255, 0.5);
+    border: 2px solid #00cc66 !important; /* Bright green */
+    box-shadow: 0 0 5px rgba(0, 204, 102, 0.5);
     padding: 5px 10px;
+}
+
+/* Apply green gradient to number input labels */
+.stNumberInput label {
+    background: linear-gradient(to right, #00ff88, #00aa44) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
+    font-weight: bold !important;
 }
 
 /* Custom scrollbar styling */

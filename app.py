@@ -496,16 +496,14 @@ with tab1:
                color='white', fontsize=14, pad=15)
     ax1.set_axis_off()
     
-    # Add a legend explaining node colors with brighter outline
+    # Add a legend explaining node colors with brighter outline - using only purple-magenta-blue
     legend_elements = [
         plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=custom_cmap(0.0), 
                 markeredgecolor='#ae56ff', markersize=10, label='Lowest frequency (violet)'),
-        plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=custom_cmap(0.33), 
-                markeredgecolor='#ff50ff', markersize=10, label='Lower frequency (magenta)'),
-        plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=custom_cmap(0.67), 
-                markeredgecolor='#ffc060', markersize=10, label='Higher frequency (orange)'),
+        plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=custom_cmap(0.5), 
+                markeredgecolor='#ff50ff', markersize=10, label='Medium frequency (magenta)'),
         plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=custom_cmap(1.0), 
-                markeredgecolor='#70e898', markersize=10, label='Highest frequency (green)')
+                markeredgecolor='#5080ff', markersize=10, label='Highest frequency (blue)')
     ]
     ax1.legend(handles=legend_elements, loc='upper right', 
             frameon=True, framealpha=0.7, facecolor='#121212', 

@@ -420,7 +420,7 @@ with tab1:
     
     # Create custom colormap that matches our gradient_text1 theme for nodes
     custom_cmap = LinearSegmentedColormap.from_list("kuramoto_colors", 
-                                                ["#14a5ff", "#8138ff"], 
+                                                ["#8A2BE2", "#FF00FF", "#FFA500"], 
                                                 N=256)
     
     # Sort oscillators by their natural frequency for consistent coloring
@@ -467,10 +467,23 @@ with tab1:
     n_nodes = len(G.nodes)
     node_size = max(100, int(1000 * (1 / (0.1 * n_nodes + 0.5))))  # Formula for scaling
     
+    # Generate brighter versions of node colors for edges
+    bright_node_colors = []
+    for color in node_colors:
+        # Convert hex to RGB and make it brighter
+        r = int(color[1:3], 16)
+        g = int(color[3:5], 16)
+        b = int(color[5:7], 16)
+        # Make RGB values brighter (closer to white)
+        r = min(255, int(r * 1.5))
+        g = min(255, int(g * 1.5))
+        b = min(255, int(b * 1.5))
+        bright_node_colors.append(f"#{r:02x}{g:02x}{b:02x}")
+    
     nodes = nx.draw_networkx_nodes(G, pos, ax=ax1, 
                                node_color=node_colors, 
                                node_size=node_size, alpha=0.9, 
-                               edgecolors='white', linewidths=1.5)
+                               edgecolors=bright_node_colors, linewidths=1.0)
     
     # Add node labels only if there are relatively few nodes
     if n_oscillators <= 15:
@@ -483,14 +496,14 @@ with tab1:
                color='white', fontsize=14, pad=15)
     ax1.set_axis_off()
     
-    # Add a legend explaining node colors
+    # Add a legend explaining node colors with brighter outline
     legend_elements = [
-        plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=custom_cmap(0.1), 
-                markeredgecolor='white', markersize=10, label='Lower frequency'),
+        plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=custom_cmap(0.0), 
+                markeredgecolor='#ae56ff', markersize=10, label='Lower frequency (violet)'),
         plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=custom_cmap(0.5), 
-                markeredgecolor='white', markersize=10, label='Medium frequency'),
-        plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=custom_cmap(0.9), 
-                markeredgecolor='white', markersize=10, label='Higher frequency')
+                markeredgecolor='#ff50ff', markersize=10, label='Medium frequency (magenta)'),
+        plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=custom_cmap(1.0), 
+                markeredgecolor='#ffc060', markersize=10, label='Higher frequency (orange)')
     ]
     ax1.legend(handles=legend_elements, loc='upper right', 
             frameon=True, framealpha=0.7, facecolor='#121212', 

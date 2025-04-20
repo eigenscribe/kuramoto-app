@@ -25,8 +25,8 @@ body {
 /* Gradient text styles - THESE TWO SPECIFIC GRADIENTS SHOULD BE USED */
 .gradient_text1 {
     font-weight: bold !important;
-    background: linear-gradient(to bottom right, #00c8ff, #14a5ff, #7066ff, #5e17eb) !important;
-    background-image: -webkit-linear-gradient(to bottom right, #00c8ff, #14a5ff, #7066ff, #5e17eb) !important;
+    background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb) !important;
+    background-image: -webkit-linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb) !important;
     -webkit-background-clip: text !important;
     background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
@@ -98,7 +98,7 @@ body {
 
 .section h3 {
     font-weight: bold !important;
-    background: linear-gradient(to bottom right, #00c8ff, #14a5ff, #7066ff, #5e17eb) !important;
+    background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb) !important;
     -webkit-background-clip: text !important;
     background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
@@ -138,7 +138,7 @@ body {
 
 .feature-box-content h3 {
     font-weight: bold !important;
-    background: linear-gradient(to bottom right, #00c8ff, #14a5ff, #7066ff, #5e17eb) !important;
+    background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb) !important;
     -webkit-background-clip: text !important;
     background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
@@ -151,7 +151,7 @@ body {
 
 /* Button Styling */
 .btn, .stButton button, button[kind="primary"] {
-    background-image: linear-gradient(to bottom right, #00c8ff, #14a5ff, #7066ff, #5e17eb);
+    background-image: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb);
     box-shadow: 0 4px 15px 0 rgba(39, 170, 255, 0.5);
     width: 100%;
     min-width: 200px;
@@ -223,7 +223,7 @@ a:hover {
 
 /* Sidebar scrollbar styling */
 .sidebar::-webkit-scrollbar-thumb {
-    background: linear-gradient(to bottom right, #00c8ff, #14a5ff, #7066ff, #5e17eb);
+    background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb);
     border-radius: 10px;
     border: 2px solid rgba(0, 0, 0, 0.2);
 }
@@ -245,7 +245,7 @@ a:hover {
     right: -2px;
     bottom: -2px;
     left: -2px;
-    background: linear-gradient(to bottom right, #00c8ff, #14a5ff, #7066ff, #5e17eb);
+    background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb);
     border-radius: 7px;
     z-index: -1;
 }
@@ -260,7 +260,7 @@ a:hover {
 
 /* Network Connectivity section styling */
 .sidebar h3, .sidebar h3 span {
-    background: linear-gradient(to bottom right, #00c8ff, #14a5ff, #7066ff, #5e17eb) !important;
+    background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb) !important;
     -webkit-background-clip: text !important;
     background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
@@ -327,7 +327,7 @@ footer {
 
 /* Progress bar styling with gradient */
 .stProgress > div > div > div {
-    background: linear-gradient(to bottom right, #00c8ff, #14a5ff, #7066ff, #5e17eb) !important;
+    background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb) !important;
 }
 
 /* Play Animation button special styling */

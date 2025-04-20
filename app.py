@@ -33,138 +33,186 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Load the image file for background
+# Try to load style.css file directly
 try:
-    with open("src/static/images/wisp.jpg", "rb") as f:
-        img_data = f.read()
-        import base64
-        img_base64 = base64.b64encode(img_data).decode()
-        background_image = f"data:image/jpeg;base64,{img_base64}"
+    with open("styles.css", "r") as f:
+        css_content = f.read()
+        st.markdown(f"<style>{css_content}</style>", unsafe_allow_html=True)
 except:
-    # Fallback if image is not found
-    background_image = None
+    # Fallback if the styles.css file can't be read
+    # Load the image file for background
+    try:
+        with open("src/static/images/wisp.jpg", "rb") as f:
+            img_data = f.read()
+            import base64
+            img_base64 = base64.b64encode(img_data).decode()
+            background_image = f"data:image/jpeg;base64,{img_base64}"
+    except:
+        # Fallback if image is not found
+        background_image = None
 
-# Comprehensive CSS with inline background image
-st.markdown(f"""
-<style>
-/* Main styling for the entire application */
-body {{
-    font-family: 'Aclonica', sans-serif;
-    margin: 0;
-    padding: 0;
-    color: white;
-}}
+    # Comprehensive CSS with inline background image
+    st.markdown(f"""
+    <style>
+    /* Main styling for the entire application */
+    body {{
+        font-family: 'Aclonica', sans-serif;
+        margin: 0;
+        padding: 0;
+        color: white;
+    }}
 
-/* Adjust Streamlit default elements */
-.stApp {{
-    background-color: #121212;
-    background-image: {f"url('{background_image}')" if background_image else "none"};
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-}}
+    /* Adjust Streamlit default elements */
+    .stApp {{
+        background-color: #121212;
+        background-image: {f"url('{background_image}')" if background_image else "none"};
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }}
 
-/* Gradient text styles */
-.css-1y4p8pa {{
-    max-width: 100% !important;
-}}
+    /* Gradient text styles */
+    .gradient_text1 {{
+        font-weight: bold !important;
+        background: linear-gradient(to right bottom, #00e8ff, #14a5ff, #8138ff) !important;
+        -webkit-background-clip: text !important;
+        background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+        color: transparent !important;
+    }}
 
-/* Main content styling */
-.css-18e3th9 {{
-    padding-top: 2rem;
-    padding-bottom: 2rem;
-    padding-left: 5rem;
-    padding-right: 5rem;
-}}
+    .gradient_text2 {{
+        font-weight: bold !important;
+        background: linear-gradient(to right bottom, #ff8a00, #ff5e62, #ff2f92) !important;
+        -webkit-background-clip: text !important;
+        background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+        color: transparent !important;
+    }}
 
-/* Sidebar styling */
-.css-1d391kg {{
-    background-color: rgba(20, 20, 20, 0.8);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border-right: 1px solid rgba(80, 80, 80, 0.2);
-}}
+    /* Custom animation for oscillator visualization */
+    @keyframes pulse {{
+        0% {{
+            transform: scale(1);
+            opacity: 0.8;
+        }}
+        50% {{
+            transform: scale(1.1);
+            opacity: 1;
+        }}
+        100% {{
+            transform: scale(1);
+            opacity: 0.8;
+        }}
+    }}
 
-/* Custom tabs styling */
-.stTabs [data-baseweb="tab-list"] {{
-    gap: 5px;
-}}
+    /* Glow effects for various elements */
+    .glow {{
+        box-shadow: 0 0 10px 2px rgba(0, 232, 255, 0.7),
+                    0 0 20px 4px rgba(20, 165, 255, 0.5),
+                    0 0 30px 6px rgba(129, 56, 255, 0.3);
+        border-radius: 10px;
+    }}
 
-.stTabs [data-baseweb="tab"] {{
-    background-color: rgba(30, 30, 30, 0.6);
-    border-radius: 15px 15px 0px 0px;
-    padding: 5px 20px;
-    color: white;
-    transition: all 0.3s ease;
-}}
+    /* Custom tabs styling */
+    .stTabs [data-baseweb="tab-list"] {{
+        gap: 5px;
+    }}
 
-.stTabs [data-baseweb="tab-highlight"] {{
-    background: linear-gradient(to right, #00e8ff, #14a5ff, #8138ff);
-    border-radius: 15px 15px 0px 0px;
-    height: 4px;
-}}
+    .stTabs [data-baseweb="tab"] {{
+        background-color: rgba(30, 30, 30, 0.6) !important;
+        border-radius: 15px 15px 0px 0px !important;
+        padding: 5px 20px !important;
+        color: white !important;
+        transition: all 0.3s ease !important;
+    }}
 
-.stTabs [data-baseweb="tab-panel"] {{
-    background-color: rgba(30, 30, 30, 0.8);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-radius: 0px 15px 15px 15px;
-    padding: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-}}
+    .stTabs [data-baseweb="tab-highlight"] {{
+        background: linear-gradient(to right, #00e8ff, #14a5ff, #8138ff) !important;
+        border-radius: 15px 15px 0px 0px !important;
+        height: 4px !important;
+    }}
 
-/* Custom button styles */
-div.stButton > button:first-child {{
-    background: linear-gradient(45deg, #00e8ff, #14a5ff, #8138ff);
-    color: white;
-    font-weight: bold;
-    border: none;
-    border-radius: 15px;
-    padding: 10px 24px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    transition: all 0.3s ease;
-    box-shadow: 0 0 15px rgba(20, 165, 255, 0.5);
-}}
+    .stTabs [data-baseweb="tab-panel"] {{
+        background-color: rgba(30, 30, 30, 0.8) !important;
+        backdrop-filter: blur(10px) !important;
+        -webkit-backdrop-filter: blur(10px) !important;
+        border-radius: 0px 15px 15px 15px !important;
+        padding: 20px !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.3) !important;
+    }}
 
-div.stButton > button:hover {{
-    transform: translateY(-2px);
-    box-shadow: 0 5px 20px rgba(20, 165, 255, 0.7);
-}}
+    /* Sidebar styling */
+    [data-testid="stSidebar"] {{
+        background-color: rgba(20, 20, 20, 0.8) !important;
+        backdrop-filter: blur(15px) !important;
+        -webkit-backdrop-filter: blur(15px) !important;
+        border-right: 1px solid rgba(80, 80, 80, 0.2) !important;
+    }}
 
-/* Slider styling */
-[data-testid="stSlider"] [data-baseweb="slider"] [role="slider"] {{
-    background: linear-gradient(to bottom, #00e8ff, #14a5ff, #8138ff);
-    box-shadow: 0 0 10px rgba(20, 165, 255, 0.7);
-}}
+    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h1,
+    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h2,
+    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h3 {{
+        background: linear-gradient(to right, #00e8ff, #14a5ff, #8138ff) !important;
+        -webkit-background-clip: text !important;
+        background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+        color: transparent !important;
+        font-weight: bold !important;
+    }}
 
-[data-testid="stSlider"] [data-baseweb="slider"] div[role="progressbar"] {{
-    background: linear-gradient(to right, #00e8ff, #8138ff);
-}}
+    /* Custom button styles */
+    div.stButton > button:first-child {{
+        background: linear-gradient(45deg, #00e8ff, #14a5ff, #8138ff) !important;
+        color: white !important;
+        font-weight: bold !important;
+        border: none !important;
+        border-radius: 15px !important;
+        padding: 10px 24px !important;
+        text-transform: uppercase !important;
+        letter-spacing: 1px !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 0 15px rgba(20, 165, 255, 0.5) !important;
+    }}
 
-/* Make elements more rounded */
-[data-testid="stContainer"],
-[data-testid="stMarkdown"],
-[data-testid="stImage"],
-[data-testid="stText"],
-[data-testid="stButton"],
-[data-testid="stFileUploader"],
-[data-testid="stSelectbox"],
-[data-testid="stTextInput"],
-[data-testid="stNumberInput"],
-[data-testid="stSlider"],
-[data-testid="stCheckbox"] {{
-    border-radius: 15px !important;
-}}
+    div.stButton > button:hover {{
+        transform: translateY(-2px) !important;
+        box-shadow: 0 5px 20px rgba(20, 165, 255, 0.7) !important;
+    }}
 
-/* Footer styling */
-footer {{
-    visibility: hidden;
-}}
-</style>
-""", unsafe_allow_html=True)
+    /* Slider styling */
+    [data-testid="stSlider"] [data-baseweb="slider"] [role="slider"] {{
+        background: linear-gradient(to bottom, #00e8ff, #14a5ff, #8138ff) !important;
+        box-shadow: 0 0 10px rgba(20, 165, 255, 0.7) !important;
+    }}
+
+    [data-testid="stSlider"] [data-baseweb="slider"] div[role="progressbar"] {{
+        background: linear-gradient(to right, #00e8ff, #8138ff) !important;
+    }}
+
+    /* Make elements more rounded */
+    [data-testid="stContainer"],
+    [data-testid="stMarkdown"],
+    [data-testid="stImage"],
+    [data-testid="stText"],
+    [data-testid="stButton"],
+    [data-testid="stFileUploader"],
+    [data-testid="stSelectbox"],
+    [data-testid="stTextInput"],
+    [data-testid="stNumberInput"],
+    [data-testid="stSlider"],
+    [data-testid="stCheckbox"] {{
+        border-radius: 15px !important;
+    }}
+
+    /* Footer styling */
+    footer {{
+        visibility: hidden;
+    }}
+    </style>
+    """, unsafe_allow_html=True)
 
 # App title
 st.title("🌀 Kuramoto Model Simulator")

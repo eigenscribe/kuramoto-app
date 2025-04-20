@@ -802,9 +802,16 @@ with tab3:
         for i, idx in enumerate(sorted_indices):
             oscillator_colors[idx] = colors[i]
         
-        # Scatter plot with oscillator colors
-        sc = ax_circle.scatter(x, y, facecolors=oscillator_colors, edgecolor='white', s=180, 
-                             alpha=0.9, linewidth=1.5, zorder=10)
+        # Scatter plot with oscillator colors and brighter versions for outlines
+        # Create brighter versions of the colors for outlines
+        bright_oscillator_colors = np.copy(oscillator_colors)
+        for i in range(len(bright_oscillator_colors)):
+            # Make RGB values brighter (closer to white) but preserve alpha
+            bright_oscillator_colors[i, :3] = np.minimum(1.0, bright_oscillator_colors[i, :3] * 1.5)  # 50% brighter
+        
+        # Use custom edge colors instead of white
+        sc = ax_circle.scatter(x, y, facecolors=oscillator_colors, edgecolors=bright_oscillator_colors, s=180, 
+                             alpha=0.9, linewidth=1.0, zorder=10)
         
         # Calculate and show order parameter
         r = order_parameter[time_idx]
@@ -870,9 +877,15 @@ with tab3:
         for i in range(n_oscillators):
             color = oscillator_colors[i]
             
+            # Create a brighter version of the color for edge
+            # Extract RGB values and make them brighter
+            rgb = matplotlib.colors.to_rgb(color)
+            # Create brighter version (closer to white)
+            bright_color = tuple(min(1.0, c * 1.5) for c in rgb)
+            
             # Plot oscillator phases as filled dots with color gradient
             ax.scatter(times[:time_idx+1], phases[i, :time_idx+1] % (2 * np.pi), 
-                     facecolors=color, edgecolor='white', alpha=0.7, s=50, 
+                     facecolors=color, edgecolor=bright_color, alpha=0.7, s=50, 
                      linewidth=0.5, zorder=5)
             
             # Add a subtle connecting line with low opacity
@@ -881,8 +894,8 @@ with tab3:
             
             # Highlight current position with a larger filled marker
             ax.scatter([times[time_idx]], [phases[i, time_idx] % (2 * np.pi)], 
-                     s=140, facecolors=color, edgecolor='white', 
-                     linewidth=1.5, zorder=15)
+                     s=140, facecolors=color, edgecolor=bright_color, 
+                     linewidth=1.0, zorder=15)
         
         # Add labels for key phase positions
         phase_labels = [(0, '0'), (np.pi/2, 'π/2'), (np.pi, 'π'), (3*np.pi/2, '3π/2'), (2*np.pi, '2π')]
@@ -929,10 +942,19 @@ with tab3:
                                              ["#00e8ff", "#14b5ff", "#3a98ff", "#0070eb"], 
                                              N=256)
         
-        # Plot order parameter with filled gradient dots
-        colors = [cmap(r) for r in order_parameter[:time_idx+1]]
+        # Plot order parameter with filled gradient dots and brighter outline
+        base_colors = [cmap(r) for r in order_parameter[:time_idx+1]]
+        edge_colors = []
+        
+        # Create brighter versions of each color for the outlines
+        for color in base_colors:
+            rgb = matplotlib.colors.to_rgb(color)
+            # Make RGB values brighter but preserve alpha
+            bright_color = tuple(min(1.0, c * 1.5) for c in rgb)
+            edge_colors.append(bright_color)
+        
         scatter = ax.scatter(times[:time_idx+1], order_parameter[:time_idx+1],
-                          facecolors=colors, edgecolor='white',
+                          facecolors=base_colors, edgecolors=edge_colors,
                           s=70, alpha=0.9, linewidth=0.5, zorder=10)
         
         # Add a connecting line with low opacity
@@ -941,10 +963,15 @@ with tab3:
         
         # Highlight current position with a larger filled marker
         if time_idx > 0:
+            # Get color and make brighter version for outline
+            current_color = cmap(order_parameter[time_idx])
+            rgb = matplotlib.colors.to_rgb(current_color)
+            bright_current = tuple(min(1.0, c * 1.5) for c in rgb)
+            
             ax.scatter([times[time_idx]], [order_parameter[time_idx]], 
-                     s=180, facecolors=cmap(order_parameter[time_idx]), 
-                     edgecolor='white', 
-                     linewidth=1.5, zorder=15)
+                     s=180, facecolors=current_color, 
+                     edgecolors=bright_current, 
+                     linewidth=1.0, zorder=15)
         
         # Add highlights at important thresholds
         ax.axhline(y=0.5, color='#aaaaaa', linestyle='--', alpha=0.5, zorder=1, 

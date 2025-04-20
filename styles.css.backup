@@ -229,7 +229,7 @@ a:hover {
 }
 
 .sidebar::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(to right, #00e8ff, #0070eb);
+    background: linear-gradient(to right, #00ffee, #27aaff);
 }
 
 /* Network connectivity input styling */
@@ -432,7 +432,7 @@ button:hover {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(to right, #00e8ff, #0070eb);
+    background: linear-gradient(to right, #00ffee, #27aaff);
 }
 
 /* Radio button styling - using blue from our gradient */

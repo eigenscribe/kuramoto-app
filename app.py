@@ -524,8 +524,26 @@ def run_simulation(n_oscillators, coupling_strength, frequencies, simulation_tim
     return model, times, phases, order_parameter
 
 # Run the simulation
+# If we have a custom adjacency matrix, adjust the oscillator count to match matrix dimensions
+sim_n_oscillators = n_oscillators
+if adj_matrix is not None:
+    matrix_dim = adj_matrix.shape[0]
+    if matrix_dim != n_oscillators:
+        print(f"Adjusting simulation oscillator count to match matrix dimensions: {matrix_dim}")
+        sim_n_oscillators = matrix_dim
+        
+        # Also adjust frequencies to match this count
+        if len(frequencies) != sim_n_oscillators:
+            print(f"Adjusting frequencies array from length {len(frequencies)} to {sim_n_oscillators}")
+            if len(frequencies) > sim_n_oscillators:
+                # Truncate if too many
+                frequencies = frequencies[:sim_n_oscillators]
+            else:
+                # Extend by cycling through existing values if too few
+                frequencies = np.resize(frequencies, sim_n_oscillators)
+
 model, times, phases, order_parameter = run_simulation(
-    n_oscillators=n_oscillators,
+    n_oscillators=sim_n_oscillators,
     coupling_strength=coupling_strength,
     frequencies=frequencies,
     simulation_time=simulation_time,
@@ -544,7 +562,7 @@ with tab1:
     st.markdown(f"""
     <div style='background-color: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px; margin-bottom: 20px;'>
         <span style='font-size: 1.2em;'><b>Simulation Information</b></span><br>
-        <span><b>Oscillators:</b> {n_oscillators} | <b>Coupling Strength:</b> {coupling_strength} | <b>Network Type:</b> {network_type_internal}</span>
+        <span><b>Oscillators:</b> {sim_n_oscillators} | <b>Coupling Strength:</b> {coupling_strength} | <b>Network Type:</b> {network_type_internal}</span>
     </div>
     """, unsafe_allow_html=True)
     
@@ -771,7 +789,7 @@ with tab2:
     st.markdown(f"""
     <div style='background-color: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px; margin-bottom: 20px;'>
         <span style='font-size: 1.2em;'><b>Simulation Information</b></span><br>
-        <span><b>Oscillators:</b> {n_oscillators} | <b>Coupling Strength:</b> {coupling_strength} | <b>Network Type:</b> {network_type_internal}</span>
+        <span><b>Oscillators:</b> {sim_n_oscillators} | <b>Coupling Strength:</b> {coupling_strength} | <b>Network Type:</b> {network_type_internal}</span>
     </div>
     """, unsafe_allow_html=True)
     
@@ -954,7 +972,7 @@ with tab3:
     st.markdown(f"""
     <div style='background-color: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px; margin-bottom: 20px;'>
         <span style='font-size: 1.2em;'><b>Simulation Information</b></span><br>
-        <span><b>Oscillators:</b> {n_oscillators} | <b>Coupling Strength:</b> {coupling_strength} | <b>Network Type:</b> {network_type_internal}</span>
+        <span><b>Oscillators:</b> {sim_n_oscillators} | <b>Coupling Strength:</b> {coupling_strength} | <b>Network Type:</b> {network_type_internal}</span>
     </div>
     """, unsafe_allow_html=True)
     

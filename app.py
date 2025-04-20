@@ -215,7 +215,9 @@ if 'random_seed' not in st.session_state:
 if 'network_type' not in st.session_state:
     st.session_state.network_type = "All-to-All"
 if 'adj_matrix_input' not in st.session_state:
-    st.session_state.adj_matrix_input = ""
+    # Create a default example matrix for a 5x5 ring topology
+    default_matrix = "0, 1, 0, 0, 1\n1, 0, 1, 0, 0\n0, 1, 0, 1, 0\n0, 0, 1, 0, 1\n1, 0, 0, 1, 0"
+    st.session_state.adj_matrix_input = default_matrix
 
 # Number of oscillators slider
 n_oscillators = st.sidebar.slider(
@@ -373,9 +375,14 @@ if network_type == "Custom Adjacency Matrix":
                     row.append("0")  # Not connected
             default_matrix += ", ".join(row) + "\n"
                 
+    # Make sure we have a non-empty value for the text area
+    if network_type == "Custom Adjacency Matrix" and not st.session_state.adj_matrix_input:
+        print("Custom matrix selected but no existing input - initializing default")
+        st.session_state.adj_matrix_input = default_matrix
+        
     adj_matrix_input = st.sidebar.text_area(
         "Adjacency Matrix",
-        value=st.session_state.adj_matrix_input if st.session_state.adj_matrix_input else default_matrix,
+        value=st.session_state.adj_matrix_input,
         height=150,
         help="Enter the adjacency matrix as comma-separated values, each row on a new line",
         key="adj_matrix_input"
@@ -482,7 +489,7 @@ else:
     if network_type == "Custom Adjacency Matrix" and adj_matrix is None:
         # Use custom styled message with magenta background instead of the default yellow warning
         st.markdown("""
-        <div style="background-color: rgba(200,0,200,0.15); color: #ff33cc; 
+        <div style="background-color: rgba(255,0,255,0.1); color: #ff88ff; 
                     padding: 10px; border-radius: 15px; border-left: 5px solid #ff00ff;">
             <b>Matrix Input:</b> Please enter your custom adjacency matrix in the sidebar.
             The format should be comma-separated values with each row on a new line.

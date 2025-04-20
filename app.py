@@ -65,15 +65,33 @@ if st.session_state.loaded_config is not None:
             elif isinstance(matrix, list):
                 # Convert list to numpy array if it's still a list
                 matrix = np.array(matrix)
+            
+            # Make sure no self-loops (diagonal elements should be zero)
+            # This is important to ensure consistent visualization
+            if hasattr(matrix, 'shape') and matrix.shape[0] == matrix.shape[1]:
+                np.fill_diagonal(matrix, 0)
                 
             # Print debug info
             print(f"Loading adjacency matrix: type={type(matrix)}, shape={matrix.shape if hasattr(matrix, 'shape') else 'unknown'}")
+            
+            if hasattr(matrix, 'shape'):
+                print(f"Matrix sum: {np.sum(matrix)}, non-zeros: {np.count_nonzero(matrix)}")
+                if matrix.shape[0] >= 3:
+                    print(f"Sample (top-left 3x3):")
+                    print(matrix[:3, :3])
                 
             # Convert matrix to string representation for the text area
             matrix_str = ""
             for row in matrix:
                 matrix_str += ", ".join(str(val) for val in row) + "\n"
             st.session_state.adj_matrix_input = matrix_str.strip()
+            
+            # Store the matrix for later use in this session
+            # This ensures the matrix is properly passed to the simulation
+            if 'loaded_adj_matrix' not in st.session_state:
+                st.session_state.loaded_adj_matrix = matrix
+                print("Stored adjacency matrix for use in simulation")
+                
         except Exception as e:
             st.warning(f"Could not load custom adjacency matrix: {str(e)}")
     
@@ -307,6 +325,13 @@ network_type = st.sidebar.radio(
 
 # Custom adjacency matrix input
 adj_matrix = None
+# Check if we have a loaded adjacency matrix from a configuration
+if 'loaded_adj_matrix' in st.session_state and network_type == "Custom Adjacency Matrix":
+    adj_matrix = st.session_state.loaded_adj_matrix
+    print("Using pre-loaded adjacency matrix from configuration")
+    # Remove from session state to prevent reuse unless reloaded
+    del st.session_state.loaded_adj_matrix
+
 if network_type == "Custom Adjacency Matrix":
     st.sidebar.markdown("""
     <div style="font-size: 0.85em;">
@@ -434,8 +459,30 @@ with tab1:
         np.fill_diagonal(network_adj_matrix, 0)  # No self-connections
     else:  # Custom Adjacency Matrix
         if adj_matrix is not None:
-            network_adj_matrix = adj_matrix
-            print(f"Using custom adjacency matrix with shape {adj_matrix.shape}")
+            # Make sure we're using a copy of the matrix to avoid modifying the original
+            network_adj_matrix = np.array(adj_matrix, copy=True)
+            
+            # Make sure dimensions match
+            if network_adj_matrix.shape[0] != n_oscillators:
+                print(f"Adjacency matrix dimensions ({network_adj_matrix.shape}) don't match oscillator count ({n_oscillators})")
+                if network_adj_matrix.shape[0] > n_oscillators:
+                    # Truncate the matrix to match oscillator count
+                    network_adj_matrix = network_adj_matrix[:n_oscillators, :n_oscillators]
+                    print(f"Truncated matrix to {network_adj_matrix.shape}")
+                else:
+                    # Expand the matrix with zeros to match oscillator count
+                    temp = np.zeros((n_oscillators, n_oscillators))
+                    temp[:network_adj_matrix.shape[0], :network_adj_matrix.shape[1]] = network_adj_matrix
+                    network_adj_matrix = temp
+                    print(f"Expanded matrix to {network_adj_matrix.shape}")
+            
+            # Print detailed debug info
+            print(f"Using custom adjacency matrix with shape {network_adj_matrix.shape}")
+            print(f"Sum of elements: {np.sum(network_adj_matrix)}")
+            print(f"Number of non-zero elements: {np.count_nonzero(network_adj_matrix)}")
+            if network_adj_matrix.shape[0] >= 3:
+                print(f"Sample (top-left 3x3):")
+                print(network_adj_matrix[:3, :3])
         else:
             print("Warning: No custom adjacency matrix provided, using fallback")
             # Create a default matrix but NOT fully connected

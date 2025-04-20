@@ -632,8 +632,29 @@ def import_configuration_from_json(file_path, save_to_db=True):
         if config_dict.get('adjacency_matrix') is not None:
             try:
                 # Ensure adjacency matrix is a numpy array
-                config_dict['adjacency_matrix'] = np.array(config_dict['adjacency_matrix'])
-                print(f"Converted adjacency matrix to numpy array, shape: {config_dict['adjacency_matrix'].shape}")
+                adj_matrix = np.array(config_dict['adjacency_matrix'])
+                
+                # Make sure no self-loops (diagonal should be zero)
+                np.fill_diagonal(adj_matrix, 0)
+                
+                print(f"Converted adjacency matrix to numpy array:")
+                print(f"- Shape: {adj_matrix.shape}")
+                print(f"- Sum: {np.sum(adj_matrix)}")
+                print(f"- Non-zero elements: {np.count_nonzero(adj_matrix)}")
+                
+                # Determine if it's a fully connected matrix (all 1s except diagonal)
+                is_fully_connected = np.all(
+                    (adj_matrix == 1) | 
+                    (np.eye(adj_matrix.shape[0]) == 1)
+                )
+                
+                if is_fully_connected:
+                    print("WARNING: Matrix appears to be fully connected. Checking if this is correct...")
+                    # If every off-diagonal element is 1, it might be mistakenly set to fully connected
+                    if np.sum(adj_matrix) == adj_matrix.shape[0] * (adj_matrix.shape[0] - 1):
+                        print("This seems to be a 'All-to-All' network type rather than a custom matrix.")
+                
+                config_dict['adjacency_matrix'] = adj_matrix
                 
                 # Verify network type is set correctly
                 if config_dict.get('network_type') != "Custom Adjacency Matrix":

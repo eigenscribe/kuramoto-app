@@ -221,18 +221,18 @@ a:hover {
     backdrop-filter: blur(10px);
 }
 
-/* Sidebar scrollbar styling */
+/* Sidebar scrollbar styling - lighter */
 .sidebar::-webkit-scrollbar-thumb {
-    background: linear-gradient(to right bottom, #ffaa33, #ff6600, #ff3300);
+    background: linear-gradient(to right bottom, #ffcc88, #ff8855, #ff6633);
     border-radius: 10px;
     border: 2px solid rgba(0, 0, 0, 0.2);
 }
 
 .sidebar::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(to right, #ffaa33, #ff3300);
+    background: linear-gradient(to right, #ffdd99, #ff7744);
 }
 
-/* Network connectivity input styling */
+/* Network connectivity input styling - lighter */
 .sidebar .stNumberInput > div {
     position: relative;
     z-index: 1;
@@ -245,7 +245,7 @@ a:hover {
     right: -2px;
     bottom: -2px;
     left: -2px;
-    background: linear-gradient(to right bottom, #ffaa33, #ff6600, #ff3300);
+    background: linear-gradient(to right bottom, #ffcc88, #ff8855, #ff6633);
     border-radius: 7px;
     z-index: -1;
 }
@@ -258,22 +258,23 @@ a:hover {
     z-index: 2;
 }
 
-/* Network Connectivity section styling */
+/* Network Connectivity section styling - lighter */
 .sidebar h3, .sidebar h3 span {
-    background: linear-gradient(to right bottom, #ffaa33, #ff6600, #ff3300) !important;
+    background: linear-gradient(to right bottom, #ffcc88, #ff8855, #ff6633) !important;
     -webkit-background-clip: text !important;
     background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
     color: transparent !important;
     font-weight: bold !important;
     text-align: center;
+    letter-spacing: 0.2px !important;
 }
 
 /* Slider styling for the active (colored) part */
 /* This targets the left side of slider (between minimum value and thumb) */
 .stSlider [data-baseweb=slider] div[data-type="range"] div:first-child,
 .stSlider [data-baseweb=slider] [data-testid="stSliderProgress"] {
-    background: linear-gradient(to right, #ffaa33, #ff6600, #ff3300) !important; /* Orange gradient */
+    background: linear-gradient(to right, #ffbb66, #ff7744, #ff5522) !important; /* Orange-pink gradient */
     height: 4px !important; /* Ensure consistent height */
 }
 
@@ -285,9 +286,9 @@ a:hover {
 
 /* Slider thumb styling */
 .stSlider [data-baseweb=slider] [role=slider] {
-    background: #ff6600 !important; /* Orange */
+    background: #ff7744 !important; /* Orange-pink */
     border: 2px solid white !important;
-    box-shadow: 0 0 8px rgba(255, 102, 0, 0.7) !important;
+    box-shadow: 0 0 8px rgba(255, 119, 68, 0.7) !important;
 }
 
 /* Special styling for the Time Point slider header - green gradient */
@@ -408,14 +409,15 @@ button:hover {
     border-color: #14b5ff;
 }
 
-/* Orange gradient text for all slider labels (variables) */
+/* Orange-pink gradient text for all slider labels (variables) - lighter */
 .stSlider label {
-    background: linear-gradient(to right, #ffaa33, #ff6600, #ff3300) !important;
+    background: linear-gradient(to right, #ffcc88, #ff8855, #ff6633) !important;
     -webkit-background-clip: text !important;
     background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
     color: transparent !important;
     font-weight: bold !important;
+    letter-spacing: 0.2px !important;
 }
 
 /* Improve selectbox appearance */
@@ -438,19 +440,20 @@ button:hover {
     border-radius: 15px;
     background-color: #222;
     color: white;
-    border: 2px solid #ff6600 !important; /* Orange */
-    box-shadow: 0 0 5px rgba(255, 102, 0, 0.5);
+    border: 2px solid #ff7744 !important; /* Orange-pink */
+    box-shadow: 0 0 5px rgba(255, 119, 68, 0.5);
     padding: 5px 10px;
 }
 
-/* Apply orange gradient to number input labels */
+/* Apply orange-pink gradient to number input labels - lighter */
 .stNumberInput label {
-    background: linear-gradient(to right, #ffaa33, #ff6600, #ff3300) !important;
+    background: linear-gradient(to right, #ffcc88, #ff8855, #ff6633) !important;
     -webkit-background-clip: text !important;
     background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
     color: transparent !important;
     font-weight: bold !important;
+    letter-spacing: 0.2px !important;
 }
 
 /* Custom scrollbar styling */

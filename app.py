@@ -514,7 +514,7 @@ with tab1:
     # Create a heatmap of the adjacency matrix using blue gradient
     # Create a custom blue colormap for the adjacency matrix (swapped light/dark and adjusted intensity)
     blue_cmap = LinearSegmentedColormap.from_list("adj_matrix_blue", 
-                                             ["#00c2dd", "#109ae8", "#0255b0"], 
+                                             ["#00c2dd", "#109ae8", "#0070db"], 
                                              N=256)
     # Apply custom colormap - dark blue for 0s, light blue for 1s
     im = ax2.imshow(network_adj_matrix, cmap=blue_cmap)
@@ -960,7 +960,7 @@ with tab3:
         
         # Create a custom colormap that matches the blue gradient used in the sidebar
         cmap = LinearSegmentedColormap.from_list("order_param", 
-                                             ["#00e8ff", "#14b5ff", "#3a98ff", "#0070eb"], 
+                                             ["#00c2dd", "#109ae8", "#0070db"], 
                                              N=256)
         
         # Plot order parameter with filled gradient dots and brighter outline
@@ -1140,7 +1140,7 @@ with tab3:
     <div class='section'>
         <h3 class='gradient_text1'>Visualization Guide</h3>
         <p>The <b>top plot</b> shows oscillator phases over time. Each horizontal trace represents one oscillator's phase trajectory with consistent coloring based on the oscillator's natural frequency.</p>
-        <p>The <b>bottom left plot</b> shows oscillators on a unit circle. Each colored dot represents an oscillator at its current phase position. The orange arrow shows the mean field vector, with length equal to the order parameter r.</p>
+        <p>The <b>bottom left plot</b> shows oscillators on a unit circle. Each colored dot represents an oscillator at its current phase position. The blue arrow shows the mean field vector, with length equal to the order parameter r.</p>
         <p>The <b>bottom right plot</b> shows the order parameter over time, with color-coded dots showing the synchronization level from 0 (no synchronization) to 1 (complete synchronization).</p>
         <p>Click "Play Animation" to watch all three visualizations animate together to see the synchronization process in real-time.</p>
     </div>

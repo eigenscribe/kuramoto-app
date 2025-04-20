@@ -320,7 +320,7 @@ footer {
 /* Make plots more visible */
 .stPlot {
     background-color: rgba(255, 255, 255, 0.9);
-    border-radius: 8px;
+    border-radius: 15px;
     padding: 15px;
     margin-bottom: 20px;
 }
@@ -333,21 +333,25 @@ footer {
 /* Play Animation button special styling */
 [data-testid="stHorizontalBlock"] [data-testid="column"][data-testid="stVerticalBlock"]:nth-of-type(2) .stButton button {
     width: 100%;
-    min-width: 250px;
+    min-width: 280px;
     height: 55px;
     line-height: 55px;
     font-size: 18px;
     letter-spacing: 0.5px;
-    border-radius: 12px;
+    border-radius: 15px;
     background-image: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb);
     box-shadow: 0 5px 15px rgba(20, 165, 255, 0.4);
     transition: all 0.3s ease;
     text-align: center;
     margin: 0 auto;
+    display: block;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 [data-testid="stHorizontalBlock"] [data-testid="column"][data-testid="stVerticalBlock"]:nth-of-type(2) .stButton button:hover {
-    transform: translateY(-2px);
+    transform: translateX(-50%) translateY(-2px);
     box-shadow: 0 8px 20px rgba(20, 181, 255, 0.5);
     background-image: linear-gradient(to right, #00e8ff, #0070eb);
 }

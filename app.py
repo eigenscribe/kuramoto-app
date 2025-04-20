@@ -472,6 +472,16 @@ if network_type == "Custom Adjacency Matrix":
 # Create tabs for different visualizations (Network is default tab)
 tab1, tab2, tab3, tab4, tab5 = st.tabs(["Network", "Distributions", "Animation", "Database", "Configurations"])
 
+# Set a unique key for each tab to force refresh of the Network tab
+if 'current_tab' not in st.session_state:
+    st.session_state.current_tab = "Network"
+    
+# Add a hidden button that is programmatically clicked when checking a custom matrix
+tab_key = f"tab_refresh_{int(time.time())}"
+if st.session_state.current_tab == "Network" and adj_matrix is not None:
+    # This ensures the network tab is refreshed when the adjacency matrix changes
+    st.session_state.refresh_network = True
+
 # Determine the effective network type for display and matrix creation
 # If we have a custom matrix, ALWAYS force the network type to custom
 # regardless of what's displayed in the UI
@@ -556,6 +566,15 @@ model, times, phases, order_parameter = run_simulation(
 # TAB 1: NETWORK TAB
 ########################
 with tab1:
+    # Update current tab in session state to track which tab is active
+    st.session_state.current_tab = "Network"
+    
+    # Force a reload when we have a custom matrix change
+    if 'refresh_network' in st.session_state and st.session_state.refresh_network:
+        # Reset the flag to prevent infinite reloads
+        st.session_state.refresh_network = False
+        # This will cause network visualization to rebuild completely
+        st.empty().button("Refresh Network", key=f"network_refresh_{time.time()}", on_click=lambda: None)
     st.markdown("<h2 class='gradient_text2'>Network Structure</h2>", unsafe_allow_html=True)
     
     # Display simulation information
@@ -810,6 +829,8 @@ with tab1:
 # TAB 2: DISTRIBUTIONS TAB
 ########################
 with tab2:
+    # Update current tab in session state
+    st.session_state.current_tab = "Distributions"
     st.markdown("<h2 class='gradient_text2'>Initial Distributions</h2>", unsafe_allow_html=True)
     
     # Display simulation information at the top
@@ -993,6 +1014,8 @@ with tab2:
 # TAB 3: ANIMATION TAB
 ########################
 with tab3:
+    # Update current tab in session state
+    st.session_state.current_tab = "Animation"
     st.markdown("<h2 class='gradient_text2'>Interactive Animation</h2>", unsafe_allow_html=True)
     
     # Display simulation information at the top

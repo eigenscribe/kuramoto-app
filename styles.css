@@ -36,8 +36,8 @@ body {
 
 .gradient_text2 {
     font-weight: bold;
-    background: linear-gradient(#00ffee, #27aaff);
-    background-image: -webkit-linear-gradient(#00ffee, #27aaff);
+    background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb);
+    background-image: -webkit-linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -85,7 +85,7 @@ body {
 
 .section h2 {
     font-weight: bold;
-    background: linear-gradient(#00ffee, #27aaff);
+    background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -175,7 +175,7 @@ body {
 /* Button hover effects */
 .btn:hover, .stButton button:hover, button[kind="primary"]:hover {
     background-position: 100% 0;
-    background-image: linear-gradient(to right, #00ffee, #27aaff);
+    background-image: linear-gradient(to right, #00e8ff, #0070eb);
     filter: brightness(1.1);
     transition: all .4s ease-in-out;
 }
@@ -187,13 +187,13 @@ h1, h2, h3, h4, p, div, span, a, button, input, textarea, select {
 
 /* Links */
 a {
-    color: #22f793;
+    color: #14b5ff;
     text-decoration: none;
     transition: color 0.3s;
 }
 
 a:hover {
-    color: #0a95eb;
+    color: #00e8ff;
 }
 
 /* Streamlit specific styles */
@@ -210,8 +210,8 @@ a:hover {
 }
 
 .stTabs [aria-selected="true"] {
-    background-color: rgba(0, 255, 238, 0.2);
-    border-bottom: 3px solid #00ffee;
+    background-color: rgba(20, 181, 255, 0.2);
+    border-bottom: 3px solid #14b5ff;
     color: white !important;
 }
 
@@ -348,8 +348,8 @@ footer {
 
 [data-testid="stHorizontalBlock"] [data-testid="column"][data-testid="stVerticalBlock"]:nth-of-type(2) .stButton button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(129, 56, 255, 0.5);
-    background-image: linear-gradient(to right, #00ffee, #27aaff);
+    box-shadow: 0 8px 20px rgba(20, 181, 255, 0.5);
+    background-image: linear-gradient(to right, #00e8ff, #0070eb);
 }
 
 /* Card row layout for horizontal alignment */
@@ -364,8 +364,8 @@ footer {
 /* Tech tag styling */
 .tech-tag {
     display: inline-block;
-    background: linear-gradient(130deg, rgba(34, 247, 147, 0.2), rgba(10, 149, 235, 0.2));
-    border: 1px solid rgba(34, 247, 147, 0.3);
+    background: linear-gradient(130deg, rgba(0, 232, 255, 0.2), rgba(0, 112, 235, 0.2));
+    border: 1px solid rgba(20, 181, 255, 0.3);
     border-radius: 15px;
     padding: 3px 10px;
     margin: 3px;
@@ -381,7 +381,7 @@ button, select, input, textarea {
 }
 
 button:hover {
-    border-color: #22f793;
+    border-color: #14b5ff;
 }
 
 /* Fix slider text */

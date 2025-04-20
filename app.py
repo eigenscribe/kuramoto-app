@@ -343,7 +343,21 @@ if network_type == "Custom Adjacency Matrix":
             if adj_matrix.shape[0] != adj_matrix.shape[1]:
                 st.sidebar.error("The adjacency matrix must be square.")
             elif adj_matrix.shape[0] != n_oscillators:
-                st.sidebar.error(f"Matrix dimensions ({adj_matrix.shape[0]}x{adj_matrix.shape[1]}) don't match oscillator count ({n_oscillators}).")
+                # Provide a warning but allow mismatched dimensions for imported configs
+                st.sidebar.warning(f"Matrix dimensions ({adj_matrix.shape[0]}x{adj_matrix.shape[1]}) don't match oscillator count ({n_oscillators}). The network graph may not display correctly.")
+                
+                # Log debugging information
+                print(f"Adjacency matrix shape mismatch: matrix is {adj_matrix.shape}, but n_oscillators={n_oscillators}")
+                
+                # Try to adapt matrix size if possible
+                if adj_matrix.shape[0] > n_oscillators:
+                    # Truncate to fit current oscillator count
+                    adj_matrix = adj_matrix[:n_oscillators, :n_oscillators]
+                    print(f"Truncated matrix to {adj_matrix.shape}")
+                    st.sidebar.info("Matrix was truncated to match oscillator count.")
+                else:
+                    # We'll use the matrix as-is and the error will be caught in network visualization
+                    pass
             else:
                 st.sidebar.success("Adjacency matrix validated successfully!")
         except Exception as e:
@@ -419,9 +433,30 @@ with tab1:
         network_adj_matrix = network_adj_matrix.astype(float)
         np.fill_diagonal(network_adj_matrix, 0)  # No self-connections
     else:  # Custom Adjacency Matrix
-        network_adj_matrix = adj_matrix if adj_matrix is not None else np.ones((n_oscillators, n_oscillators))
+        if adj_matrix is not None:
+            network_adj_matrix = adj_matrix
+            print(f"Using custom adjacency matrix with shape {adj_matrix.shape}")
+        else:
+            print("Warning: No custom adjacency matrix provided, using fallback")
+            # Create a default matrix but NOT fully connected
+            # Use a simple ring structure instead as fallback
+            network_adj_matrix = np.zeros((n_oscillators, n_oscillators))
+            for i in range(n_oscillators):
+                network_adj_matrix[i, (i-1) % n_oscillators] = 1
+                network_adj_matrix[i, (i+1) % n_oscillators] = 1
     
     # Create a graph visualization using networkx
+    # Ensure the adjacency matrix has no self-loops (diagonal should be zero)
+    np.fill_diagonal(network_adj_matrix, 0)
+    
+    # Print debug info
+    if network_type == "Custom Adjacency Matrix":
+        print(f"Network adjacency matrix before creating graph:")
+        print(f"Shape: {network_adj_matrix.shape}")
+        print(f"Sum of elements: {np.sum(network_adj_matrix)}")
+        print(f"Number of non-zero elements: {np.count_nonzero(network_adj_matrix)}")
+        print(f"Sample of matrix: {network_adj_matrix[:3, :3] if network_adj_matrix.shape[0] >= 3 else network_adj_matrix}")
+    
     G = nx.from_numpy_array(network_adj_matrix)
     
     # Create custom colormap that matches our gradient_text1 theme for nodes
@@ -1570,6 +1605,11 @@ with tab5:
                                     if st.button("Load this configuration now", key="load_imported"):
                                         config = get_configuration(result)
                                         if config:
+                                            # Special handling for adjacency matrix when loading from database
+                                            if config.get('network_type') == "Custom Adjacency Matrix" and config.get('adjacency_matrix') is not None:
+                                                print(f"Loading custom adjacency matrix from database: shape {config['adjacency_matrix'].shape}")
+                                                st.session_state.network_type = "Custom Adjacency Matrix"
+                                                
                                             st.session_state.loaded_config = config
                                             st.success("Configuration loaded! Applying settings...")
                                             st.rerun()
@@ -1577,6 +1617,11 @@ with tab5:
                                     st.success("Configuration imported successfully!")
                                     # Store directly in session state for immediate use
                                     if not save_to_db and st.button("Use this configuration now", key="use_imported"):
+                                        # Special handling for adjacency matrix when loading directly
+                                        if isinstance(result, dict) and result.get('network_type') == "Custom Adjacency Matrix" and result.get('adjacency_matrix') is not None:
+                                            print(f"Loading custom adjacency matrix directly: shape {result['adjacency_matrix'].shape}")
+                                            st.session_state.network_type = "Custom Adjacency Matrix"
+                                            
                                         st.session_state.loaded_config = result
                                         st.success("Applying imported settings...")
                                         st.rerun()

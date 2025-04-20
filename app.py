@@ -919,17 +919,24 @@ with tab3:
             ax.plot(times[:time_idx+1], phases[i, :time_idx+1] % (2 * np.pi), 
                   color=color, alpha=0.2, linewidth=0.8, zorder=2)
             
-            # Add minimal glow effect to all data points (very subtle)
-            for t in range(0, time_idx + 1, 3):  # Add glow to every 3rd point to avoid clutter
+            # Add two-layer glow effect to selected data points (matching unit circle)
+            for t in range(0, time_idx + 1, 5):  # Add glow to every 5th point to avoid clutter
                 x = times[t]
                 y = phases[i, t] % (2 * np.pi)
                 
-                # Add subtle glow effect using Circle patch
-                mini_glow = plt.Circle((x, y), 0.07, transform=ax.get_xaxis_transform(),
-                                  fill=True, color=color, alpha=0.1, zorder=4)
+                # Outer glow (larger, more subtle)
+                outer_glow = plt.Circle((x, y), 0.1, transform=ax.get_xaxis_transform(),
+                                  fill=True, color=color, alpha=0.12, zorder=3)
+                # Inner glow (smaller, more vibrant)
+                inner_glow = plt.Circle((x, y), 0.06, transform=ax.get_xaxis_transform(),
+                                  fill=True, color=color, alpha=0.2, zorder=4)
+                
                 # Need to adjust the y-scale to match the plot coordinates
-                mini_glow.set_radius(0.03 * (2 * np.pi) / ax.get_ylim()[1])
-                ax.add_patch(mini_glow)
+                outer_glow.set_radius(0.045 * (2 * np.pi) / ax.get_ylim()[1])
+                inner_glow.set_radius(0.028 * (2 * np.pi) / ax.get_ylim()[1])
+                
+                ax.add_patch(outer_glow)
+                ax.add_patch(inner_glow)
             
             # Plot oscillator phases as filled dots with color gradient
             ax.scatter(times[:time_idx+1], phases[i, :time_idx+1] % (2 * np.pi), 
@@ -1011,18 +1018,25 @@ with tab3:
         ax.plot(times[:time_idx+1], order_parameter[:time_idx+1], 
               color='white', alpha=0.3, linewidth=1, zorder=5)
               
-        # Add subtle glow to selected points along the order parameter curve
+        # Add two-layer glow to selected points along the order parameter curve
         for t in range(0, time_idx + 1, 5):  # Add glow to every 5th point to avoid clutter
             x = times[t]
             y = order_parameter[t]
             color = cmap(y)
             
-            # Add subtle glow effect using Circle patch
-            mini_glow = plt.Circle((x, y), 0.08, transform=ax.get_xaxis_transform(), 
-                           fill=True, color=color, alpha=0.1, zorder=8)
+            # Outer glow (larger, more subtle)
+            outer_glow = plt.Circle((x, y), 0.11, transform=ax.get_xaxis_transform(), 
+                            fill=True, color=color, alpha=0.08, zorder=7)
+            # Inner glow (smaller, more vibrant)
+            inner_glow = plt.Circle((x, y), 0.07, transform=ax.get_xaxis_transform(), 
+                            fill=True, color=color, alpha=0.15, zorder=8)
+            
             # Adjust the y-scale to match the plot coordinates
-            mini_glow.set_radius(0.02 * (1.05) / ax.get_ylim()[1])
-            ax.add_patch(mini_glow)
+            outer_glow.set_radius(0.03 * (1.05) / ax.get_ylim()[1])
+            inner_glow.set_radius(0.018 * (1.05) / ax.get_ylim()[1])
+            
+            ax.add_patch(outer_glow)
+            ax.add_patch(inner_glow)
         
         # Plot data points on top of glows
         scatter = ax.scatter(times[:time_idx+1], order_parameter[:time_idx+1],

@@ -273,7 +273,7 @@ a:hover {
 /* This targets the left side of slider (between minimum value and thumb) */
 .stSlider [data-baseweb=slider] div[data-type="range"] div:first-child,
 .stSlider [data-baseweb=slider] [data-testid="stSliderProgress"] {
-    background: #3a98ff !important; /* Blue from our gradient */
+    background: linear-gradient(to right, #00ff88, #00aa44) !important; /* Green gradient */
     height: 4px !important; /* Ensure consistent height */
 }
 
@@ -285,9 +285,19 @@ a:hover {
 
 /* Slider thumb styling */
 .stSlider [data-baseweb=slider] [role=slider] {
-    background: #14b5ff !important; /* Blue from our gradient */
+    background: #00cc66 !important; /* Bright green */
     border: 2px solid white !important;
-    box-shadow: 0 0 8px rgba(20, 181, 255, 0.7) !important;
+    box-shadow: 0 0 8px rgba(0, 204, 102, 0.7) !important;
+}
+
+/* Special styling for the Time Point slider only */
+[data-testid="stVerticalBlock"] > div:nth-of-type(5) .stSlider label {
+    background: linear-gradient(to right, #00ff88, #00aa44) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
+    font-weight: bold !important;
 }
 
 /* Override Streamlit defaults */

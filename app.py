@@ -632,8 +632,20 @@ with tab1:
         print(f"Sum of elements: {np.sum(network_adj_matrix)}")
         print(f"Number of non-zero elements: {np.count_nonzero(network_adj_matrix)}")
         print(f"Sample of matrix: {network_adj_matrix[:3, :3] if network_adj_matrix.shape[0] >= 3 else network_adj_matrix}")
-    
-    G = nx.from_numpy_array(network_adj_matrix)
+        
+        # Ensure the adjacency matrix has proper values for building a network
+        # Some users might enter very small values (like 0.01) that don't register as edges
+        # Convert anything > 0.1 to a definite edge to ensure network is visible
+        adj_for_network = network_adj_matrix.copy()
+        adj_for_network[adj_for_network > 0.1] = 1.0
+        if np.count_nonzero(adj_for_network) != np.count_nonzero(network_adj_matrix):
+            print(f"Enhancing {np.count_nonzero(adj_for_network) - np.count_nonzero(network_adj_matrix)} weak connections for visualization")
+        
+        # Use the enhanced matrix for network visualization only
+        G = nx.from_numpy_array(adj_for_network)
+    else:
+        # Use original matrix for standard network types
+        G = nx.from_numpy_array(network_adj_matrix)
     
     # Create custom colormap that matches our gradient_text1 theme for nodes
     custom_cmap = LinearSegmentedColormap.from_list("kuramoto_colors", 
@@ -664,9 +676,24 @@ with tab1:
     # Create graph visualization
     ax1.set_facecolor('#121212')
     
-    # Draw the graph with dark blue edges to match adjacency matrix
-    edges = nx.draw_networkx_edges(G, pos, ax=ax1, alpha=0.7, 
-                               edge_color='#0070db', width=1.5)
+    # Debug information about the graph
+    print(f"Graph info: nodes={len(G.nodes())}, edges={len(G.edges())}")
+    if len(G.edges()) == 0:
+        print("WARNING: Graph has no edges! Check adjacency matrix values.")
+        # Force at least some edges for visualization by creating a ring
+        temp_G = nx.cycle_graph(network_adj_matrix.shape[0])
+        pos = nx.circular_layout(temp_G)
+        edges = nx.draw_networkx_edges(temp_G, pos, ax=ax1, alpha=0.7,
+                                  edge_color='#ff5500', width=1.5, 
+                                  style='dashed')  # Use orange dashed lines to indicate fallback
+        # Add warning to graph
+        ax1.text(0.5, 0.5, "Warning: No edges detected in custom matrix\nShowing placeholder network",
+              horizontalalignment='center', verticalalignment='center',
+              transform=ax1.transAxes, color='#ff5500', fontsize=14)
+    else:
+        # Draw the graph with dark blue edges to match adjacency matrix
+        edges = nx.draw_networkx_edges(G, pos, ax=ax1, alpha=0.7, 
+                                   edge_color='#0070db', width=1.5)
     
     # Convert the RGBA colors to hex for networkx
     node_colors = []

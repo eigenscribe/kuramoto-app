@@ -11,7 +11,6 @@ from matplotlib.animation import FuncAnimation
 from matplotlib.collections import LineCollection
 import io
 import base64
-from IPython.display import HTML
 
 def render_animation_tab(model, times, phases, order_parameter):
     """

@@ -328,10 +328,23 @@ adj_matrix = None
 # Check if we have a loaded adjacency matrix from a configuration
 if 'loaded_adj_matrix' in st.session_state:
     adj_matrix = st.session_state.loaded_adj_matrix
-    print(f"Using pre-loaded adjacency matrix from configuration with shape {adj_matrix.shape if hasattr(adj_matrix, 'shape') else 'unknown'}")
-    # The matrix is used directly, regardless of the network_type UI selection
-    # This ensures configurations with custom matrices always display correctly
-    # Don't remove from session state yet - we'll do that after one successful use
+    print(f"Retrieved adjacency matrix from session state with shape {adj_matrix.shape if hasattr(adj_matrix, 'shape') else 'unknown'}")
+    
+    # Safety check to ensure matrix is valid
+    if hasattr(adj_matrix, 'shape') and adj_matrix.shape[0] > 0:
+        print(f"Matrix looks valid: shape={adj_matrix.shape}, sum={np.sum(adj_matrix)}, non-zeros={np.count_nonzero(adj_matrix)}")
+        
+        # CRITICAL: We need to force the correct network type
+        # This needs to take precedence over what's selected in the UI radio button
+        if network_type != "Custom Adjacency Matrix":
+            print("Detected loaded matrix with network type that doesn't match 'Custom Adjacency Matrix'.")
+            print(f"Current network_type is '{network_type}' but will use matrix internally")
+    else:
+        print("Warning: Found loaded_adj_matrix in session state but it appears invalid:")
+        print(f"Matrix type: {type(adj_matrix)}")
+        if hasattr(adj_matrix, 'shape'):
+            print(f"Shape: {adj_matrix.shape}")
+        adj_matrix = None  # Reset to None if invalid matrix
 
 if network_type == "Custom Adjacency Matrix":
     st.sidebar.markdown("""
@@ -394,15 +407,31 @@ if network_type == "Custom Adjacency Matrix":
 tab1, tab2, tab3, tab4, tab5 = st.tabs(["Network", "Distributions", "Animation", "Database", "Configurations"])
 
 # Determine the effective network type for display and matrix creation
-# Force network type to "Custom Adjacency Matrix" if adjacency matrix is provided
-# This ensures we're really using the user-defined matrix, not a built-in type
+# If we have a custom matrix, ALWAYS force the network type to custom
+# regardless of what's displayed in the UI
 if adj_matrix is not None:
-    print(f"Detected adjacency matrix - forcing network type to Custom")
-    # Don't change the UI selection, but use the matrix for visualization
+    print(f"Detected valid adjacency matrix - forcing internal network type to Custom")
+    print(f"Matrix shape: {adj_matrix.shape}, sum: {np.sum(adj_matrix)}, non-zeros: {np.count_nonzero(adj_matrix)}")
+    
+    # Don't change the UI selection, but use Custom type for all internal processing
     network_type_internal = "Custom Adjacency Matrix"
+    
+    # CRITICAL: We must NOT delete the matrix from session state until we've used it successfully
+    # Otherwise, it will be lost on the next rerun when Streamlit rebuilds the application
+    
+    # Keep a flag to signal we've saved the matrix for this session
+    if 'using_loaded_matrix' not in st.session_state:
+        st.session_state.using_loaded_matrix = True
+        print("First use of loaded matrix - will keep in session state")
 else:
     # Use the selected network type
     network_type_internal = network_type
+    
+    # If we don't have a custom matrix but the UI type is set to custom,
+    # we need to ensure this is communicated clearly
+    if network_type == "Custom Adjacency Matrix" and adj_matrix is None:
+        st.warning("Custom adjacency matrix selected but no valid matrix provided. Please enter a matrix in the sidebar.")
+        print("Warning: Custom adjacency matrix selected but no valid matrix found")
 
 # Function to simulate model
 @st.cache_data(ttl=300)

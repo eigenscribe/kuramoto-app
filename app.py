@@ -830,17 +830,11 @@ with tab3:
             # Make RGB values brighter (closer to white) but preserve alpha
             bright_oscillator_colors[i, :3] = np.minimum(1.0, bright_oscillator_colors[i, :3] * 1.7)  # 70% brighter
         
-        # First add a larger glow effect for each oscillator
+        # Add original glow effect for each oscillator (single glow)
         for i in range(n_oscillators):
-            glow = plt.Circle((x[i], y[i]), 0.11, fill=True, 
+            glow = plt.Circle((x[i], y[i]), 0.08, fill=True, 
                           color=oscillator_colors[i], alpha=0.3, zorder=7)
             ax_circle.add_patch(glow)
-            
-        # Add a subtle pulse effect with secondary glow
-        for i in range(n_oscillators):
-            second_glow = plt.Circle((x[i], y[i]), 0.14, fill=True, 
-                               color=bright_oscillator_colors[i], alpha=0.15, zorder=6)
-            ax_circle.add_patch(second_glow)
         
         # Use custom edge colors and increased size for main points
         sc = ax_circle.scatter(x, y, facecolors=oscillator_colors, edgecolors=bright_oscillator_colors, s=200, 
@@ -906,58 +900,37 @@ with tab3:
         for i, idx in enumerate(sorted_indices):
             oscillator_colors[idx] = custom_cmap(color_indices[i])
         
-        # Plot all oscillators as dots up to the current time point with enhanced effects
+        # Plot all oscillators as dots up to the current time point with subtle effects
         for i in range(n_oscillators):
             color = oscillator_colors[i]
             
-            # Create a brighter version of the color for edge and glow effects
+            # Create a brighter version of the color for edge highlighting
             rgb = matplotlib.colors.to_rgb(color)
             # Create brighter version (closer to white)
-            bright_color = tuple(min(1.0, c * 1.7) for c in rgb)
+            bright_color = tuple(min(1.0, c * 1.5) for c in rgb)
             
             # Add a subtle connecting line with low opacity
             ax.plot(times[:time_idx+1], phases[i, :time_idx+1] % (2 * np.pi), 
                   color=color, alpha=0.2, linewidth=0.8, zorder=2)
-            
-            # For each data point in the time series, add glowing effects
-            for t in range(time_idx + 1):
-                x = times[t]
-                y = phases[i, t] % (2 * np.pi)
-                
-                # Only add glow to points that are at least some distance apart (to avoid cluttering)
-                if t % 5 == 0 or t == time_idx:  # Add glow to every 5th point and current point
-                    # Add subtle glow effect using Circle patch (similar to the unit circle plot)
-                    glow = plt.Circle((x, y), 0.12, transform=ax.get_xaxis_transform(), 
-                                  fill=True, color=color, alpha=0.2, zorder=4)
-                    # Need to adjust the y-scale to match the plot coordinates
-                    glow.set_radius(0.05 * (2 * np.pi) / ax.get_ylim()[1])
-                    ax.add_patch(glow)
             
             # Plot oscillator phases as filled dots with color gradient
             ax.scatter(times[:time_idx+1], phases[i, :time_idx+1] % (2 * np.pi), 
                      facecolors=color, edgecolor=bright_color, alpha=0.8, s=50, 
                      linewidth=0.5, zorder=5)
             
-            # Highlight current position with a larger filled marker and pulse effect
-            # First add subtle pulse glow
+            # Highlight only the current position with a subtle glow and larger marker
             current_x = times[time_idx]
             current_y = phases[i, time_idx] % (2 * np.pi)
             
-            # Add large outer glow for current point
-            outer_glow = plt.Circle((current_x, current_y), 0.28, transform=ax.get_xaxis_transform(),
-                               fill=True, color=bright_color, alpha=0.15, zorder=13)
-            outer_glow.set_radius(0.12 * (2 * np.pi) / ax.get_ylim()[1])
-            ax.add_patch(outer_glow)
+            # Add a subtle glow just for current point (not too intense)
+            glow = plt.Circle((current_x, current_y), 0.2, transform=ax.get_xaxis_transform(),
+                         fill=True, color=color, alpha=0.15, zorder=13)
+            glow.set_radius(0.06 * (2 * np.pi) / ax.get_ylim()[1])
+            ax.add_patch(glow)
             
-            # Add medium inner glow
-            inner_glow = plt.Circle((current_x, current_y), 0.2, transform=ax.get_xaxis_transform(),
-                               fill=True, color=color, alpha=0.25, zorder=14)
-            inner_glow.set_radius(0.08 * (2 * np.pi) / ax.get_ylim()[1])
-            ax.add_patch(inner_glow)
-            
-            # Draw the actual current point marker on top
+            # Draw the actual current point marker on top with slightly larger size
             ax.scatter([times[time_idx]], [phases[i, time_idx] % (2 * np.pi)], 
-                     s=140, facecolors=color, edgecolor=bright_color, 
+                     s=120, facecolors=color, edgecolor=bright_color, 
                      linewidth=1.5, zorder=15)
         
         # Add labels for key phase positions
@@ -1019,51 +992,31 @@ with tab3:
         # Add a connecting line with low opacity first (lower z-order)
         ax.plot(times[:time_idx+1], order_parameter[:time_idx+1], 
               color='white', alpha=0.3, linewidth=1, zorder=5)
-              
-        # Add glowing effects to selected points
-        for t in range(time_idx + 1):
-            if t % 5 == 0 or t == time_idx:  # Add glow to every 5th point and current point
-                x = times[t]
-                y = order_parameter[t]
-                color = cmap(y)
-                
-                # Add subtle glow effect using Circle patch
-                glow = plt.Circle((x, y), 0.12, transform=ax.get_xaxis_transform(), 
-                              fill=True, color=color, alpha=0.2, zorder=8)
-                # Adjust the y-scale to match the plot coordinates
-                glow.set_radius(0.03 * (1.05) / ax.get_ylim()[1])
-                ax.add_patch(glow)
         
-        # Plot data points on top of glows
+        # Plot data points
         scatter = ax.scatter(times[:time_idx+1], order_parameter[:time_idx+1],
                           facecolors=base_colors, edgecolors=edge_colors,
                           s=70, alpha=0.9, linewidth=0.5, zorder=10)
         
-        # Highlight current position with a larger filled marker and glow effects
+        # Highlight current position with a larger filled marker and subtle glow
         if time_idx > 0:
             # Get color and make brighter version for outline
             current_color = cmap(order_parameter[time_idx])
             rgb = matplotlib.colors.to_rgb(current_color)
-            bright_current = tuple(min(1.0, c * 1.7) for c in rgb)
+            bright_current = tuple(min(1.0, c * 1.5) for c in rgb)
             
             current_x = times[time_idx]
             current_y = order_parameter[time_idx]
             
-            # Add large outer glow for current point
-            outer_glow = plt.Circle((current_x, current_y), 0.25, transform=ax.get_xaxis_transform(),
-                               fill=True, color=bright_current, alpha=0.15, zorder=13)
-            outer_glow.set_radius(0.06 * (1.05) / ax.get_ylim()[1])
-            ax.add_patch(outer_glow)
-            
-            # Add medium inner glow
-            inner_glow = plt.Circle((current_x, current_y), 0.18, transform=ax.get_xaxis_transform(),
-                               fill=True, color=current_color, alpha=0.25, zorder=14)
-            inner_glow.set_radius(0.04 * (1.05) / ax.get_ylim()[1])
-            ax.add_patch(inner_glow)
+            # Add a subtle glow just for current point
+            glow = plt.Circle((current_x, current_y), 0.18, transform=ax.get_xaxis_transform(),
+                         fill=True, color=current_color, alpha=0.15, zorder=13)
+            glow.set_radius(0.04 * (1.05) / ax.get_ylim()[1])
+            ax.add_patch(glow)
             
             # Draw current point
             ax.scatter([times[time_idx]], [order_parameter[time_idx]], 
-                     s=180, facecolors=current_color, 
+                     s=150, facecolors=current_color, 
                      edgecolors=bright_current, 
                      linewidth=1.5, zorder=15)
         

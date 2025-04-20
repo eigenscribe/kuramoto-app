@@ -420,7 +420,7 @@ with tab1:
     
     # Create custom colormap that matches our gradient_text1 theme for nodes
     custom_cmap = LinearSegmentedColormap.from_list("kuramoto_colors", 
-                                                ["#8A2BE2", "#FF00FF", "#FFA500"], 
+                                                ["#8A2BE2", "#FF00FF", "#FFA500", "#50C878"], 
                                                 N=256)
     
     # Sort oscillators by their natural frequency for consistent coloring
@@ -499,20 +499,22 @@ with tab1:
     # Add a legend explaining node colors with brighter outline
     legend_elements = [
         plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=custom_cmap(0.0), 
-                markeredgecolor='#ae56ff', markersize=10, label='Lower frequency (violet)'),
-        plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=custom_cmap(0.5), 
-                markeredgecolor='#ff50ff', markersize=10, label='Medium frequency (magenta)'),
+                markeredgecolor='#ae56ff', markersize=10, label='Lowest frequency (violet)'),
+        plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=custom_cmap(0.33), 
+                markeredgecolor='#ff50ff', markersize=10, label='Lower frequency (magenta)'),
+        plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=custom_cmap(0.67), 
+                markeredgecolor='#ffc060', markersize=10, label='Higher frequency (orange)'),
         plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=custom_cmap(1.0), 
-                markeredgecolor='#ffc060', markersize=10, label='Higher frequency (orange)')
+                markeredgecolor='#70e898', markersize=10, label='Highest frequency (green)')
     ]
     ax1.legend(handles=legend_elements, loc='upper right', 
             frameon=True, framealpha=0.7, facecolor='#121212', 
             edgecolor='#555555', labelcolor='white')
     
     # Create a heatmap of the adjacency matrix using blue gradient
-    # Create a custom blue colormap for the adjacency matrix
+    # Create a custom blue colormap for the adjacency matrix (swapped light/dark and adjusted intensity)
     blue_cmap = LinearSegmentedColormap.from_list("adj_matrix_blue", 
-                                             ["#0070eb", "#14b5ff", "#00e8ff"], 
+                                             ["#00c2dd", "#109ae8", "#0255b0"], 
                                              N=256)
     # Apply custom colormap - dark blue for 0s, light blue for 1s
     im = ax2.imshow(network_adj_matrix, cmap=blue_cmap)
@@ -836,15 +838,15 @@ with tab3:
         r = order_parameter[time_idx]
         psi = np.angle(np.sum(np.exp(1j * phases_at_time)))
         
-        # Draw arrow showing mean field with glow effect - using orange color
+        # Draw arrow showing mean field with glow effect - using blue color
         # First add glow/shadow
         ax_circle.arrow(0, 0, r * np.cos(psi), r * np.sin(psi), 
-                       head_width=0.07, head_length=0.12, fc='#ffaa33', ec='#ffaa33', 
+                       head_width=0.07, head_length=0.12, fc='#1e90ff', ec='#1e90ff', 
                        width=0.03, alpha=0.3, zorder=5)
         
         # Then add main arrow
         ax_circle.arrow(0, 0, r * np.cos(psi), r * np.sin(psi), 
-                       head_width=0.05, head_length=0.1, fc='#ff9500', ec='#ff9500', 
+                       head_width=0.05, head_length=0.1, fc='#007bff', ec='#007bff', 
                        width=0.02, zorder=6)
         
         # Draw axes

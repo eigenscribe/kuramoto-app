@@ -219,6 +219,16 @@ if 'adj_matrix_input' not in st.session_state:
     default_matrix = "0, 1, 0, 0, 1\n1, 0, 1, 0, 0\n0, 1, 0, 1, 0\n0, 0, 1, 0, 1\n1, 0, 0, 1, 0"
     st.session_state.adj_matrix_input = default_matrix
 
+# For auto-adjusting oscillator count based on matrix dimensions
+if 'next_n_oscillators' not in st.session_state:
+    st.session_state.next_n_oscillators = None
+    
+# If we have a pending oscillator count update from the previous run, apply it now
+if st.session_state.next_n_oscillators is not None:
+    print(f"Updating oscillator count from {st.session_state.n_oscillators} to {st.session_state.next_n_oscillators}")
+    st.session_state.n_oscillators = st.session_state.next_n_oscillators
+    st.session_state.next_n_oscillators = None  # Clear the pending update
+
 # Number of oscillators slider
 n_oscillators = st.sidebar.slider(
     "Number of Oscillators",
@@ -428,22 +438,24 @@ if network_type == "Custom Adjacency Matrix":
             if adj_matrix.shape[0] != adj_matrix.shape[1]:
                 st.sidebar.error(f"The adjacency matrix must be square. Current shape: {adj_matrix.shape}")
             elif adj_matrix.shape[0] != n_oscillators:
-                # New feature: automatically update the number of oscillators to match the matrix dimension
+                # We can't modify widget session state once widgets are created,
+                # so we'll save the desired dimension in a different session state variable
                 matrix_dim = adj_matrix.shape[0]
                 
                 # Log information
-                print(f"Auto-adjusting oscillator count: matrix is {adj_matrix.shape}, updating n_oscillators from {n_oscillators} to {matrix_dim}")
+                print(f"Matrix dimensions ({matrix_dim}) don't match current oscillator count ({n_oscillators})")
                 
-                # Update session state to reflect the new oscillator count
-                st.session_state.n_oscillators = matrix_dim
+                # Store the matrix as is, don't try to resize it
+                st.session_state.next_n_oscillators = matrix_dim
                 
-                # Set the local variable as well for the current run
-                n_oscillators = matrix_dim
+                # Show message explaining what's happening
+                st.sidebar.info(f"""
+                Matrix size ({matrix_dim}×{matrix_dim}) differs from current oscillator count ({n_oscillators}).
+                The matrix will be used as-is for this simulation. Next time you interact with the UI, 
+                the oscillator count will automatically update to match your matrix dimensions.
+                """)
                 
-                # Show success message
-                st.sidebar.success(f"Number of oscillators automatically updated to {matrix_dim} to match matrix dimensions.")
-                
-                # No need to resize matrix as we're adjusting oscillator count instead
+                # Keep local variable as is, use adj_matrix without modification
             else:
                 st.sidebar.success("Adjacency matrix validated successfully!")
                 
@@ -484,10 +496,11 @@ else:
     # If we don't have a custom matrix but the UI type is set to custom,
     # we need to ensure this is communicated clearly
     if network_type == "Custom Adjacency Matrix" and adj_matrix is None:
-        # Use custom styled message with magenta background instead of the default yellow warning
+        # Use custom styled message with orange background instead of the default yellow warning
+        # This matches the sidebar error messages styling
         st.markdown("""
-        <div style="background-color: rgba(255,0,255,0.1); color: #ff88ff; 
-                    padding: 10px; border-radius: 15px; border-left: 5px solid #ff00ff;">
+        <div style="background-color: rgba(255,150,0,0.15); color: #ffaa50; 
+                    padding: 10px; border-radius: 15px; border-left: 5px solid #ff8800;">
             <b>Matrix Input:</b> Please enter your custom adjacency matrix in the sidebar.
             The format should be comma-separated values with each row on a new line.
         </div>
@@ -564,16 +577,15 @@ with tab1:
             # Make sure we're using a copy of the matrix to avoid modifying the original
             network_adj_matrix = np.array(adj_matrix, copy=True)
             
-            # Make sure dimensions match - this should actually never happen now 
-            # that we auto-adjust oscillator count, but we keep this as a safety check
+            # This section handles the case where network_adj_matrix dimensions
+            # don't match n_oscillators, which might happen in rare cases
             if network_adj_matrix.shape[0] != n_oscillators:
-                print(f"Matrix dimensions mismatch after auto-adjustment: matrix is {network_adj_matrix.shape} but n_oscillators={n_oscillators}")
+                print(f"Network matrix dimensions mismatch: matrix is {network_adj_matrix.shape} but n_oscillators={n_oscillators}")
                 
-                # Just to be safe, use the matrix dimensions and adjust oscillator count again
-                matrix_dim = network_adj_matrix.shape[0]
-                print(f"Re-adjusting oscillator count to matrix dimension: {matrix_dim}")
-                n_oscillators = matrix_dim
-                st.session_state.n_oscillators = matrix_dim
+                # Here we directly use the matrix at its current dimensions without changing session state
+                # This is safe because we're not modifying widget values, just local processing
+                n_oscillators = network_adj_matrix.shape[0]
+                print(f"Using matrix at its native dimension: {n_oscillators}x{n_oscillators}")
             
             # Print detailed debug info
             print(f"Using custom adjacency matrix with shape {network_adj_matrix.shape}")

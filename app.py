@@ -1127,7 +1127,8 @@ with tab3:
         min_value=0, 
         max_value=len(times)-1, 
         value=st.session_state.time_index,
-        help="Manually select a specific time point to display"
+        help="Manually select a specific time point to display",
+        key="time_point_slider"  # Add a specific key for easier CSS targeting
     )
     st.session_state.time_index = time_index
     

@@ -605,3 +605,34 @@ button:hover {
 [data-testid="stTabs"] [data-baseweb="tab-panel"]:nth-child(3)::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(to right, #77ffbb, #33cc77);
 }
+
+/* Animation tab time point slider styling with green gradient - specific key targeting */
+[data-testid*="time_point_slider"] [data-baseweb="slider"] div[role="slider"],
+[data-testid="stTabs"] [data-baseweb="tab-panel"]:nth-child(3) [data-testid*="stSlider"] [data-baseweb="slider"] div[role="slider"] {
+    background: linear-gradient(to right, #66ffaa, #22aa55) !important;
+    border-color: #22aa55 !important;
+    box-shadow: 0 0 8px rgba(51, 204, 119, 0.7) !important;
+}
+
+/* Animation tab slider track styling */
+[data-testid*="time_point_slider"] [data-baseweb="slider"] div[data-testid="stTickBar"],
+[data-testid="stTabs"] [data-baseweb="tab-panel"]:nth-child(3) [data-testid*="stSlider"] [data-baseweb="slider"] div[data-testid="stTickBar"] {
+    background: linear-gradient(to right, rgba(102, 255, 170, 0.3), rgba(34, 170, 85, 0.3)) !important;
+}
+
+/* Animation tab slider progress bar */
+[data-testid*="time_point_slider"] [data-baseweb="slider"] div[role="progressbar"],
+[data-testid="stTabs"] [data-baseweb="tab-panel"]:nth-child(3) [data-testid*="stSlider"] [data-baseweb="slider"] div[role="progressbar"] {
+    background: linear-gradient(to right, #66ffaa, #22aa55) !important;
+}
+
+/* Time Point label in animation tab */
+[data-testid*="time_point_slider"] label,
+[data-testid="stTabs"] [data-baseweb="tab-panel"]:nth-child(3) [data-testid*="stSlider"] label {
+    background: linear-gradient(to right, #66ffaa, #33cc77, #22aa55) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
+    font-weight: bold !important;
+}

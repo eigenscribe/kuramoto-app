@@ -491,10 +491,13 @@ with tab1:
         g = int(node_colors[i][3:5], 16) / 255.0
         b = int(node_colors[i][5:7], 16) / 255.0
         
+        # Calculate proper glow radius based on node size
+        node_radius = np.sqrt(node_size) / 2  # NetworkX node_size is in points^2
+        
         # Outer glow (larger, more transparent)
         outer_glow = patches.Circle(
             node_pos, 
-            radius=np.sqrt(node_size) / 40, 
+            radius=node_radius * 1.2,  # 20% larger than node
             color=(r, g, b, 0.15),  # Lower alpha for outer glow
             fill=True,
             zorder=1
@@ -504,7 +507,7 @@ with tab1:
         # Inner glow (smaller, more opaque)
         inner_glow = patches.Circle(
             node_pos, 
-            radius=np.sqrt(node_size) / 50, 
+            radius=node_radius * 1.1,  # 10% larger than node
             color=(r, g, b, 0.3),  # Higher alpha for inner glow
             fill=True,
             zorder=2

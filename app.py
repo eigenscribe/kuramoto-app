@@ -677,81 +677,13 @@ with tab3:
     # Initialize time_index in session state if not present
     if 'time_index' not in st.session_state:
         st.session_state.time_index = 0
-    
-    # Playback controls layout
-    playback_container = st.container()
-    
-    # Add a slider to manually control visualization time point
-    time_index = playback_container.slider(
-        "Time Point", 
-        min_value=0, 
-        max_value=len(times)-1, 
-        value=st.session_state.time_index,
-        help="Manually select a specific time point to display"
-    )
-    st.session_state.time_index = time_index
-    
-    # Display the current time
-    playback_container.markdown(f"<div style='text-align: center;'><h4>Current Time: t = {times[time_index]:.3f}</h4></div>", unsafe_allow_html=True)
-    
-    # Centered animation controls with custom styling
-    col1, col2, col3, col4, col5 = st.columns([1, 1, 1, 1, 1])
-    
-    # Playback speed control
-    animation_speed = col1.slider(
-        "Speed", 
-        min_value=0.5, 
-        max_value=5.0, 
-        value=3.0, 
-        step=0.5,
-        help="Control how fast the animation plays"
-    )
-    
-    # Previous frame button
-    if col2.button("⏮ Previous", use_container_width=True):
-        if st.session_state.time_index > 0:
-            st.session_state.time_index -= 1
-            st.rerun()
-    
-    # Play Animation button
-    animate = col3.button("▶ Play", use_container_width=True)
-    
-    # Next frame button
-    if col4.button("⏭ Next", use_container_width=True):
-        if st.session_state.time_index < len(times) - 1:
-            st.session_state.time_index += 1
-            st.rerun()
-    
-    # Save simulation button
-    if col5.button("💾 Save", use_container_width=True, type="primary"):
-        # Get frequency parameters based on the selected distribution
-        freq_params = {}
-        if freq_type == "Normal":
-            freq_params = {"mean": freq_mean, "std": freq_std}
-        elif freq_type == "Uniform":
-            freq_params = {"min": freq_min, "max": freq_max}
-        elif freq_type == "Bimodal":
-            freq_params = {"peak1": peak1, "peak2": peak2}
-        elif freq_type == "Custom":
-            freq_params = {"values": custom_freqs}
         
-        # Save to database
-        sim_id = store_simulation(
-            model=model,
-            times=times,
-            phases=phases,
-            order_parameter=order_parameter,
-            frequencies=frequencies,
-            freq_type=freq_type,
-            freq_params=freq_params,
-            adjacency_matrix=adj_matrix
-        )
-        
-        if sim_id:
-            st.success(f"Simulation data saved successfully with ID: {sim_id}")
-            st.info("You can access this data in the Database tab.")
-        else:
-            st.error("Failed to save simulation data.")
+    # Set time index from session state
+    time_index = st.session_state.time_index
+    
+    # Initialize animation variables
+    animate = False
+    animation_speed = 3.0
     
     # Get time and order parameter values for the current time index
     current_time = times[time_index]
@@ -994,6 +926,81 @@ with tab3:
         order_plot_placeholder = st.empty()
         order_plot_placeholder.pyplot(create_order_parameter_plot(time_index))
     
+    # Display the current time
+    st.markdown(f"<div style='text-align: center;'><h4>Current Time: t = {times[time_index]:.3f}</h4></div>", unsafe_allow_html=True)
+    
+    # Playback controls layout - now after the plots
+    playback_container = st.container()
+    
+    # Add a slider to manually control visualization time point
+    time_index = playback_container.slider(
+        "Time Point", 
+        min_value=0, 
+        max_value=len(times)-1, 
+        value=st.session_state.time_index,
+        help="Manually select a specific time point to display"
+    )
+    st.session_state.time_index = time_index
+    
+    # Centered animation controls with custom styling
+    col1, col2, col3, col4, col5 = st.columns([1, 1, 1, 1, 1])
+    
+    # Playback speed control
+    animation_speed = col1.slider(
+        "Speed", 
+        min_value=0.5, 
+        max_value=5.0, 
+        value=3.0, 
+        step=0.5,
+        help="Control how fast the animation plays"
+    )
+    
+    # Previous frame button
+    if col2.button("⏮ Previous", use_container_width=True):
+        if st.session_state.time_index > 0:
+            st.session_state.time_index -= 1
+            st.rerun()
+    
+    # Play Animation button
+    animate = col3.button("▶ Play", use_container_width=True)
+    
+    # Next frame button
+    if col4.button("⏭ Next", use_container_width=True):
+        if st.session_state.time_index < len(times) - 1:
+            st.session_state.time_index += 1
+            st.rerun()
+    
+    # Save simulation button
+    if col5.button("💾 Save", use_container_width=True, type="primary"):
+        # Get frequency parameters based on the selected distribution
+        freq_params = {}
+        if freq_type == "Normal":
+            freq_params = {"mean": freq_mean, "std": freq_std}
+        elif freq_type == "Uniform":
+            freq_params = {"min": freq_min, "max": freq_max}
+        elif freq_type == "Bimodal":
+            freq_params = {"peak1": peak1, "peak2": peak2}
+        elif freq_type == "Custom":
+            freq_params = {"values": custom_freqs}
+        
+        # Save to database
+        sim_id = store_simulation(
+            model=model,
+            times=times,
+            phases=phases,
+            order_parameter=order_parameter,
+            frequencies=frequencies,
+            freq_type=freq_type,
+            freq_params=freq_params,
+            adjacency_matrix=adj_matrix
+        )
+        
+        if sim_id:
+            st.success(f"Simulation data saved successfully with ID: {sim_id}")
+            st.info("You can access this data in the Database tab.")
+        else:
+            st.error("Failed to save simulation data.")
+            
     # If animation is triggered
     if animate:
         # Get the current time index as the starting point

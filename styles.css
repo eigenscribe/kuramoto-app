@@ -223,13 +223,13 @@ a:hover {
 
 /* Sidebar scrollbar styling */
 .sidebar::-webkit-scrollbar-thumb {
-    background: linear-gradient(to right bottom, #ff66aa, #ff3366, #9966ff, #6633cc);
+    background: linear-gradient(to right bottom, #ffaa33, #ff6600, #ff3300);
     border-radius: 10px;
     border: 2px solid rgba(0, 0, 0, 0.2);
 }
 
 .sidebar::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(to right, #ff66aa, #9966ff);
+    background: linear-gradient(to right, #ffaa33, #ff3300);
 }
 
 /* Network connectivity input styling */
@@ -245,7 +245,7 @@ a:hover {
     right: -2px;
     bottom: -2px;
     left: -2px;
-    background: linear-gradient(to right bottom, #ff66aa, #ff3366, #9966ff, #6633cc);
+    background: linear-gradient(to right bottom, #ffaa33, #ff6600, #ff3300);
     border-radius: 7px;
     z-index: -1;
 }
@@ -260,7 +260,7 @@ a:hover {
 
 /* Network Connectivity section styling */
 .sidebar h3, .sidebar h3 span {
-    background: linear-gradient(to right bottom, #ff66aa, #ff3366, #9966ff, #6633cc) !important;
+    background: linear-gradient(to right bottom, #ffaa33, #ff6600, #ff3300) !important;
     -webkit-background-clip: text !important;
     background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
@@ -273,7 +273,7 @@ a:hover {
 /* This targets the left side of slider (between minimum value and thumb) */
 .stSlider [data-baseweb=slider] div[data-type="range"] div:first-child,
 .stSlider [data-baseweb=slider] [data-testid="stSliderProgress"] {
-    background: linear-gradient(to right, #ff66aa, #ff3366, #9966ff) !important; /* Brighter pink to purple */
+    background: linear-gradient(to right, #ffaa33, #ff6600, #ff3300) !important; /* Orange gradient */
     height: 4px !important; /* Ensure consistent height */
 }
 
@@ -285,14 +285,14 @@ a:hover {
 
 /* Slider thumb styling */
 .stSlider [data-baseweb=slider] [role=slider] {
-    background: #ff3366 !important; /* Orange-pink */
+    background: #ff6600 !important; /* Orange */
     border: 2px solid white !important;
-    box-shadow: 0 0 8px rgba(255, 51, 102, 0.7) !important;
+    box-shadow: 0 0 8px rgba(255, 102, 0, 0.7) !important;
 }
 
-/* Special styling for the Time Point slider header */
+/* Special styling for the Time Point slider header - green gradient */
 [data-testid="stVerticalBlock"] > div:nth-of-type(5) .stSlider label {
-    background: linear-gradient(to right, #ff66aa, #ff3366, #9966ff) !important;
+    background: linear-gradient(to right, #00ff99, #00cc66, #009933) !important;
     -webkit-background-clip: text !important;
     background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
@@ -408,9 +408,9 @@ button:hover {
     border-color: #14b5ff;
 }
 
-/* Pink gradient text for all slider labels (variables) - brighter pink to purple */
+/* Orange gradient text for all slider labels (variables) */
 .stSlider label {
-    background: linear-gradient(to right, #ff66aa, #ff3366, #9966ff) !important;
+    background: linear-gradient(to right, #ffaa33, #ff6600, #ff3300) !important;
     -webkit-background-clip: text !important;
     background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
@@ -438,14 +438,14 @@ button:hover {
     border-radius: 15px;
     background-color: #222;
     color: white;
-    border: 2px solid #ff66aa !important; /* Brighter pink */
-    box-shadow: 0 0 5px rgba(255, 102, 170, 0.5);
+    border: 2px solid #ff6600 !important; /* Orange */
+    box-shadow: 0 0 5px rgba(255, 102, 0, 0.5);
     padding: 5px 10px;
 }
 
-/* Apply pink gradient to number input labels - brighter pink to purple */
+/* Apply orange gradient to number input labels */
 .stNumberInput label {
-    background: linear-gradient(to right, #ff66aa, #ff3366, #9966ff) !important;
+    background: linear-gradient(to right, #ffaa33, #ff6600, #ff3300) !important;
     -webkit-background-clip: text !important;
     background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
@@ -489,4 +489,15 @@ button:hover {
     font-size: 11px;
     padding: 0 10px;
     margin: 5px auto;
+}
+
+/* Animation tab scrollbar styling with green gradient */
+[data-testid="stTabs"] [data-baseweb="tab-panel"]:nth-child(3)::-webkit-scrollbar-thumb {
+    background: linear-gradient(to right bottom, #00ff99, #00cc66, #009933);
+    border-radius: 10px;
+    border: 2px solid rgba(0, 0, 0, 0.2);
+}
+
+[data-testid="stTabs"] [data-baseweb="tab-panel"]:nth-child(3)::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(to right, #00ff99, #009933);
 }

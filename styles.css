@@ -495,6 +495,14 @@ button:hover {
     background: linear-gradient(to right, #ffcc88, #ff8855, #ff6633) !important;
 }
 
+/* Orange-pink slider styling for oscillator and coupling parameters */
+.sidebar .stSlider[data-testid*="oscillators"] [data-baseweb="slider"] div[role="slider"],
+.sidebar .stSlider[data-testid*="coupling"] [data-baseweb="slider"] div[role="slider"] {
+    background: linear-gradient(to right, #ffcc88, #ff6633) !important;
+    border-color: #ff6633 !important;
+    box-shadow: 0 0 5px rgba(255, 102, 51, 0.5) !important;
+}
+
 /* Frequency parameters - Blue gradient */
 .sidebar .stSelectbox label,
 .sidebar .stSlider[data-testid*="mean"] label,
@@ -506,12 +514,31 @@ button:hover {
     background: linear-gradient(to right, #33ccff, #0088ee) !important;
 }
 
+/* Blue slider styling for frequency parameters */
+.sidebar .stSlider[data-testid*="mean"] [data-baseweb="slider"] div[role="slider"],
+.sidebar .stSlider[data-testid*="standard_deviation"] [data-baseweb="slider"] div[role="slider"],
+.sidebar .stSlider[data-testid*="minimum"] [data-baseweb="slider"] div[role="slider"],
+.sidebar .stSlider[data-testid*="maximum"] [data-baseweb="slider"] div[role="slider"],
+.sidebar .stSlider[data-testid*="peak"] [data-baseweb="slider"] div[role="slider"] {
+    background: linear-gradient(to right, #33ccff, #0066dd) !important;
+    border-color: #0066dd !important;
+    box-shadow: 0 0 5px rgba(0, 136, 238, 0.5) !important;
+}
+
 /* Time parameters - Green gradient */
 .sidebar .stSlider[data-testid*="simulation_time"] label,
 .sidebar .stSlider[data-testid*="time_step"] label,
 .sidebar .stNumberInput[data-testid*="random_seed"] label,
 .sidebar .stRadio label {
     background: linear-gradient(to right, #66ffaa, #33cc77, #22aa55) !important;
+}
+
+/* Green slider styling for time parameters */
+.sidebar .stSlider[data-testid*="simulation_time"] [data-baseweb="slider"] div[role="slider"],
+.sidebar .stSlider[data-testid*="time_step"] [data-baseweb="slider"] div[role="slider"] {
+    background: linear-gradient(to right, #66ffaa, #22aa55) !important;
+    border-color: #22aa55 !important;
+    box-shadow: 0 0 5px rgba(51, 204, 119, 0.5) !important;
 }
 
 /* Custom scrollbar styling */
@@ -525,6 +552,22 @@ button:hover {
     border-radius: 10px;
 }
 
+/* Green scrollbar for time-related elements */
+.sidebar .stSlider[data-testid*="time"] ~ div::-webkit-scrollbar-thumb,
+.sidebar .stSlider[data-testid*="simulation_time"] ~ div::-webkit-scrollbar-thumb,
+.sidebar .stSlider[data-testid*="time_step"] ~ div::-webkit-scrollbar-thumb {
+    background: linear-gradient(to right bottom, #66ffaa, #33cc77, #22aa55) !important;
+    border-radius: 10px;
+    border: 2px solid rgba(0, 0, 0, 0.2);
+}
+
+.sidebar .stSlider[data-testid*="time"] ~ div::-webkit-scrollbar-thumb:hover,
+.sidebar .stSlider[data-testid*="simulation_time"] ~ div::-webkit-scrollbar-thumb:hover,
+.sidebar .stSlider[data-testid*="time_step"] ~ div::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(to right, #66ffaa, #22aa55) !important;
+}
+
+/* Default scrollbar styling */
 ::-webkit-scrollbar-thumb {
     background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb);
     border-radius: 10px;

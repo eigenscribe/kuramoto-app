@@ -480,39 +480,7 @@ with tab1:
         b = min(255, int(b * 1.5))
         bright_node_colors.append(f"#{r:02x}{g:02x}{b:02x}")
     
-    # Add glow effects for nodes (similar to animation tab)
-    # Import matplotlib.patches for Circle
-    import matplotlib.patches as patches
-    
-    # First layer of glow (larger, more transparent)
-    for i, (node, node_pos) in enumerate(pos.items()):
-        # Extract original color components
-        r = int(node_colors[i][1:3], 16) / 255.0
-        g = int(node_colors[i][3:5], 16) / 255.0
-        b = int(node_colors[i][5:7], 16) / 255.0
-        
-        # Calculate proper glow radius based on node size
-        node_radius = np.sqrt(node_size) / 2  # NetworkX node_size is in points^2
-        
-        # Outer glow (just slightly larger than node, more transparent)
-        outer_glow = patches.Circle(
-            node_pos, 
-            radius=node_radius * 1.05,  # Just 5% larger than node
-            color=(r, g, b, 0.15),  # Lower alpha for outer glow
-            fill=True,
-            zorder=1
-        )
-        ax1.add_patch(outer_glow)
-        
-        # Inner glow (almost same size as node, more opaque)
-        inner_glow = patches.Circle(
-            node_pos, 
-            radius=node_radius * 1.02,  # Just 2% larger than node
-            color=(r, g, b, 0.25),  # Higher alpha for inner glow
-            fill=True,
-            zorder=2
-        )
-        ax1.add_patch(inner_glow)
+    # No glow effect for network nodes to keep the visualization clean
     
     # Draw the main nodes on top of glow effects
     nodes = nx.draw_networkx_nodes(G, pos, ax=ax1, 

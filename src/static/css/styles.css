@@ -1,0 +1,638 @@
+/* Main styling for the entire application */
+body {
+    font-family: 'Aclonica', sans-serif;
+    margin: 0;
+    padding: 0;
+    color: white;
+}
+
+/* Adjust Streamlit default elements */
+.stApp {
+    background-color: #121212;
+    background-image: url('wisp.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Gradient text styles - THESE TWO SPECIFIC GRADIENTS SHOULD BE USED */
+.gradient_text1 {
+    font-weight: bold !important;
+    background: linear-gradient(to right bottom, #00e8ff, #14a5ff, #8138ff) !important;
+    background-image: -webkit-linear-gradient(to right bottom, #00e8ff, #14a5ff, #8138ff) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
+    text-align: center;
+}
+
+.gradient_text2 {
+    font-weight: bold;
+    background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb);
+    background-image: -webkit-linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+
+/* Add semi-transparent overlay for better content visibility */
+.main::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: -1;
+}
+
+/* Section styles */
+.section {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 30px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+.section:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.section-content {
+    color: white;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;
+    text-align: left;
+    align-items: flex-start;
+    padding: 15px;
+}
+
+.section h2 {
+    font-weight: bold;
+    background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    margin-top: 0;
+    font-size: 1.8rem;
+    width: 100%;
+    text-align: center;
+}
+
+.section h3 {
+    font-weight: bold !important;
+    background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
+    font-size: 1.4rem;
+    text-align: center;
+}
+
+/* Feature box styling */
+.feature-box {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    backdrop-filter: blur(5px);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.feature-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.feature-box-content {
+    color: white;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;
+    text-align: left;
+    align-items: flex-start;
+}
+
+.feature-box-content h3 {
+    font-weight: bold !important;
+    background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
+    margin-top: 0;
+    font-size: 1.5rem;
+    width: 100%;
+    text-align: center;
+}
+
+/* Button Styling */
+.btn, .stButton button, button[kind="primary"] {
+    background-image: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb);
+    box-shadow: 0 4px 15px 0 rgba(39, 170, 255, 0.5);
+    width: 100%;
+    min-width: 100px;
+    font-size: 13px;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    margin: 10px auto;
+    height: 35px;
+    text-align: center;
+    border: none;
+    background-size: 300% 100%;
+    border-radius: 15px;
+    transition: all .4s ease-in-out;
+    font-family: 'Aclonica', sans-serif;
+    display: block;
+    text-decoration: none;
+    line-height: 35px;
+}
+
+/* Button hover effects */
+.btn:hover, .stButton button:hover, button[kind="primary"]:hover {
+    background-position: 100% 0;
+    background-image: linear-gradient(to right, #00e8ff, #0070eb);
+    filter: brightness(1.1);
+    transition: all .4s ease-in-out;
+}
+
+/* Typography improvements */
+h1, h2, h3, h4, p, div, span, a, button, input, textarea, select {
+    font-family: 'Aclonica', sans-serif;
+}
+
+/* Links */
+a {
+    color: #14b5ff;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+a:hover {
+    color: #00e8ff;
+}
+
+/* Streamlit specific styles */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 10px;
+}
+
+.stTabs [data-baseweb="tab"] {
+    background-color: rgba(20, 165, 255, 0.1);
+    border-radius: 4px 4px 0 0;
+    padding: 10px 20px;
+    border: 1px solid rgba(20, 165, 255, 0.3);
+    color: white !important;
+}
+
+.stTabs [aria-selected="true"] {
+    background-color: rgba(20, 181, 255, 0.2);
+    border-bottom: 3px solid #14b5ff;
+    color: white !important;
+}
+
+/* Sidebar customization */
+.css-1d391kg, .css-1lcbmhc {
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+}
+
+/* Sidebar scrollbar styling - green gradient */
+.sidebar::-webkit-scrollbar-thumb {
+    background: linear-gradient(to right bottom, #66ffaa, #33cc77, #22aa55);
+    border-radius: 10px;
+    border: 2px solid rgba(0, 0, 0, 0.2);
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(to right, #77ffbb, #33cc77);
+}
+
+/* Network connectivity input styling - green gradient */
+.sidebar .stNumberInput > div {
+    position: relative;
+    z-index: 1;
+}
+
+.sidebar .stNumberInput > div::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    bottom: -2px;
+    left: -2px;
+    background: linear-gradient(to right bottom, #66ffaa, #33cc77, #22aa55);
+    border-radius: 7px;
+    z-index: -1;
+}
+
+.sidebar .stNumberInput > div > div > input {
+    border-radius: 4px;
+    background-color: #222;
+    border: none;
+    position: relative;
+    z-index: 2;
+}
+
+/* Network Connectivity section styling - green gradient */
+.sidebar h3, .sidebar h3 span {
+    background: linear-gradient(to right bottom, #66ffaa, #33cc77, #22aa55) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
+    font-weight: bold !important;
+    text-align: center;
+    letter-spacing: 0.2px !important;
+}
+
+/* Slider styling for the active (colored) part */
+/* This targets the left side of slider (between minimum value and thumb) */
+.stSlider [data-baseweb=slider] div[data-type="range"] div:first-child,
+.stSlider [data-baseweb=slider] [data-testid="stSliderProgress"] {
+    background: linear-gradient(to right, #ffcc88, #ff8855, #ff6633) !important; /* Lighter orange-pink gradient */
+    height: 4px !important; /* Ensure consistent height */
+}
+
+/* Slider track styling for the inactive (grey) part */
+.stSlider [data-baseweb=slider] div[data-type="range"] div:nth-child(2) {
+    background: rgba(255, 255, 255, 0.1) !important;
+    height: 4px !important; /* Ensure consistent height */
+}
+
+/* Slider thumb styling */
+.stSlider [data-baseweb=slider] [role=slider] {
+    background: #ff7744 !important; /* Orange-pink */
+    border: 2px solid white !important;
+    box-shadow: 0 0 8px rgba(255, 119, 68, 0.7) !important;
+}
+
+/* Special styling for the Time Point slider header - softer green gradient */
+[data-testid="stVerticalBlock"] > div:nth-of-type(5) .stSlider label {
+    background: linear-gradient(to right, #66ffaa, #33cc77, #22aa55) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
+    font-weight: bold !important;
+    letter-spacing: 0.2px !important;
+}
+
+/* Style the min/max values on sliders with lighter blue gradient */
+.stSlider [data-testid="stTickBar"] {
+    color: transparent !important;
+}
+
+.stSlider [data-testid="stTickBar"] > div {
+    background: linear-gradient(to right, #33ccff, #0088ee) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
+    font-weight: bold !important;
+    letter-spacing: 0.2px !important;
+}
+
+/* Override Streamlit defaults */
+.stMarkdown {
+    color: white;
+}
+
+/* Footer style */
+footer {
+    text-align: center;
+    margin-top: 30px;
+    padding: 10px;
+    font-size: 0.8em;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Custom footer for copyright */
+.footer {
+    text-align: center;
+    margin-top: 30px;
+    padding: 15px;
+    font-size: 0.9em;
+    color: white;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+}
+
+/* Make plots more visible */
+.stPlot {
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+/* Progress bar styling with gradient */
+.stProgress > div > div > div {
+    background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb) !important;
+}
+
+/* Play Animation button special styling */
+[data-testid="stHorizontalBlock"] [data-testid="column"][data-testid="stVerticalBlock"]:nth-of-type(2) .stButton button {
+    width: 100%;
+    min-width: 120px;
+    height: 32px;
+    line-height: 32px;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    border-radius: 10px;
+    background-image: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb);
+    box-shadow: 0 2px 8px rgba(20, 165, 255, 0.4);
+    transition: all 0.3s ease;
+    text-align: center;
+    margin: 0 auto;
+}
+
+[data-testid="stHorizontalBlock"] [data-testid="column"][data-testid="stVerticalBlock"]:nth-of-type(2) .stButton button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(20, 181, 255, 0.5);
+    background-image: linear-gradient(to right, #00e8ff, #0070eb);
+}
+
+/* Card row layout for horizontal alignment */
+.card-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+/* Tech tag styling */
+.tech-tag {
+    display: inline-block;
+    background: linear-gradient(130deg, rgba(0, 232, 255, 0.2), rgba(0, 112, 235, 0.2));
+    border: 1px solid rgba(20, 181, 255, 0.3);
+    border-radius: 15px;
+    padding: 3px 10px;
+    margin: 3px;
+    font-size: 0.8rem;
+    color: white;
+}
+
+/* Dark theme adjustments */
+button, select, input, textarea {
+    background-color: #222;
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+button:hover {
+    border-color: #14b5ff;
+}
+
+/* Orange-pink gradient text for all slider labels (variables) - lighter */
+.stSlider label {
+    background: linear-gradient(to right, #ffcc88, #ff8855, #ff6633) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
+    font-weight: bold !important;
+    letter-spacing: 0.2px !important;
+}
+
+/* Improve selectbox appearance */
+.stSelectbox > div[data-baseweb="select"] {
+    border: 2px solid;
+    border-image: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb) 1;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.stSelectbox > div[data-baseweb="select"] > div {
+    background-color: #222;
+    color: white;
+    border: none;
+    border-radius: 13px;
+}
+
+/* Selectbox labels */
+.stSelectbox label {
+    background: linear-gradient(to right, #ffcc88, #ff8855, #ff6633) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
+    font-weight: bold !important;
+    letter-spacing: 0.2px !important;
+}
+
+/* Default selector - will be overridden by more specific ones */
+.sidebar .stSelectbox label {
+    /* Already defined in our systematic color structure */
+}
+
+/* Improve number input appearance for all inputs */
+.stNumberInput > div > div > input {
+    border-radius: 15px;
+    background-color: #222;
+    color: white;
+    border: 2px solid #ff7744 !important; /* Orange-pink */
+    box-shadow: 0 0 5px rgba(255, 119, 68, 0.5);
+    padding: 5px 10px;
+}
+
+/* Apply orange-pink gradient to number input labels - lighter */
+.stNumberInput label {
+    background: linear-gradient(to right, #ffcc88, #ff8855, #ff6633) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
+    font-weight: bold !important;
+    letter-spacing: 0.2px !important;
+}
+
+/* Systematic sidebar coloring structure */
+
+/* Base settings for all sidebar inputs - shared properties */
+.sidebar .stNumberInput label,
+.sidebar .stSlider label,
+.sidebar .stSelectbox label,
+.sidebar .stRadio label {
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
+    font-weight: bold !important;
+    letter-spacing: 0.2px !important;
+}
+
+/* System parameters - Orange-pink gradient for Oscillators and Coupling */
+.sidebar .stSlider[data-testid*="oscillators"] label,
+.sidebar .stSlider[data-testid*="coupling"] label {
+    background: linear-gradient(to right, #ffcc88, #ff8855, #ff6633) !important;
+}
+
+/* Orange-pink slider styling for oscillator and coupling parameters */
+.sidebar .stSlider[data-testid*="oscillators"] [data-baseweb="slider"] div[role="slider"],
+.sidebar .stSlider[data-testid*="coupling"] [data-baseweb="slider"] div[role="slider"] {
+    background: linear-gradient(to right, #ffcc88, #ff6633) !important;
+    border-color: #ff6633 !important;
+    box-shadow: 0 0 5px rgba(255, 102, 51, 0.5) !important;
+}
+
+/* Frequency parameters - Blue gradient */
+.sidebar .stSelectbox label,
+.sidebar .stSlider[data-testid*="mean"] label,
+.sidebar .stSlider[data-testid*="standard_deviation"] label,
+.sidebar .stSlider[data-testid*="minimum"] label,
+.sidebar .stSlider[data-testid*="maximum"] label,
+.sidebar .stSlider[data-testid*="peak"] label,
+.sidebar .stTextArea label {
+    background: linear-gradient(to right, #33ccff, #0088ee) !important;
+}
+
+/* Blue slider styling for frequency parameters */
+.sidebar .stSlider[data-testid*="mean"] [data-baseweb="slider"] div[role="slider"],
+.sidebar .stSlider[data-testid*="standard_deviation"] [data-baseweb="slider"] div[role="slider"],
+.sidebar .stSlider[data-testid*="minimum"] [data-baseweb="slider"] div[role="slider"],
+.sidebar .stSlider[data-testid*="maximum"] [data-baseweb="slider"] div[role="slider"],
+.sidebar .stSlider[data-testid*="peak"] [data-baseweb="slider"] div[role="slider"] {
+    background: linear-gradient(to right, #33ccff, #0066dd) !important;
+    border-color: #0066dd !important;
+    box-shadow: 0 0 5px rgba(0, 136, 238, 0.5) !important;
+}
+
+/* Time parameters - Green gradient */
+.sidebar .stSlider[data-testid*="simulation_time"] label,
+.sidebar .stSlider[data-testid*="time_step"] label,
+.sidebar .stNumberInput[data-testid*="random_seed"] label,
+.sidebar .stRadio label {
+    background: linear-gradient(to right, #66ffaa, #33cc77, #22aa55) !important;
+}
+
+/* Green slider styling for time parameters */
+.sidebar .stSlider[data-testid*="simulation_time"] [data-baseweb="slider"] div[role="slider"],
+.sidebar .stSlider[data-testid*="time_step"] [data-baseweb="slider"] div[role="slider"] {
+    background: linear-gradient(to right, #66ffaa, #22aa55) !important;
+    border-color: #22aa55 !important;
+    box-shadow: 0 0 5px rgba(51, 204, 119, 0.5) !important;
+}
+
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
+/* Green scrollbar for time-related elements */
+.sidebar .stSlider[data-testid*="time"] ~ div::-webkit-scrollbar-thumb,
+.sidebar .stSlider[data-testid*="simulation_time"] ~ div::-webkit-scrollbar-thumb,
+.sidebar .stSlider[data-testid*="time_step"] ~ div::-webkit-scrollbar-thumb {
+    background: linear-gradient(to right bottom, #66ffaa, #33cc77, #22aa55) !important;
+    border-radius: 10px;
+    border: 2px solid rgba(0, 0, 0, 0.2);
+}
+
+.sidebar .stSlider[data-testid*="time"] ~ div::-webkit-scrollbar-thumb:hover,
+.sidebar .stSlider[data-testid*="simulation_time"] ~ div::-webkit-scrollbar-thumb:hover,
+.sidebar .stSlider[data-testid*="time_step"] ~ div::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(to right, #66ffaa, #22aa55) !important;
+}
+
+/* Default scrollbar styling */
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb);
+    border-radius: 10px;
+    border: 2px solid rgba(0, 0, 0, 0.2);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(to right, #00e8ff, #0070eb);
+}
+
+/* Radio button styling - using blue from our gradient */
+[data-testid="stRadio"] [data-baseweb="radio"] div[data-checked="true"] div:first-child {
+    background: #14b5ff !important; /* Blue from our gradient */
+    border: 2px solid white !important;
+    box-shadow: 0 0 5px rgba(20, 181, 255, 0.7) !important;
+}
+
+/* Animation tab button styling - make them smaller */
+[data-testid="stTabs"] [data-baseweb="tab-panel"]:nth-child(3) .stButton button {
+    min-width: 80px;
+    height: 30px;
+    line-height: 30px;
+    font-size: 11px;
+    padding: 0 10px;
+    margin: 5px auto;
+}
+
+/* Animation tab scrollbar styling with softer green gradient */
+[data-testid="stTabs"] [data-baseweb="tab-panel"]:nth-child(3)::-webkit-scrollbar-thumb {
+    background: linear-gradient(to right bottom, #66ffaa, #33cc77, #22aa55);
+    border-radius: 10px;
+    border: 2px solid rgba(0, 0, 0, 0.2);
+}
+
+[data-testid="stTabs"] [data-baseweb="tab-panel"]:nth-child(3)::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(to right, #77ffbb, #33cc77);
+}
+
+/* Animation tab time point slider styling with green gradient - specific key targeting */
+[data-testid*="time_point_slider"] [data-baseweb="slider"] div[role="slider"],
+[data-testid="stTabs"] [data-baseweb="tab-panel"]:nth-child(3) [data-testid*="stSlider"] [data-baseweb="slider"] div[role="slider"] {
+    background: linear-gradient(to right, #66ffaa, #22aa55) !important;
+    border-color: #22aa55 !important;
+    box-shadow: 0 0 8px rgba(51, 204, 119, 0.7) !important;
+}
+
+/* Animation tab slider track styling */
+[data-testid*="time_point_slider"] [data-baseweb="slider"] div[data-testid="stTickBar"],
+[data-testid="stTabs"] [data-baseweb="tab-panel"]:nth-child(3) [data-testid*="stSlider"] [data-baseweb="slider"] div[data-testid="stTickBar"] {
+    background: linear-gradient(to right, rgba(102, 255, 170, 0.3), rgba(34, 170, 85, 0.3)) !important;
+}
+
+/* Animation tab slider progress bar */
+[data-testid*="time_point_slider"] [data-baseweb="slider"] div[role="progressbar"],
+[data-testid="stTabs"] [data-baseweb="tab-panel"]:nth-child(3) [data-testid*="stSlider"] [data-baseweb="slider"] div[role="progressbar"] {
+    background: linear-gradient(to right, #66ffaa, #22aa55) !important;
+}
+
+/* Time Point label in animation tab */
+[data-testid*="time_point_slider"] label,
+[data-testid="stTabs"] [data-baseweb="tab-panel"]:nth-child(3) [data-testid*="stSlider"] label {
+    background: linear-gradient(to right, #66ffaa, #33cc77, #22aa55) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
+    font-weight: bold !important;
+}

@@ -371,16 +371,40 @@ if network_type == "Custom Adjacency Matrix":
         try:
             # Parse the input text into a numpy array
             rows = adj_matrix_input.strip().split('\n')
+            
+            # Ensure we have at least one row
+            if len(rows) == 0:
+                raise ValueError("No data found in matrix input")
+                
+            # Process each row, removing extra spaces and parsing values
             adj_matrix = []
             for row in rows:
-                values = [float(val.strip()) for val in row.split(',')]
-                adj_matrix.append(values)
+                # Skip empty rows
+                if not row.strip():
+                    continue
+                    
+                # Process values in this row
+                values = []
+                for val in row.split(','):
+                    # Convert to float, handling extra whitespace
+                    cleaned_val = val.strip()
+                    if cleaned_val:  # Skip empty entries
+                        values.append(float(cleaned_val))
+                
+                # Ensure row has data
+                if values:
+                    adj_matrix.append(values)
             
+            # Make sure we have a valid matrix with data
+            if not adj_matrix:
+                raise ValueError("Could not find valid numeric data in input")
+                
+            # Convert to numpy array for faster processing
             adj_matrix = np.array(adj_matrix)
             
             # Validate the adjacency matrix
             if adj_matrix.shape[0] != adj_matrix.shape[1]:
-                st.sidebar.error("The adjacency matrix must be square.")
+                st.sidebar.error(f"The adjacency matrix must be square. Current shape: {adj_matrix.shape}")
             elif adj_matrix.shape[0] != n_oscillators:
                 # Provide a warning but allow mismatched dimensions for imported configs
                 st.sidebar.warning(f"Matrix dimensions ({adj_matrix.shape[0]}x{adj_matrix.shape[1]}) don't match oscillator count ({n_oscillators}). The network graph may not display correctly.")
@@ -395,12 +419,23 @@ if network_type == "Custom Adjacency Matrix":
                     print(f"Truncated matrix to {adj_matrix.shape}")
                     st.sidebar.info("Matrix was truncated to match oscillator count.")
                 else:
-                    # We'll use the matrix as-is and the error will be caught in network visualization
-                    pass
+                    # Expand matrix with zeros
+                    temp = np.zeros((n_oscillators, n_oscillators))
+                    temp[:adj_matrix.shape[0], :adj_matrix.shape[1]] = adj_matrix
+                    adj_matrix = temp
+                    print(f"Expanded matrix to {adj_matrix.shape}")
+                    st.sidebar.info("Matrix was expanded with zeros to match oscillator count.")
             else:
                 st.sidebar.success("Adjacency matrix validated successfully!")
+                
+            # Store in session state for persistence
+            st.session_state.loaded_adj_matrix = adj_matrix
+            print(f"Updated adjacency matrix in session state with shape {adj_matrix.shape}")
+                
         except Exception as e:
             st.sidebar.error(f"Error parsing matrix: {str(e)}")
+            print(f"Matrix parsing error: {str(e)}")
+            print(f"Input was: '{adj_matrix_input}'")
             adj_matrix = None
 
 # Create tabs for different visualizations (Network is default tab)
@@ -430,7 +465,14 @@ else:
     # If we don't have a custom matrix but the UI type is set to custom,
     # we need to ensure this is communicated clearly
     if network_type == "Custom Adjacency Matrix" and adj_matrix is None:
-        st.warning("Custom adjacency matrix selected but no valid matrix provided. Please enter a matrix in the sidebar.")
+        # Use custom styled message with green background instead of the default yellow warning
+        st.markdown("""
+        <div style="background-color: rgba(0,100,0,0.2); color: #00aa00; 
+                    padding: 10px; border-radius: 5px; border-left: 5px solid #00cc00;">
+            <b>Matrix Input:</b> Please enter your custom adjacency matrix in the sidebar.
+            The format should be comma-separated values with each row on a new line.
+        </div>
+        """, unsafe_allow_html=True)
         print("Warning: Custom adjacency matrix selected but no valid matrix found")
 
 # Function to simulate model

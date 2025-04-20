@@ -25,8 +25,8 @@ body {
 /* Gradient text styles - THESE TWO SPECIFIC GRADIENTS SHOULD BE USED */
 .gradient_text1 {
     font-weight: bold !important;
-    background: linear-gradient(to right bottom, #00e8ff, #14a5ff, #8138ff) !important;
-    background-image: -webkit-linear-gradient(to right bottom, #00e8ff, #14a5ff, #8138ff) !important;
+    background: linear-gradient(to right bottom, #FF66AA, #FF3366, #9966FF) !important;
+    background-image: -webkit-linear-gradient(to right bottom, #FF66AA, #FF3366, #9966FF) !important;
     -webkit-background-clip: text !important;
     background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
@@ -36,8 +36,8 @@ body {
 
 .gradient_text2 {
     font-weight: bold;
-    background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb);
-    background-image: -webkit-linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb);
+    background: linear-gradient(to right bottom, #FF66AA, #FF3366, #9966FF, #6633CC);
+    background-image: -webkit-linear-gradient(to right bottom, #FF66AA, #FF3366, #9966FF, #6633CC);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;

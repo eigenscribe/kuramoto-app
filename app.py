@@ -62,6 +62,12 @@ if st.session_state.loaded_config is not None:
             if isinstance(matrix, bytes):
                 import pickle
                 matrix = pickle.loads(matrix)
+            elif isinstance(matrix, list):
+                # Convert list to numpy array if it's still a list
+                matrix = np.array(matrix)
+                
+            # Print debug info
+            print(f"Loading adjacency matrix: type={type(matrix)}, shape={matrix.shape if hasattr(matrix, 'shape') else 'unknown'}")
                 
             # Convert matrix to string representation for the text area
             matrix_str = ""

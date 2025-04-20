@@ -630,7 +630,18 @@ def import_configuration_from_json(file_path, save_to_db=True):
         
         # Convert lists back to numpy arrays if needed
         if config_dict.get('adjacency_matrix') is not None:
-            config_dict['adjacency_matrix'] = np.array(config_dict['adjacency_matrix'])
+            try:
+                # Ensure adjacency matrix is a numpy array
+                config_dict['adjacency_matrix'] = np.array(config_dict['adjacency_matrix'])
+                print(f"Converted adjacency matrix to numpy array, shape: {config_dict['adjacency_matrix'].shape}")
+                
+                # Verify network type is set correctly
+                if config_dict.get('network_type') != "Custom Adjacency Matrix":
+                    print(f"Updating network type from {config_dict.get('network_type')} to 'Custom Adjacency Matrix'")
+                    config_dict['network_type'] = "Custom Adjacency Matrix"
+            except Exception as e:
+                print(f"Error processing adjacency matrix: {e}")
+                config_dict['adjacency_matrix'] = None
         
         # Save to database if requested
         if save_to_db:

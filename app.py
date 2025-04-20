@@ -1005,36 +1005,29 @@ with tab3:
     )
     st.session_state.time_index = time_index
     
-    # Centered animation controls with custom styling
-    col1, col2, col3, col4, col5 = st.columns([1, 1, 1, 1, 1])
+    # Centered animation controls with custom styling - removed speed slider
+    col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
     
-    # Playback speed control
-    animation_speed = col1.slider(
-        "Speed", 
-        min_value=0.5, 
-        max_value=5.0, 
-        value=3.0, 
-        step=0.5,
-        help="Control how fast the animation plays"
-    )
+    # Set a fixed animation speed value
+    animation_speed = 3.0  # Fixed moderate animation speed
     
     # Previous frame button
-    if col2.button("⏮ Previous", use_container_width=True):
+    if col1.button("⏮ Previous", use_container_width=True):
         if st.session_state.time_index > 0:
             st.session_state.time_index -= 1
             st.rerun()
     
     # Play Animation button
-    animate = col3.button("▶ Play", use_container_width=True)
+    animate = col2.button("▶ Play", use_container_width=True)
     
     # Next frame button
-    if col4.button("⏭ Next", use_container_width=True):
+    if col3.button("⏭ Next", use_container_width=True):
         if st.session_state.time_index < len(times) - 1:
             st.session_state.time_index += 1
             st.rerun()
     
     # Save simulation button
-    if col5.button("💾 Save", use_container_width=True, type="primary"):
+    if col4.button("💾 Save", use_container_width=True, type="primary"):
         # Get frequency parameters based on the selected distribution
         freq_params = {}
         if freq_type == "Normal":

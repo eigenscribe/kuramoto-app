@@ -508,7 +508,7 @@ with tab1:
     np.fill_diagonal(network_adj_matrix, 0)
     
     # Print debug info
-    if network_type == "Custom Adjacency Matrix":
+    if network_type_internal == "Custom Adjacency Matrix":
         print(f"Network adjacency matrix before creating graph:")
         print(f"Shape: {network_adj_matrix.shape}")
         print(f"Sum of elements: {np.sum(network_adj_matrix)}")
@@ -533,7 +533,7 @@ with tab1:
         oscillator_colors[idx] = custom_cmap(color_indices[i])
     
     # Choose layout based on network type
-    if network_type == "Nearest Neighbor":
+    if network_type_internal == "Nearest Neighbor":
         # Circular layout for nearest neighbor (ring)
         pos = nx.circular_layout(G)
     elif n_oscillators <= 20:
@@ -671,7 +671,7 @@ with tab2:
     st.markdown(f"""
     <div style='background-color: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px; margin-bottom: 20px;'>
         <span style='font-size: 1.2em;'><b>Simulation Information</b></span><br>
-        <span><b>Oscillators:</b> {n_oscillators} | <b>Coupling Strength:</b> {coupling_strength} | <b>Network Type:</b> {network_type}</span>
+        <span><b>Oscillators:</b> {n_oscillators} | <b>Coupling Strength:</b> {coupling_strength} | <b>Network Type:</b> {network_type_internal}</span>
     </div>
     """, unsafe_allow_html=True)
     
@@ -854,7 +854,7 @@ with tab3:
     st.markdown(f"""
     <div style='background-color: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px; margin-bottom: 20px;'>
         <span style='font-size: 1.2em;'><b>Simulation Information</b></span><br>
-        <span><b>Oscillators:</b> {n_oscillators} | <b>Coupling Strength:</b> {coupling_strength} | <b>Network Type:</b> {network_type}</span>
+        <span><b>Oscillators:</b> {n_oscillators} | <b>Coupling Strength:</b> {coupling_strength} | <b>Network Type:</b> {network_type_internal}</span>
     </div>
     """, unsafe_allow_html=True)
     

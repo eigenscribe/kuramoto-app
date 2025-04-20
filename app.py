@@ -917,24 +917,7 @@ with tab3:
             ax.plot(times[:time_idx+1], phases[i, :time_idx+1] % (2 * np.pi), 
                   color=color, alpha=0.2, linewidth=0.8, zorder=2)
             
-            # Add two-layer glow effect to selected data points (matching unit circle)
-            for t in range(0, time_idx + 1, 5):  # Add glow to every 5th point to avoid clutter
-                x = times[t]
-                y = phases[i, t] % (2 * np.pi)
-                
-                # Outer glow (larger, more subtle)
-                outer_glow = plt.Circle((x, y), 0.1, transform=ax.get_xaxis_transform(),
-                                  fill=True, color=color, alpha=0.12, zorder=3)
-                # Inner glow (smaller, more vibrant)
-                inner_glow = plt.Circle((x, y), 0.06, transform=ax.get_xaxis_transform(),
-                                  fill=True, color=color, alpha=0.2, zorder=4)
-                
-                # Need to adjust the y-scale to match the plot coordinates
-                outer_glow.set_radius(0.045 * (2 * np.pi) / ax.get_ylim()[1])
-                inner_glow.set_radius(0.028 * (2 * np.pi) / ax.get_ylim()[1])
-                
-                ax.add_patch(outer_glow)
-                ax.add_patch(inner_glow)
+            # Removed glow effect from regular points as requested
             
             # Plot oscillator phases as filled dots with color gradient
             ax.scatter(times[:time_idx+1], phases[i, :time_idx+1] % (2 * np.pi), 

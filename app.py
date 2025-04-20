@@ -420,7 +420,7 @@ with tab1:
     
     # Create custom colormap that matches our gradient_text1 theme for nodes
     custom_cmap = LinearSegmentedColormap.from_list("kuramoto_colors", 
-                                                ["#8A2BE2", "#FF00FF", "#FFA500", "#50C878"], 
+                                                ["#9933FF", "#FF33FF", "#FFAA00", "#50FF96"], 
                                                 N=256)
     
     # Sort oscillators by their natural frequency for consistent coloring
@@ -588,7 +588,7 @@ with tab2:
         
         # Create custom colormap that matches our gradient theme
         custom_cmap = LinearSegmentedColormap.from_list("kuramoto_colors", 
-                                                ["#00ffee", "#27aaff"], 
+                                                ["#00ffff", "#00aaff"], 
                                                 N=256)
         
         # Create custom colors with a gradient effect that matches our theme

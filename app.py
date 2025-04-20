@@ -14,6 +14,66 @@ from database import (store_simulation, get_simulation, list_simulations, delete
                   save_configuration, list_configurations, get_configuration, delete_configuration,
                   get_configuration_by_name)
 
+# Initialize session state for configuration loading
+if 'loaded_config' not in st.session_state:
+    st.session_state.loaded_config = None
+
+# Apply loaded configuration if available
+if st.session_state.loaded_config is not None:
+    config = st.session_state.loaded_config
+    
+    # Update session state with configuration values
+    st.session_state.n_oscillators = config['n_oscillators']
+    st.session_state.coupling_strength = config['coupling_strength']
+    st.session_state.simulation_time = config['simulation_time']
+    st.session_state.time_step = config['time_step']
+    st.session_state.random_seed = config['random_seed']
+    st.session_state.network_type = config['network_type']
+    st.session_state.freq_type = config['frequency_distribution']
+    
+    # Update frequency distribution parameters based on type
+    freq_params = config.get('frequency_params', {})
+    if freq_params:
+        try:
+            freq_params = json.loads(freq_params)
+        except:
+            # It's already a dictionary
+            pass
+            
+        if config['frequency_distribution'] == "Normal":
+            st.session_state.freq_mean = freq_params.get('mean', 0.0)
+            st.session_state.freq_std = freq_params.get('std', 1.0)
+        elif config['frequency_distribution'] == "Uniform":
+            st.session_state.freq_min = freq_params.get('min', -1.0)
+            st.session_state.freq_max = freq_params.get('max', 1.0)
+        elif config['frequency_distribution'] == "Bimodal":
+            st.session_state.peak1 = freq_params.get('peak1', -1.0)
+            st.session_state.peak2 = freq_params.get('peak2', 1.0)
+        elif config['frequency_distribution'] == "Custom":
+            if 'custom_values' in freq_params and isinstance(freq_params['custom_values'], list):
+                st.session_state.custom_freqs = ', '.join(map(str, freq_params['custom_values']))
+            elif 'values' in freq_params and isinstance(freq_params['values'], list):
+                st.session_state.custom_freqs = ', '.join(map(str, freq_params['values']))
+    
+    # Handle custom adjacency matrix if present
+    if config['network_type'] == "Custom Adjacency Matrix" and config.get('adjacency_matrix') is not None:
+        try:
+            matrix = config['adjacency_matrix']
+            if isinstance(matrix, bytes):
+                import pickle
+                matrix = pickle.loads(matrix)
+                
+            # Convert matrix to string representation for the text area
+            matrix_str = ""
+            for row in matrix:
+                matrix_str += ", ".join(str(val) for val in row) + "\n"
+            st.session_state.adj_matrix_input = matrix_str.strip()
+        except Exception as e:
+            st.warning(f"Could not load custom adjacency matrix: {str(e)}")
+    
+    # Clear the loaded config to prevent reapplying it on next rerun
+    st.session_state.loaded_config = None
+
 # Set up Matplotlib style for dark theme plots
 plt.style.use('dark_background')
 plt.rcParams.update({
@@ -1322,64 +1382,13 @@ with tab5:
                 config = get_configuration(selected_config_id)
                 
                 if config:
-                    # Need to use session state to update all sidebar values
-                    st.session_state.n_oscillators = config['n_oscillators']
-                    st.session_state.coupling_strength = config['coupling_strength']
-                    st.session_state.simulation_time = config['simulation_time']
-                    st.session_state.time_step = config['time_step']
-                    st.session_state.random_seed = config['random_seed']
-                    st.session_state.network_type = config['network_type']
-                    st.session_state.freq_type = config['frequency_distribution']
+                    # Store the configuration in a special session state variable
+                    # This will be used on the next rerun to set the widget values
+                    st.session_state.loaded_config = config
                     
-                    # Update frequency distribution parameters
-                    freq_params = config['frequency_params'] if config['frequency_params'] else {}
-                    if config['frequency_distribution'] == "Normal":
-                        st.session_state.freq_mean = freq_params.get('mean', 0.0)
-                        st.session_state.freq_std = freq_params.get('std', 1.0)
-                    elif config['frequency_distribution'] == "Uniform":
-                        st.session_state.freq_min = freq_params.get('min', -1.0)
-                        st.session_state.freq_max = freq_params.get('max', 1.0)
-                    elif config['frequency_distribution'] == "Bimodal":
-                        st.session_state.peak1 = freq_params.get('peak1', -1.0)
-                        st.session_state.peak2 = freq_params.get('peak2', 1.0)
-                    elif config['frequency_distribution'] == "Custom":
-                        st.session_state.custom_freqs = freq_params.get('values', "0.5, 1.0, 1.5")
-                    
-                    # Handling custom adjacency matrix
-                    if config['network_type'] == "Custom Adjacency Matrix" and config['adjacency_matrix'] is not None:
-                        adj_matrix_str = ""
-                        for row in config['adjacency_matrix']:
-                            adj_matrix_str += ", ".join(str(val) for val in row) + "\n"
-                        st.session_state.adj_matrix_input = adj_matrix_str.strip()
-                    
-                    st.success(f"Configuration '{config['name']}' loaded! Refresh the page to apply all settings.")
-                    
-                    # Provide a button to refresh the page
-                    st.markdown("""
-                    <div style="text-align: center; margin-top: 20px;">
-                        <button onclick="window.location.reload();" class="reload-button">
-                            Refresh Page to Apply Settings
-                        </button>
-                    </div>
-                    <style>
-                        .reload-button {
-                            background: linear-gradient(to bottom right, #14a5ff, #7066ff);
-                            color: white;
-                            border: none;
-                            padding: 10px 20px;
-                            border-radius: 8px;
-                            cursor: pointer;
-                            font-weight: bold;
-                            box-shadow: 0 4px 12px rgba(20, 165, 255, 0.4);
-                        }
-                        .reload-button:hover {
-                            background: linear-gradient(to right, #00ffee, #27aaff);
-                            transform: translateY(-2px);
-                            box-shadow: 0 6px 15px rgba(0, 255, 238, 0.5);
-                            transition: all 0.3s ease;
-                        }
-                    </style>
-                    """, unsafe_allow_html=True)
+                    # Show success message and rerun the app to apply the configuration
+                    st.success(f"Configuration '{config['name']}' loaded successfully! Applying settings...")
+                    st.rerun()
                 else:
                     st.error("Failed to load the selected configuration.")
             
@@ -1393,6 +1402,6 @@ with tab5:
                     delete_id = delete_options[config_to_delete]
                     if delete_configuration(delete_id):
                         st.success(f"Configuration deleted successfully.")
-                        st.experimental_rerun()  # Refresh the page to update the list
+                        st.rerun()  # Refresh the page to update the list
                     else:
                         st.error("Failed to delete configuration.")

@@ -420,7 +420,7 @@ with tab1:
     
     # Create custom colormap that matches our gradient_text1 theme for nodes
     custom_cmap = LinearSegmentedColormap.from_list("kuramoto_colors", 
-                                                ["#9933FF", "#FF33FF", "#3366FF"], 
+                                                ["#FF3366", "#FF66AA", "#3366FF"], 
                                                 N=256)
     
     # Sort oscillators by their natural frequency for consistent coloring
@@ -496,12 +496,12 @@ with tab1:
                color='white', fontsize=14, pad=15)
     ax1.set_axis_off()
     
-    # Add a legend explaining node colors with brighter outline - using only purple-magenta-blue
+    # Add a legend explaining node colors with brighter outline - using magenta-orange to pink to blue
     legend_elements = [
         plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=custom_cmap(0.0), 
-                markeredgecolor='#ae56ff', markersize=10, label='Lowest frequency (violet)'),
+                markeredgecolor='#ff6699', markersize=10, label='Lowest frequency (magenta-orange)'),
         plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=custom_cmap(0.5), 
-                markeredgecolor='#ff50ff', markersize=10, label='Medium frequency (magenta)'),
+                markeredgecolor='#ff88cc', markersize=10, label='Medium frequency (pink)'),
         plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=custom_cmap(1.0), 
                 markeredgecolor='#5080ff', markersize=10, label='Highest frequency (blue)')
     ]

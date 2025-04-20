@@ -33,31 +33,138 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Custom CSS
-st.markdown("""
+# Load the image file for background
+try:
+    with open("src/static/images/wisp.jpg", "rb") as f:
+        img_data = f.read()
+        import base64
+        img_base64 = base64.b64encode(img_data).decode()
+        background_image = f"data:image/jpeg;base64,{img_base64}"
+except:
+    # Fallback if image is not found
+    background_image = None
+
+# Comprehensive CSS with inline background image
+st.markdown(f"""
 <style>
 /* Main styling for the entire application */
-body {
+body {{
     font-family: 'Aclonica', sans-serif;
     margin: 0;
     padding: 0;
     color: white;
-}
+}}
 
 /* Adjust Streamlit default elements */
-.stApp {
+.stApp {{
     background-color: #121212;
-}
+    background-image: {f"url('{background_image}')" if background_image else "none"};
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}}
 
-/* Add more CSS as needed */
+/* Gradient text styles */
+.css-1y4p8pa {{
+    max-width: 100% !important;
+}}
+
+/* Main content styling */
+.css-18e3th9 {{
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    padding-left: 5rem;
+    padding-right: 5rem;
+}}
+
+/* Sidebar styling */
+.css-1d391kg {{
+    background-color: rgba(20, 20, 20, 0.8);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-right: 1px solid rgba(80, 80, 80, 0.2);
+}}
+
+/* Custom tabs styling */
+.stTabs [data-baseweb="tab-list"] {{
+    gap: 5px;
+}}
+
+.stTabs [data-baseweb="tab"] {{
+    background-color: rgba(30, 30, 30, 0.6);
+    border-radius: 15px 15px 0px 0px;
+    padding: 5px 20px;
+    color: white;
+    transition: all 0.3s ease;
+}}
+
+.stTabs [data-baseweb="tab-highlight"] {{
+    background: linear-gradient(to right, #00e8ff, #14a5ff, #8138ff);
+    border-radius: 15px 15px 0px 0px;
+    height: 4px;
+}}
+
+.stTabs [data-baseweb="tab-panel"] {{
+    background-color: rgba(30, 30, 30, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 0px 15px 15px 15px;
+    padding: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+}}
+
+/* Custom button styles */
+div.stButton > button:first-child {{
+    background: linear-gradient(45deg, #00e8ff, #14a5ff, #8138ff);
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 15px;
+    padding: 10px 24px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 15px rgba(20, 165, 255, 0.5);
+}}
+
+div.stButton > button:hover {{
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(20, 165, 255, 0.7);
+}}
+
+/* Slider styling */
+[data-testid="stSlider"] [data-baseweb="slider"] [role="slider"] {{
+    background: linear-gradient(to bottom, #00e8ff, #14a5ff, #8138ff);
+    box-shadow: 0 0 10px rgba(20, 165, 255, 0.7);
+}}
+
+[data-testid="stSlider"] [data-baseweb="slider"] div[role="progressbar"] {{
+    background: linear-gradient(to right, #00e8ff, #8138ff);
+}}
+
+/* Make elements more rounded */
+[data-testid="stContainer"],
+[data-testid="stMarkdown"],
+[data-testid="stImage"],
+[data-testid="stText"],
+[data-testid="stButton"],
+[data-testid="stFileUploader"],
+[data-testid="stSelectbox"],
+[data-testid="stTextInput"],
+[data-testid="stNumberInput"],
+[data-testid="stSlider"],
+[data-testid="stCheckbox"] {{
+    border-radius: 15px !important;
+}}
+
+/* Footer styling */
+footer {{
+    visibility: hidden;
+}}
 </style>
 """, unsafe_allow_html=True)
-
-# Load CSS file if it exists
-css_path = "src/static/css/styles.css"
-if os.path.exists(css_path):
-    with open(css_path, "r") as f:
-        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 # App title
 st.title("🌀 Kuramoto Model Simulator")

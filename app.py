@@ -674,25 +674,84 @@ with tab3:
     # Create oscillator visualization
     st.markdown("<h3 class='gradient_text1'>Oscillator Synchronization</h3>", unsafe_allow_html=True)
     
-    # Initialize time_index to 0 (for static visualization if animation doesn't run)
-    time_index = 0
+    # Initialize time_index in session state if not present
+    if 'time_index' not in st.session_state:
+        st.session_state.time_index = 0
     
-    # Centered animation button with custom styling
-    col1, col2, col3 = st.columns([1, 3, 1])
+    # Playback controls layout
+    playback_container = st.container()
     
-    with col1:
-        st.empty()  # Left spacing
+    # Add a slider to manually control visualization time point
+    time_index = playback_container.slider(
+        "Time Point", 
+        min_value=0, 
+        max_value=len(times)-1, 
+        value=st.session_state.time_index,
+        format="t=%.2f" % times[st.session_state.time_index],
+        help="Manually select a specific time point to display"
+    )
+    st.session_state.time_index = time_index
     
-    with col2:
-        animate = st.button("Play Animation", use_container_width=True)
+    # Centered animation controls with custom styling
+    col1, col2, col3, col4, col5 = st.columns([1, 1, 1, 1, 1])
     
-    with col3:
-        st.empty()  # Right spacing
+    # Playback speed control
+    animation_speed = col1.slider(
+        "Speed", 
+        min_value=0.5, 
+        max_value=5.0, 
+        value=3.0, 
+        step=0.5,
+        help="Control how fast the animation plays"
+    )
     
-    # Keep fixed animation speed
-    animation_speed = 3
+    # Previous frame button
+    if col2.button("⏮ Previous", use_container_width=True):
+        if st.session_state.time_index > 0:
+            st.session_state.time_index -= 1
+            st.rerun()
     
-    # Get time and order parameter values
+    # Play Animation button
+    animate = col3.button("▶ Play", use_container_width=True)
+    
+    # Next frame button
+    if col4.button("⏭ Next", use_container_width=True):
+        if st.session_state.time_index < len(times) - 1:
+            st.session_state.time_index += 1
+            st.rerun()
+    
+    # Save simulation button
+    if col5.button("💾 Save", use_container_width=True, type="primary"):
+        # Get frequency parameters based on the selected distribution
+        freq_params = {}
+        if freq_type == "Normal":
+            freq_params = {"mean": freq_mean, "std": freq_std}
+        elif freq_type == "Uniform":
+            freq_params = {"min": freq_min, "max": freq_max}
+        elif freq_type == "Bimodal":
+            freq_params = {"peak1": peak1, "peak2": peak2}
+        elif freq_type == "Custom":
+            freq_params = {"values": custom_freqs}
+        
+        # Save to database
+        sim_id = store_simulation(
+            model=model,
+            times=times,
+            phases=phases,
+            order_parameter=order_parameter,
+            frequencies=frequencies,
+            freq_type=freq_type,
+            freq_params=freq_params,
+            adjacency_matrix=network_adj_matrix
+        )
+        
+        if sim_id:
+            st.success(f"Simulation data saved successfully with ID: {sim_id}")
+            st.info("You can access this data in the Database tab.")
+        else:
+            st.error("Failed to save simulation data.")
+    
+    # Get time and order parameter values for the current time index
     current_time = times[time_index]
     current_r = order_parameter[time_index]
     
@@ -935,8 +994,8 @@ with tab3:
     
     # If animation is triggered
     if animate:
-        # Store current position to return to after animation
-        current_pos = time_index
+        # Get the current time index as the starting point
+        start_idx = st.session_state.time_index
         
         # Calculate how many frames to skip based on speed
         frame_skip = max(1, int(11 - animation_speed))
@@ -945,9 +1004,12 @@ with tab3:
         progress_bar = st.progress(0)
         
         # Animation loop
-        for i in range(0, len(times), frame_skip):
+        for i in range(start_idx, len(times), frame_skip):
+            # Update the session state
+            st.session_state.time_index = i
+            
             # Update progress bar
-            progress = i / (len(times) - 1)
+            progress = (i - start_idx) / (len(times) - 1 - start_idx) if i < len(times) - 1 else 1.0
             progress_bar.progress(progress)
             
             # Update all three plots

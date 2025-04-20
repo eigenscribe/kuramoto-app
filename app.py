@@ -864,9 +864,9 @@ with tab3:
         for y in np.linspace(0, 1, 6):
             ax.axhspan(y-0.05, y+0.05, color='#222233', alpha=0.3, zorder=0)
         
-        # Create a custom colormap that matches gradient_text2
+        # Create a custom colormap that matches the blue gradient used in the sidebar
         cmap = LinearSegmentedColormap.from_list("order_param", 
-                                             ["#00ffee", "#27aaff"], 
+                                             ["#00e8ff", "#14b5ff", "#3a98ff", "#0070eb"], 
                                              N=256)
         
         # Plot order parameter with filled gradient dots
@@ -903,8 +903,7 @@ with tab3:
         # Create custom grid
         ax.grid(True, color='#333333', alpha=0.5, linestyle=':')
         
-        # Add legend
-        ax.legend(loc='upper right', framealpha=0.7)
+        # Legend removed as requested
         
         # Add subtle box around the plot
         for spine in ax.spines.values():

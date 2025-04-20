@@ -480,10 +480,22 @@ with tab1:
         b = min(255, int(b * 1.5))
         bright_node_colors.append(f"#{r:02x}{g:02x}{b:02x}")
     
+    # Add enhanced two-layer glow effect for each node
+    for i, (x, y) in enumerate(pos.values()):
+        # Outer glow (larger, more subtle)
+        outer_glow = plt.Circle((x, y), node_size/5000, fill=True, 
+                           color=node_colors[i], alpha=0.2, zorder=6)
+        ax1.add_patch(outer_glow)
+        
+        # Inner glow (smaller, more vibrant)
+        inner_glow = plt.Circle((x, y), node_size/8000, fill=True, 
+                           color=node_colors[i], alpha=0.3, zorder=7)
+        ax1.add_patch(inner_glow)
+    
     nodes = nx.draw_networkx_nodes(G, pos, ax=ax1, 
                                node_color=node_colors, 
                                node_size=node_size, alpha=0.9, 
-                               edgecolors=bright_node_colors, linewidths=1.0)
+                               edgecolors=bright_node_colors, linewidths=1.5)
     
     # Add node labels only if there are relatively few nodes
     if n_oscillators <= 15:

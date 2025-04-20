@@ -437,6 +437,28 @@ button:hover {
     border-radius: 13px;
 }
 
+/* Selectbox labels */
+.stSelectbox label {
+    background: linear-gradient(to right, #ffcc88, #ff8855, #ff6633) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
+    font-weight: bold !important;
+    letter-spacing: 0.2px !important;
+}
+
+/* Apply green gradient to sidebar selectbox labels */
+.sidebar .stSelectbox label {
+    background: linear-gradient(to right, #66ffaa, #33cc77, #22aa55) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
+    font-weight: bold !important;
+    letter-spacing: 0.2px !important;
+}
+
 /* Improve number input appearance for all inputs */
 .stNumberInput > div > div > input {
     border-radius: 15px;
@@ -450,6 +472,17 @@ button:hover {
 /* Apply orange-pink gradient to number input labels - lighter */
 .stNumberInput label {
     background: linear-gradient(to right, #ffcc88, #ff8855, #ff6633) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
+    font-weight: bold !important;
+    letter-spacing: 0.2px !important;
+}
+
+/* Apply green gradient to sidebar number input labels */
+.sidebar .stNumberInput label {
+    background: linear-gradient(to right, #66ffaa, #33cc77, #22aa55) !important;
     -webkit-background-clip: text !important;
     background-clip: text !important;
     -webkit-text-fill-color: transparent !important;

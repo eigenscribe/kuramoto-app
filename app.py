@@ -1195,28 +1195,30 @@ with tab3:
         for i, idx in enumerate(sorted_indices):
             oscillator_colors[idx] = colors[i]
         
-        # Enhanced scatter plot with oscillator colors and cool effects
-        # Create brighter versions of the colors for outlines and glow
+        # Enhanced scatter plot with oscillator colors - with reduced glow effect
+        # Create slightly brighter versions of the colors for outlines and glow
         bright_oscillator_colors = np.copy(oscillator_colors)
         for i in range(len(bright_oscillator_colors)):
-            # Make RGB values brighter (closer to white) but preserve alpha
-            bright_oscillator_colors[i, :3] = np.minimum(1.0, bright_oscillator_colors[i, :3] * 1.7)  # 70% brighter
+            # Make RGB values brighter (closer to white) but preserve alpha - reduced from 1.7 to 1.3
+            bright_oscillator_colors[i, :3] = np.minimum(1.0, bright_oscillator_colors[i, :3] * 1.3)  # 30% brighter
         
-        # First add a larger glow effect for each oscillator
+        # First add a smaller glow effect for each oscillator
         for i in range(n_oscillators):
-            glow = plt.Circle((x[i], y[i]), 0.11, fill=True, 
-                          color=oscillator_colors[i], alpha=0.3, zorder=7)
+            # Reduced size from 0.11 to 0.07 and alpha from 0.3 to 0.2
+            glow = plt.Circle((x[i], y[i]), 0.07, fill=True, 
+                          color=oscillator_colors[i], alpha=0.2, zorder=7)
             ax_circle.add_patch(glow)
             
-        # Add a subtle pulse effect with secondary glow
+        # Add a subtle pulse effect with smaller secondary glow (or remove if too much)
         for i in range(n_oscillators):
-            second_glow = plt.Circle((x[i], y[i]), 0.14, fill=True, 
-                               color=bright_oscillator_colors[i], alpha=0.15, zorder=6)
+            # Reduced size from 0.14 to 0.09 and alpha from 0.15 to 0.1
+            second_glow = plt.Circle((x[i], y[i]), 0.09, fill=True, 
+                               color=bright_oscillator_colors[i], alpha=0.1, zorder=6)
             ax_circle.add_patch(second_glow)
         
-        # Use custom edge colors and increased size for main points
-        sc = ax_circle.scatter(x, y, facecolors=oscillator_colors, edgecolors=bright_oscillator_colors, s=200, 
-                         alpha=0.9, linewidth=1.5, zorder=10)
+        # Use custom edge colors and increased size for main points - slightly smaller
+        sc = ax_circle.scatter(x, y, facecolors=oscillator_colors, edgecolors=bright_oscillator_colors, s=180, 
+                         alpha=0.9, linewidth=1.3, zorder=10)
         
         # Calculate and show order parameter
         r = order_parameter[time_idx]

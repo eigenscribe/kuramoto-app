@@ -1573,27 +1573,27 @@ with tab3:
     # Set a fixed animation speed value
     animation_speed = 3.0  # Fixed moderate animation speed
     
-    # Previous frame button
-    if col1.button("⏪ Previous", use_container_width=True):
+    # Previous frame button with smaller text
+    if col1.button("⏮️ <span style='font-size:13px;'>Previous</span>", use_container_width=True):
         if st.session_state.time_index > 0:
             st.session_state.time_index -= 1
             st.rerun()
     
-    # Simplified Play/Pause button with text inside
-    play_button_text = "⏯️ Play"
+    # Simplified Play/Pause button with text inside and consistent style
+    play_button_text = "⏯️ <span style='font-size:13px;'>Play</span>"
     if col2.button(play_button_text, use_container_width=True):
         # Toggle animation state
         animate = True
         # Let the animation code run
     
-    # Next frame button
-    if col3.button("⏩ Next", use_container_width=True):
+    # Next frame button with smaller text
+    if col3.button("⏭️ <span style='font-size:13px;'>Next</span>", use_container_width=True):
         if st.session_state.time_index < len(times) - 1:
             st.session_state.time_index += 1
             st.rerun()
     
-    # Save simulation button
-    if col4.button("💾 Save", use_container_width=True, type="primary"):
+    # Save simulation button with smaller text
+    if col4.button("💾 <span style='font-size:13px;'>Save</span>", use_container_width=True, type="primary"):
         # Get frequency parameters based on the selected distribution
         freq_params = {}
         if freq_type == "Normal":

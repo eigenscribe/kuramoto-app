@@ -465,6 +465,35 @@ if network_type == "Custom Adjacency Matrix":
                     print("Network refresh requested via button")
                     st.rerun()
                 
+                # Add save preset button and input field
+                with st.sidebar.expander("Save as Preset"):
+                    preset_name = st.text_input("Preset Name", key="preset_name", 
+                                             placeholder="Enter a name for this matrix")
+                    if st.button("Save Preset", key="save_preset_btn"):
+                        if preset_name:
+                            # Save the configuration with current parameters
+                            config_id = save_configuration(
+                                name=preset_name,
+                                n_oscillators=adj_matrix.shape[0],
+                                coupling_strength=coupling_strength,
+                                simulation_time=simulation_time,
+                                time_step=time_step,
+                                random_seed=random_seed,
+                                network_type="Custom Adjacency Matrix",
+                                frequency_distribution=freq_type,
+                                frequency_params=json.dumps({
+                                    "mean": float(freq_mean) if 'freq_mean' in locals() else 0.0,
+                                    "std": float(freq_std) if 'freq_std' in locals() else 1.0,
+                                    "min": float(freq_min) if 'freq_min' in locals() else -1.0,
+                                    "max": float(freq_max) if 'freq_max' in locals() else 1.0
+                                }),
+                                adjacency_matrix=adj_matrix
+                            )
+                            st.success(f"Saved preset '{preset_name}' successfully!")
+                            print(f"Saved matrix preset: '{preset_name}' with shape {adj_matrix.shape}")
+                        else:
+                            st.error("Please enter a preset name")
+                
             # Store in session state for persistence
             st.session_state.loaded_adj_matrix = adj_matrix
             print(f"Updated adjacency matrix in session state with shape {adj_matrix.shape}")
@@ -691,6 +720,27 @@ with tab1:
     if network_type_internal == "Nearest Neighbor":
         # Circular layout for nearest neighbor (ring)
         pos = nx.circular_layout(G)
+    # Special case for the Etz Hayim (Tree of Life) matrix - 10x10 matrix with specific structure
+    elif network_type_internal == "Custom Adjacency Matrix" and network_adj_matrix.shape[0] == 10 and np.count_nonzero(network_adj_matrix) >= 40:
+        # This appears to be our special Etz Hayim matrix - use a custom tree-like layout
+        # Create a dictionary with fixed positions for this specific matrix
+        # These positions follow a traditional Sephirotic tree arrangement
+        fixed_positions = {
+            0: (0.0, 0.75),    # Keter (Crown) - top position
+            1: (-0.5, 0.5),    # Chokhmah (Wisdom) - upper right
+            2: (0.5, 0.5),     # Binah (Understanding) - upper left
+            3: (-0.6, 0.0),    # Chesed (Kindness) - middle right
+            4: (0.6, 0.0),     # Gevurah (Strength) - middle left
+            5: (0.0, 0.0),     # Tiferet (Beauty) - center
+            6: (-0.5, -0.5),   # Netzach (Victory) - lower right
+            7: (0.5, -0.5),    # Hod (Splendor) - lower left
+            8: (0.0, -0.5),    # Yesod (Foundation) - bottom center
+            9: (0.0, -0.75)    # Malkhut (Kingdom) - bottom
+        }
+        pos = fixed_positions
+        
+        # Add a note that we're using the special layout
+        st.info("Using special 'Etz Hayim' (Tree of Life) layout for this adjacency matrix.")
     elif n_oscillators <= 20:
         # Spring layout for smaller networks
         pos = nx.spring_layout(G, seed=random_seed)
@@ -820,16 +870,42 @@ with tab1:
     # Display the figure
     st.pyplot(fig)
     
-    st.markdown("""
-    <div class='section'>
-        <p>The network visualization shows:</p>
-        <ul>
-            <li><b>Left:</b> Graph representation of oscillator connections, with nodes colored by natural frequency</li>
-            <li><b>Right:</b> Adjacency matrix representation, where each cell (i,j) represents the connection strength between oscillators</li>
-        </ul>
-        <p>The structure of this network affects how synchronization patterns emerge and propagate through the system.</p>
-    </div>
-    """, unsafe_allow_html=True)
+    # Special description for Etz Hayim matrix
+    if network_type_internal == "Custom Adjacency Matrix" and network_adj_matrix.shape[0] == 10 and np.count_nonzero(network_adj_matrix) >= 40:
+        st.markdown("""
+        <div class='section'>
+            <p>The network visualization shows the <b>Etz Hayim</b> (Tree of Life) configuration:</p>
+            <ul>
+                <li><b>Left:</b> Graph representing the ten Sephirot (emanations) in the Kabbalistic Tree of Life, arranged in their traditional positions</li>
+                <li><b>Right:</b> Adjacency matrix showing the 22 paths connecting the Sephirot</li>
+            </ul>
+            <p>The nodes represent (from top to bottom, right to left):</p>
+            <ol>
+                <li>Keter (Crown) - Will and the origin of divine revelation</li>
+                <li>Chokhmah (Wisdom) - Beginning of conscious thought</li>
+                <li>Binah (Understanding) - Processing and understanding</li>
+                <li>Chesed (Kindness) - Expansion, loving kindness</li>
+                <li>Gevurah (Strength) - Restriction, judgment and discipline</li>
+                <li>Tiferet (Beauty) - Harmony, balance, integration</li>
+                <li>Netzach (Victory) - Endurance and overcoming</li>
+                <li>Hod (Splendor) - Surrender, sincerity, and gratitude</li>
+                <li>Yesod (Foundation) - Connection and bonding force</li>
+                <li>Malkhut (Kingdom) - Physical manifestation and action</li>
+            </ol>
+            <p>This structure offers a fascinating system to study synchronization patterns across interconnected oscillators.</p>
+        </div>
+        """, unsafe_allow_html=True)
+    else:
+        st.markdown("""
+        <div class='section'>
+            <p>The network visualization shows:</p>
+            <ul>
+                <li><b>Left:</b> Graph representation of oscillator connections, with nodes colored by natural frequency</li>
+                <li><b>Right:</b> Adjacency matrix representation, where each cell (i,j) represents the connection strength between oscillators</li>
+            </ul>
+            <p>The structure of this network affects how synchronization patterns emerge and propagate through the system.</p>
+        </div>
+        """, unsafe_allow_html=True)
 
 ########################
 # TAB 2: DISTRIBUTIONS TAB

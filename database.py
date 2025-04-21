@@ -2,13 +2,21 @@
 Database module for the Kuramoto Model Simulator.
 This module provides functionality to store and retrieve simulation data,
 as well as import/export configurations as JSON files.
+
+Enhanced with machine learning support for:
+- Dataset generation and export
+- Feature extraction for neural networks
+- Batch simulation processing
+- Time series analysis
 """
 
 import os
 import numpy as np
 import json
+import pickle
+import pandas as pd
 from datetime import datetime
-from sqlalchemy import create_engine, Column, Integer, Float, String, DateTime, LargeBinary, ForeignKey, Text
+from sqlalchemy import create_engine, Column, Integer, Float, String, DateTime, LargeBinary, ForeignKey, Text, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 
@@ -120,6 +128,60 @@ class Configuration(Base):
     
     def __repr__(self):
         return f"<Configuration(id={self.id}, name='{self.name}')>"
+
+
+class MLDataset(Base):
+    """Model representing a ML-ready dataset composed of multiple simulations."""
+    __tablename__ = "ml_datasets"
+    
+    id = Column(Integer, primary_key=True)
+    name = Column(String(100), nullable=False, unique=True)
+    timestamp = Column(DateTime, default=datetime.now)
+    description = Column(Text, nullable=True)
+    feature_type = Column(String(50))  # e.g., 'time_series', 'graph', 'spectral'
+    target_type = Column(String(50))   # e.g., 'classification', 'regression', 'forecasting'
+    preprocessing = Column(Text)      # JSON string of preprocessing steps
+    
+    # Relationships
+    simulations = relationship("MLDatasetSimulation", back_populates="dataset", cascade="all, delete-orphan")
+    features = relationship("MLFeature", back_populates="dataset", cascade="all, delete-orphan")
+    
+    def __repr__(self):
+        return f"<MLDataset(id={self.id}, name='{self.name}', type='{self.feature_type}')>"
+
+
+class MLDatasetSimulation(Base):
+    """Model representing a simulation included in an ML dataset."""
+    __tablename__ = "ml_dataset_simulations"
+    
+    id = Column(Integer, primary_key=True)
+    dataset_id = Column(Integer, ForeignKey("ml_datasets.id"))
+    simulation_id = Column(Integer, ForeignKey("simulations.id"))
+    split = Column(String(20))  # 'train', 'validation', 'test'
+    
+    # Relationships
+    dataset = relationship("MLDataset", back_populates="simulations")
+    
+    def __repr__(self):
+        return f"<MLDatasetSimulation(dataset_id={self.dataset_id}, simulation_id={self.simulation_id}, split='{self.split}')>"
+
+
+class MLFeature(Base):
+    """Model representing features extracted from simulations for ML."""
+    __tablename__ = "ml_features"
+    
+    id = Column(Integer, primary_key=True)
+    dataset_id = Column(Integer, ForeignKey("ml_datasets.id"))
+    name = Column(String(100))
+    description = Column(Text, nullable=True)
+    data = Column(LargeBinary)  # Pickled numpy array or pandas dataframe
+    feature_type = Column(String(50))  # 'input', 'target', 'metadata'
+    
+    # Relationships
+    dataset = relationship("MLDataset", back_populates="features")
+    
+    def __repr__(self):
+        return f"<MLFeature(id={self.id}, name='{self.name}', type='{self.feature_type}')>"
 
 # Create all tables
 Base.metadata.create_all(engine)

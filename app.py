@@ -691,6 +691,155 @@ if network_type == "Custom Adjacency Matrix":
             print(f"Input was: '{adj_matrix_input}'")
             adj_matrix = None
 
+# Add JSON Parameter Import Section to sidebar
+st.sidebar.markdown("<h3 class='gradient_text1'>JSON Configuration</h3>", unsafe_allow_html=True)
+
+# Display a brief explanation
+st.sidebar.markdown("""
+Import parameters via JSON format. This allows you to save and load complex configurations, including custom adjacency matrices.
+""")
+
+# Initialize session state for JSON example if not present
+if 'json_example' not in st.session_state:
+    st.session_state.json_example = ""
+
+# Add a collapsible section with examples
+with st.sidebar.expander("JSON Format Examples", expanded=False):
+    example_json = {
+        "n_oscillators": 10,
+        "coupling_strength": 1.0,
+        "network_type": "All-to-All", 
+        "simulation_time": 10.0,
+        "time_step": 0.1,
+        "random_seed": 42,
+        "frequency_distribution": "Normal",
+        "frequency_parameters": {
+            "mean": 0.0,
+            "std": 0.2
+        }
+    }
+    
+    st.code(json.dumps(example_json, indent=2), language="json")
+    
+    st.markdown("""
+    **Parameter Details:**
+    - **n_oscillators**: Number of oscillators (integer)
+    - **coupling_strength**: Coupling strength K parameter (float)
+    - **network_type**: "All-to-All", "Nearest Neighbor", "Random", "Custom Adjacency Matrix"
+    - **simulation_time**: Total time to simulate (float)
+    - **time_step**: Time step for integration (float)
+    - **random_seed**: Seed for random number generation (integer)
+    - **frequency_distribution**: "Normal", "Uniform", "Custom", "Golden Ratio"
+    - **frequency_parameters**: Parameters specific to the chosen distribution
+    - **adjacency_matrix**: (Optional) 2D array representing network connectivity
+    """)
+    
+    # Add small-world network example
+    st.markdown("**Small-world network example:**")
+    
+    # Generate a sample small-world network
+    n = 10
+    sample_matrix = np.zeros((n, n))
+    for i in range(n):
+        # Connect to neighbors
+        for j in range(1, 3):
+            sample_matrix[i, (i+j) % n] = 1
+            sample_matrix[i, (i-j) % n] = 1
+            
+    # Add a few random long-range connections
+    np.random.seed(42)
+    for _ in range(5):
+        i = np.random.randint(0, n)
+        j = np.random.randint(0, n)
+        if i != j and sample_matrix[i, j] == 0:
+            sample_matrix[i, j] = 1
+            sample_matrix[j, i] = 1
+            
+    # Create example with matrix
+    complex_example = {
+        "n_oscillators": n,
+        "coupling_strength": 0.8,
+        "network_type": "Custom Adjacency Matrix",
+        "simulation_time": 20.0,
+        "time_step": 0.05,
+        "random_seed": 42,
+        "frequency_distribution": "Normal",
+        "frequency_parameters": {
+            "mean": 0.0,
+            "std": 0.1
+        },
+        "adjacency_matrix": sample_matrix.tolist()
+    }
+    
+    # Add button to use this example
+    if st.button("Use Small-World Example"):
+        st.session_state.json_example = json.dumps(complex_example, indent=2)
+        st.rerun()
+
+# Display text area for JSON input
+json_input = st.sidebar.text_area(
+    "JSON Parameters",
+    value=st.session_state.json_example,
+    height=150,
+    placeholder='Paste your JSON configuration here...',
+    help="Enter a valid JSON configuration for the Kuramoto simulation"
+)
+
+# Add import button and logic
+if st.sidebar.button("Import Parameters", key="sidebar_import_json_button"):
+    if json_input.strip():
+        try:
+            # Parse the JSON input
+            params, error = parse_json_parameters(json_input)
+            
+            if error:
+                st.sidebar.error(f"Error parsing JSON: {error}")
+            else:
+                # Update session state with the parsed parameters
+                if params is not None:
+                    st.session_state.n_oscillators = params["n_oscillators"]
+                    st.session_state.coupling_strength = params["coupling_strength"]
+                    st.session_state.network_type = params["network_type"]
+                    st.session_state.simulation_time = params["simulation_time"]
+                    st.session_state.time_step = params["time_step"]
+                    st.session_state.random_seed = params["random_seed"]
+                    st.session_state.freq_type = params["frequency_distribution"]
+                    
+                    # Update frequency parameters based on distribution type
+                    if params["frequency_distribution"] == "Normal":
+                        st.session_state.freq_mean = params["frequency_parameters"]["mean"]
+                        st.session_state.freq_std = params["frequency_parameters"]["std"]
+                    elif params["frequency_distribution"] == "Uniform":
+                        st.session_state.freq_min = params["frequency_parameters"]["min"]
+                        st.session_state.freq_max = params["frequency_parameters"]["max"]
+                    elif params["frequency_distribution"] == "Custom" and "custom_values" in params["frequency_parameters"]:
+                        st.session_state.custom_freqs = ", ".join(str(x) for x in params["frequency_parameters"]["custom_values"])
+                    
+                    # Handle custom adjacency matrix if present
+                    if params["adjacency_matrix"] is not None:
+                        matrix = params["adjacency_matrix"]
+                        
+                        # Convert matrix to string representation for the text area
+                        matrix_str = ""
+                        for row in matrix:
+                            matrix_str += ", ".join(str(val) for val in row) + "\n"
+                        
+                        # Update session state for adjacency matrix
+                        st.session_state.adj_matrix_input = matrix_str.strip()
+                        st.session_state.loaded_adj_matrix = matrix
+                    
+                    # Show success message
+                    st.sidebar.success("Parameters imported successfully!")
+                    
+                    # Rerun the app to apply the changes
+                    st.rerun()
+                else:
+                    st.sidebar.error("Failed to parse JSON parameters. Please check your input format.")
+        except Exception as e:
+            st.sidebar.error(f"Error processing parameters: {str(e)}")
+    else:
+        st.sidebar.warning("Please enter JSON configuration before importing.")
+
 # Create tabs for different visualizations (Network is default tab)
 tab1, tab2, tab3 = st.tabs(["Network", "Distributions", "Animation"])
 

@@ -23,6 +23,7 @@ def parse_json_parameters(json_string):
         "network_type": "All-to-All", 
         "simulation_time": 10.0,
         "time_step": 0.1,
+        "auto_optimize": true, (optional)
         "random_seed": 42,
         "frequency_distribution": "Normal",
         "frequency_parameters": {
@@ -46,6 +47,7 @@ def parse_json_parameters(json_string):
             "network_type": "All-to-All",
             "simulation_time": 10.0,
             "time_step": 0.1,
+            "auto_optimize": False,
             "random_seed": 42,
             "frequency_distribution": "Normal",
             "frequency_parameters": {
@@ -73,11 +75,14 @@ def parse_json_parameters(json_string):
         if "time_step" in params:
             result["time_step"] = float(params["time_step"])
             
+        if "auto_optimize" in params:
+            result["auto_optimize"] = bool(params["auto_optimize"])
+            
         if "random_seed" in params:
             result["random_seed"] = int(params["random_seed"])
             
         if "frequency_distribution" in params:
-            valid_distributions = ["Normal", "Uniform", "Custom", "Golden Ratio"]
+            valid_distributions = ["Normal", "Uniform", "Custom", "Golden Ratio", "Bimodal"]
             if params["frequency_distribution"] in valid_distributions:
                 result["frequency_distribution"] = params["frequency_distribution"]
             
@@ -287,7 +292,10 @@ st.markdown(f"""
 # Title
 st.markdown("<h1 class='gradient_text1'>Kuramoto Model Simulator</h1>", unsafe_allow_html=True)
 
-# Add JSON Parameter Import Section at the top of the sidebar
+# Create main sidebar parameters header at the top
+st.sidebar.markdown("<h2 class='gradient_text1'>Simulation Parameters</h2>", unsafe_allow_html=True)
+
+# Add JSON Parameter Import Section
 st.sidebar.markdown("<h3 class='gradient_text1'>JSON Configuration</h3>", unsafe_allow_html=True)
 
 # Initialize session state for JSON example if not present
@@ -311,6 +319,7 @@ with st.sidebar.expander("Examples", expanded=False):
         "network_type": "All-to-All", 
         "simulation_time": 10.0,
         "time_step": 0.1,
+        "auto_optimize": True,
         "random_seed": 42,
         "frequency_distribution": "Normal",
         "frequency_parameters": {
@@ -349,6 +358,7 @@ with st.sidebar.expander("Examples", expanded=False):
         "network_type": "Custom Adjacency Matrix",
         "simulation_time": 20.0,
         "time_step": 0.05,
+        "auto_optimize": True,
         "random_seed": 42,
         "frequency_distribution": "Normal",
         "frequency_parameters": {
@@ -358,8 +368,8 @@ with st.sidebar.expander("Examples", expanded=False):
         "adjacency_matrix": sample_matrix.tolist()
     }
     
-    # Add button to use this example
-    if st.button("Use Small-World Example"):
+    # Add button to use this example - with smaller text
+    if st.button("Use Small-World", key="small_world_btn"):
         st.session_state.json_example = json.dumps(complex_example, indent=2)
         st.rerun()
 
@@ -418,11 +428,11 @@ if st.sidebar.button("Import Parameters", key="sidebar_import_json_button"):
     else:
         st.sidebar.warning("Please enter JSON configuration before importing.")
 
-# Add separator before simulation parameters
+# Add separator before individual parameters
 st.sidebar.markdown("<hr style='margin: 15px 0px; border-color: rgba(255,255,255,0.2);'>", unsafe_allow_html=True)
 
-# Create sidebar with parameters
-st.sidebar.markdown("<h3 class='gradient_text1'>Simulation Parameters</h3>", unsafe_allow_html=True)
+# Create subheading for manual parameters
+st.sidebar.markdown("<h3 class='gradient_text1'>Manual Configuration</h3>", unsafe_allow_html=True)
 
 # Initialize session state for parameters if they don't exist
 if 'n_oscillators' not in st.session_state:

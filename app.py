@@ -1072,11 +1072,14 @@ with tab2:
     # Add the distribution histograms
     dist_col1, dist_col2 = st.columns(2)
     
+    # Define a consistent figure size for both histograms
+    hist_figsize = (4.0, 3.0)
+    
     with dist_col1:
         st.markdown("<h4 class='gradient_text2'>Natural Frequency Distribution</h4>", unsafe_allow_html=True)
         
         # Create frequency distribution histogram
-        fig_freq, ax_freq = plt.subplots(figsize=(3.5, 2.5))
+        fig_freq, ax_freq = plt.subplots(figsize=hist_figsize)
         
         # Use a gradient colormap for the histogram
         n_bins = 15
@@ -1152,8 +1155,8 @@ with tab2:
     with dist_col2:
         st.markdown("<h4 class='gradient_text2'>Initial Phase Distribution</h4>", unsafe_allow_html=True)
         
-        # Create initial phase distribution histogram
-        fig_init_phase, ax_init_phase = plt.subplots(figsize=(3.5, 2.5))
+        # Create initial phase distribution histogram with matching size
+        fig_init_phase, ax_init_phase = plt.subplots(figsize=hist_figsize)
         
         initial_phases = phases[:, 0] % (2 * np.pi)
         
@@ -1201,11 +1204,10 @@ with tab2:
         initial_r = order_parameter[0]
         initial_psi = np.angle(np.sum(np.exp(1j * initial_phases))) % (2 * np.pi)
         
-        # Add mean phase marker if order parameter is significant
-        if initial_r > 0.3:
-            ax_init_phase.axvline(x=initial_psi, color='#ff5555', linestyle='-', linewidth=2, alpha=0.7,
-                               label=f'Mean Phase: {initial_psi:.2f}')
-            ax_init_phase.legend(framealpha=0.7)
+        # Always add mean phase marker with red vertical line
+        ax_init_phase.axvline(x=initial_psi, color='#ff5555', linestyle='-', linewidth=2, alpha=0.7,
+                           label=f'Mean Phase: {initial_psi:.2f}')
+        ax_init_phase.legend(framealpha=0.7)
         
         # Customize grid
         ax_init_phase.grid(True, color='#333333', alpha=0.4, linestyle=':')

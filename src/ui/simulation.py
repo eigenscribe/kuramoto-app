@@ -82,8 +82,15 @@ def display_simulation_results(model, times, phases, order_parameter, n_oscillat
     mean_phases = np.mean(phases_unwrapped, axis=1)
     
     # Calculate the synchronized frequency
-    if len(times) > 1:
-        sync_frequency = np.mean(np.diff(mean_phases) / np.diff(times))
+    if len(times) > 1 and len(mean_phases) > 1:
+        # Make sure arrays have the same shape
+        min_len = min(len(mean_phases), len(times))
+        if min_len > 1:
+            phase_diff = np.diff(mean_phases[:min_len])
+            time_diff = np.diff(times[:min_len])
+            sync_frequency = np.mean(phase_diff / time_diff)
+        else:
+            sync_frequency = 0.0
     else:
         sync_frequency = 0.0
     

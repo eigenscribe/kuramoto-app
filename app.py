@@ -139,12 +139,12 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Load custom CSS
-with open("styles.css") as f:
+with open("static/css/styles.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 # Get the base64 encoded image
 import base64
-with open("wisp.base64", "r") as f:
+with open("static/images/wisp.base64", "r") as f:
     encoded_image = f.read()
 
 # Add custom background and custom font
@@ -2130,7 +2130,7 @@ with tab6:
     """, unsafe_allow_html=True)
     
     # Import ML helper functions
-    from ml_helper import (
+    from src.utils.ml_helper import (
         create_critical_coupling_dataset,
         create_network_topology_dataset,
         visualize_dataset,
@@ -2381,7 +2381,7 @@ with tab6:
                                     st.success(f"Dataset exported for PyTorch: {export_path}")
                                 else:
                                     # For other formats, use the general export function
-                                    from database import export_ml_dataset
+                                    from src.utils.database import export_ml_dataset
                                     format_map = {
                                         "NumPy": "numpy",
                                         "Pandas CSV": "pandas"
@@ -2453,7 +2453,7 @@ with tab6:
                 vis_dataset_id = int(vis_selected_dataset.split("ID: ")[1].split(" -")[0])
                 
                 # Get dataset details
-                from database import get_ml_dataset
+                from src.utils.database import get_ml_dataset
                 dataset_details = get_ml_dataset(vis_dataset_id)
                 
                 if dataset_details:

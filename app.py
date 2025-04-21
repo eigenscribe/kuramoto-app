@@ -360,11 +360,16 @@ if time_step_col1.button("🧠 Optimize", help="Automatically calculate optimal 
     # Get the optimization results
     optimization_results = temp_model.compute_optimal_time_step(safety_factor=0.85)
     
-    # Update the time step in the session state
-    st.session_state.time_step = optimization_results['optimal_time_step']
+    # Store the optimized time step in a different session state variable
+    # Rather than directly changing the slider's value
+    st.session_state.optimized_time_step = optimization_results['optimal_time_step']
     
     # Display a success message with the explanation
-    st.sidebar.success(f"Time step optimized to {optimization_results['optimal_time_step']:.4f}")
+    st.sidebar.success(f"""
+    Time step optimized to {optimization_results['optimal_time_step']:.4f}
+    
+    Please manually set this value in the Time Step slider above.
+    """)
     
     # Display detailed optimization information in an expander
     with st.sidebar.expander("Optimization Details"):
@@ -376,8 +381,7 @@ if time_step_col1.button("🧠 Optimize", help="Automatically calculate optimal 
         {optimization_results['explanation']}
         """)
     
-    # Force page refresh to update the slider value
-    st.rerun()
+    # We don't rerun because we can't automatically update the slider widget
 
 # Add checkbox in column 2 to always auto-optimize on simulation run
 if "auto_optimize_on_run" not in st.session_state:
@@ -734,7 +738,11 @@ model, times, phases, order_parameter, optimized_time_step = run_simulation(
 
 # If time step was optimized during simulation, display a note
 if optimized_time_step is not None:
-    st.sidebar.info(f"Time step was automatically optimized to {optimized_time_step:.4f}")
+    st.sidebar.info(f"""
+    Time step was automatically optimized to {optimized_time_step:.4f}
+    
+    You can manually set this value in the Time Step slider for future runs.
+    """)
 
 ########################
 # TAB 1: NETWORK TAB

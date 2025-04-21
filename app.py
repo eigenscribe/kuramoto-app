@@ -340,6 +340,12 @@ if time_step_col1.button("🧠 Optimize", help="Automatically calculate optimal 
     # Need to get the random seed value from session state before using it
     current_random_seed = st.session_state.random_seed if "random_seed" in st.session_state else 42
     
+    # Check for adjacency matrix in session state
+    adjacency_matrix_for_optimization = None
+    if 'loaded_adj_matrix' in st.session_state:
+        adjacency_matrix_for_optimization = st.session_state.loaded_adj_matrix
+        print(f"Using adjacency matrix from session state for optimization, shape: {adjacency_matrix_for_optimization.shape if hasattr(adjacency_matrix_for_optimization, 'shape') else 'unknown'}")
+    
     # Create a temporary model to calculate optimal time step
     temp_model = KuramotoModel(
         n_oscillators=n_oscillators,
@@ -348,7 +354,7 @@ if time_step_col1.button("🧠 Optimize", help="Automatically calculate optimal 
         simulation_time=simulation_time,
         time_step=time_step,
         random_seed=current_random_seed,
-        adjacency_matrix=adj_matrix
+        adjacency_matrix=adjacency_matrix_for_optimization
     )
     
     # Get the optimization results

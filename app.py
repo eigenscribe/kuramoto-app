@@ -8,11 +8,17 @@ from matplotlib.colors import LinearSegmentedColormap
 from io import BytesIO
 import base64
 import json
-from kuramoto_model import KuramotoModel
 import time
-from database import (store_simulation, get_simulation, list_simulations, delete_simulation,
-                  save_configuration, list_configurations, get_configuration, delete_configuration,
-                  get_configuration_by_name, export_configuration_to_json, import_configuration_from_json)
+
+# Import Kuramoto model
+from src.models.kuramoto_model import KuramotoModel
+
+# Import database utilities
+from src.utils.database import (
+    store_simulation, get_simulation, list_simulations, delete_simulation,
+    save_configuration, list_configurations, get_configuration, delete_configuration,
+    get_configuration_by_name, export_configuration_to_json, import_configuration_from_json
+)
 
 # Initialize session state for configuration loading
 if 'loaded_config' not in st.session_state:

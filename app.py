@@ -210,8 +210,7 @@ if 'simulation_time' not in st.session_state:
     st.session_state.simulation_time = 20.0
 if 'time_step' not in st.session_state:
     st.session_state.time_step = 0.05
-if 'random_seed' not in st.session_state:
-    st.session_state.random_seed = int(42)
+# random_seed is now initialized directly in the widget section
 if 'network_type' not in st.session_state:
     st.session_state.network_type = "All-to-All"
 if 'adj_matrix_input' not in st.session_state:
@@ -332,10 +331,13 @@ time_step = st.sidebar.slider(
 )
 
 # Initialize model with specified parameters
+# Use session state to prevent warnings about duplicate initialization
+if "random_seed" not in st.session_state:
+    st.session_state.random_seed = 42
+
 random_seed = int(st.sidebar.number_input(
     "Random Seed", 
     min_value=0,
-    value=42,
     step=1,
     help="Seed for reproducibility",
     key="random_seed"

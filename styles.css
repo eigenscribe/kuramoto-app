@@ -27,9 +27,14 @@ body {
     align-items: center;
 }
 
-/* Center all paragraphs and text elements */
-p, div, h1, h2, h3, h4, h5, h6 {
+/* Text alignment: Headers centered, other text left-aligned */
+h1, h2, h3, h4, h5, h6 {
     text-align: center;
+}
+
+/* Default to left-aligned text for regular content */
+p, div, li, label, .stMarkdown, .stText {
+    text-align: left;
 }
 
 /* Center all charts and plots */
@@ -103,8 +108,8 @@ p, div, h1, h2, h3, h4, h5, h6 {
     flex-direction: column;
     height: 100%;
     justify-content: space-between;
-    text-align: center;
-    align-items: center;
+    text-align: left;
+    align-items: flex-start;
     padding: 15px;
     margin: 0 auto;
 }
@@ -158,8 +163,8 @@ p, div, h1, h2, h3, h4, h5, h6 {
     flex-direction: column;
     height: 100%;
     justify-content: space-between;
-    text-align: center;
-    align-items: center;
+    text-align: left;
+    align-items: flex-start;
     margin: 0 auto;
 }
 

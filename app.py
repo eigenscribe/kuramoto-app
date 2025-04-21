@@ -438,11 +438,11 @@ st.sidebar.markdown("<h3 class='gradient_text1'>JSON Configuration</h3>", unsafe
 if 'json_example' not in st.session_state:
     st.session_state.json_example = ""
 
-# Display text area for JSON input (smaller and left-aligned)
+# Display text area for JSON input (larger and left-aligned)
 json_input = st.sidebar.text_area(
     "Import/Export Parameters",
     value=st.session_state.json_example,
-    height=120,
+    height=200,
     placeholder='Paste your JSON configuration here...',
     help="Enter a valid JSON configuration for the Kuramoto simulation"
 )
@@ -656,6 +656,7 @@ else:  # Custom
     custom_freqs = st.sidebar.text_area(
         "Enter custom frequencies (comma-separated)",
         value=st.session_state.custom_freqs,
+        height=150,
         key="custom_freqs"
     )
     try:
@@ -752,7 +753,7 @@ if network_type == "Custom Adjacency Matrix":
     adj_matrix_input = st.sidebar.text_area(
         "Adjacency Matrix",
         value=st.session_state.adj_matrix_input,
-        height=150,
+        height=200,
         help="Enter the adjacency matrix as comma-separated values, each row on a new line",
         key="adj_matrix_input"
     )

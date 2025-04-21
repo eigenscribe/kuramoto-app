@@ -4,6 +4,7 @@ Simulation UI components for Kuramoto Model Simulator.
 import streamlit as st
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import matplotlib.colors
 from matplotlib.animation import FuncAnimation
 import plotly.graph_objects as go
@@ -648,40 +649,22 @@ def display_simulation_results(model, times, phases, order_parameter, n_oscillat
                 "Std. Dev. of Natural Frequencies": np.std(frequencies)
             }
             
-            # Format as a Bootstrap-style table
-            param_table_html = """
-            <div style="background-color: rgba(0,0,0,0.2); padding: 10px; border-radius: 10px;">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th style="width: 50%;">Parameter</th>
-                        <th style="width: 50%;">Value</th>
-                    </tr>
-                </thead>
-                <tbody>
-            """
+            # Convert to DataFrame for better display
+            param_df = pd.DataFrame(list(param_data.items()), columns=["Parameter", "Value"])
             
-            for param, value in param_data.items():
-                # Format numerical values to 4 decimal places
-                if isinstance(value, float):
-                    value_str = f"{value:.4f}"
+            # Format floats before display
+            for i, val in enumerate(param_df["Value"]):
+                if isinstance(val, float):
+                    param_df.loc[i, "Value"] = f"{val:.4f}"
                 else:
-                    value_str = str(value)
-                
-                param_table_html += f"""
-                <tr>
-                    <td>{param}</td>
-                    <td>{value_str}</td>
-                </tr>
-                """
+                    param_df.loc[i, "Value"] = str(val)
             
-            param_table_html += """
-                </tbody>
-            </table>
-            </div>
-            """
-            
-            st.markdown(param_table_html, unsafe_allow_html=True)
+            # Apply custom styling
+            st.dataframe(
+                param_df,
+                hide_index=True,
+                use_container_width=True
+            )
             
             # Display results summary
             st.markdown("<h4>Results Summary</h4>", unsafe_allow_html=True)
@@ -696,39 +679,22 @@ def display_simulation_results(model, times, phases, order_parameter, n_oscillat
                 "Computation Time": f"{model.computation_time:.4f} seconds" if hasattr(model, 'computation_time') else "Not recorded"
             }
             
-            # Format as a Bootstrap-style table
-            results_table_html = """
-            <div style="background-color: rgba(0,0,0,0.2); padding: 10px; border-radius: 10px;">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th style="width: 50%;">Metric</th>
-                        <th style="width: 50%;">Value</th>
-                    </tr>
-                </thead>
-                <tbody>
-            """
+            # Convert to DataFrame for better display
+            results_df = pd.DataFrame(list(results_data.items()), columns=["Metric", "Value"])
             
-            for metric, value in results_data.items():
-                if isinstance(value, float):
-                    value_str = f"{value:.4f}"
+            # Format floats before display
+            for i, val in enumerate(results_df["Value"]):
+                if isinstance(val, float):
+                    results_df.loc[i, "Value"] = f"{val:.4f}"
                 else:
-                    value_str = str(value)
-                
-                results_table_html += f"""
-                <tr>
-                    <td>{metric}</td>
-                    <td>{value_str}</td>
-                </tr>
-                """
+                    results_df.loc[i, "Value"] = str(val)
             
-            results_table_html += """
-                </tbody>
-            </table>
-            </div>
-            """
-            
-            st.markdown(results_table_html, unsafe_allow_html=True)
+            # Apply custom styling
+            st.dataframe(
+                results_df,
+                hide_index=True,
+                use_container_width=True
+            )
         
         with data_col2:
             # Create a section for saving the results to the database
@@ -809,13 +775,13 @@ def display_simulation_results(model, times, phases, order_parameter, n_oscillat
                         name=simulation_name,
                         description=simulation_notes,
                         n_oscillators=n_oscillators,
-                        coupling_strength=coupling_strength,
+                        coupling_strength=model.coupling_strength,
                         frequencies=frequencies,
                         frequency_distribution=st.session_state.freq_type,
                         frequency_params=json.dumps(freq_params) if freq_params else None,
-                        simulation_time=simulation_time,
+                        simulation_time=model.simulation_time,
                         time_step=model.time_step,
-                        random_seed=random_seed,
+                        random_seed=model.random_seed if hasattr(model, 'random_seed') else 42,
                         network_type=model.network_type if hasattr(model, 'network_type') else "Custom",
                         adjacency_matrix=adj_matrix_to_save if include_adj_matrix else None,
                         order_parameter=order_parameter,

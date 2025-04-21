@@ -321,14 +321,51 @@ simulation_time = st.sidebar.slider(
     key="simulation_time"
 )
 
+# Time Step Controls
 time_step = st.sidebar.slider(
     "Time Step",
-    min_value=0.01,
+    min_value=0.001,
     max_value=0.1,
-    step=0.01,
-    help="Time step for simulation",
+    step=0.001,
+    format="%.3f",
+    help="Time step for simulation (smaller = more accurate but slower)",
     key="time_step"
 )
+
+# Add an auto-optimize time step button
+if st.sidebar.button("🧠 Auto-Optimize Time Step", help="Automatically calculate optimal time step for stability and accuracy"):
+    # Create a temporary model to calculate optimal time step
+    temp_model = KuramotoModel(
+        n_oscillators=n_oscillators,
+        coupling_strength=coupling_strength,
+        frequencies=frequencies,
+        simulation_time=simulation_time,
+        time_step=time_step,
+        random_seed=random_seed,
+        adjacency_matrix=adj_matrix
+    )
+    
+    # Get the optimization results
+    optimization_results = temp_model.compute_optimal_time_step(safety_factor=0.85)
+    
+    # Update the time step in the session state
+    st.session_state.time_step = optimization_results['optimal_time_step']
+    
+    # Display a success message with the explanation
+    st.sidebar.success(f"Time step optimized to {optimization_results['optimal_time_step']:.4f}")
+    
+    # Display detailed optimization information in an expander
+    with st.sidebar.expander("Optimization Details"):
+        st.markdown(f"""
+        **Stability Level:** {optimization_results['stability_level']}  
+        **Accuracy Level:** {optimization_results['accuracy_level']}  
+        **Computation Efficiency:** {optimization_results['computation_level']}
+        
+        {optimization_results['explanation']}
+        """)
+    
+    # Force page refresh to update the slider value
+    st.rerun()
 
 # Initialize model with specified parameters
 # Use session state to prevent warnings about duplicate initialization

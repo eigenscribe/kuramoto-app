@@ -157,7 +157,7 @@ body {
     min-width: 120px;
     font-size: 14px;
     font-weight: 600;
-    color: white;
+    color: white !important;
     cursor: pointer;
     margin: 10px auto;
     height: 36px;
@@ -171,6 +171,18 @@ body {
     text-decoration: none;
     line-height: 36px;
     padding: 0 15px;
+    position: relative;
+    z-index: 1;
+}
+
+/* Button text styling to ensure visibility */
+.stButton button p, .stButton button span, .stButton button div {
+    color: white !important;
+    font-family: 'Aclonica', sans-serif !important;
+    position: relative;
+    z-index: 2;
+    margin: 0;
+    padding: 0;
 }
 
 /* Button hover effects */
@@ -270,6 +282,46 @@ a:hover {
     text-align: center;
 }
 
+/* Fix for sidebar buttons - ensure text is visible */
+.sidebar .stButton button {
+    color: white !important;
+    background-color: rgba(20, 181, 255, 0.8);
+    position: relative;
+    overflow: visible;
+    z-index: 100;
+    min-height: 36px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.sidebar .stButton button p, 
+.sidebar .stButton button span, 
+.sidebar .stButton button div {
+    color: white !important;
+    position: relative;
+    z-index: 101;
+    display: block;
+    margin: auto;
+    font-weight: bold;
+}
+
+/* Specific fix for optimize button */
+.sidebar button:has(+ div div button) {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+/* This ensures the emoji and text are properly centered */
+.sidebar button > div {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
 /* Slider styling for the active (colored) part */
 /* This targets the left side of slider (between minimum value and thumb) */
 .stSlider [data-baseweb=slider] div[data-type="range"] div:first-child,
@@ -331,12 +383,12 @@ footer {
     background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb) !important;
 }
 
-/* Play Animation button special styling */
-[data-testid="stHorizontalBlock"] [data-testid="column"][data-testid="stVerticalBlock"]:nth-of-type(2) .stButton button {
+/* Animation tab button special styling */
+[data-testid="stHorizontalBlock"] .stButton button {
     width: auto;
-    min-width: 200px;
+    min-width: 80px;
     height: 40px;
-    line-height: 40px;
+    line-height: 20px; /* Adjust line height for centered text */
     font-size: 16px;
     letter-spacing: 0.5px;
     border-radius: 15px;
@@ -345,14 +397,25 @@ footer {
     transition: all 0.3s ease;
     text-align: center;
     margin: 0 auto;
-    display: block;
+    display: flex;
     position: relative;
-    left: 50%;
-    transform: translateX(-50%);
+    align-items: center;
+    justify-content: center;
 }
 
-[data-testid="stHorizontalBlock"] [data-testid="column"][data-testid="stVerticalBlock"]:nth-of-type(2) .stButton button:hover {
-    transform: translateX(-50%) translateY(-2px);
+/* Special styling for Previous/Next/Play buttons */
+[data-testid="stHorizontalBlock"] .stButton button p,
+[data-testid="stHorizontalBlock"] .stButton button span {
+    color: white !important;
+    z-index: 10;
+    position: relative;
+    display: block;
+    font-weight: bold;
+}
+
+/* Hover effect for animation tab buttons */
+[data-testid="stHorizontalBlock"] .stButton button:hover {
+    transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(20, 181, 255, 0.5);
     background-image: linear-gradient(to right, #00e8ff, #0070eb);
 }

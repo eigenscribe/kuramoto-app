@@ -27,7 +27,7 @@ if st.session_state.loaded_config is not None:
     st.session_state.coupling_strength = config['coupling_strength']
     st.session_state.simulation_time = config['simulation_time']
     st.session_state.time_step = config['time_step']
-    st.session_state.random_seed = config['random_seed']
+    st.session_state.random_seed = int(config['random_seed']) # Ensure it's an integer
     st.session_state.network_type = config['network_type']
     st.session_state.freq_type = config['frequency_distribution']
     
@@ -211,7 +211,7 @@ if 'simulation_time' not in st.session_state:
 if 'time_step' not in st.session_state:
     st.session_state.time_step = 0.05
 if 'random_seed' not in st.session_state:
-    st.session_state.random_seed = 42
+    st.session_state.random_seed = int(42)
 if 'network_type' not in st.session_state:
     st.session_state.network_type = "All-to-All"
 if 'adj_matrix_input' not in st.session_state:
@@ -332,11 +332,14 @@ time_step = st.sidebar.slider(
 )
 
 # Initialize model with specified parameters
-random_seed = st.sidebar.number_input(
+random_seed = int(st.sidebar.number_input(
     "Random Seed", 
+    min_value=0,
+    value=42,
+    step=1,
     help="Seed for reproducibility",
     key="random_seed"
-)
+))
 
 # Network Connectivity Configuration
 st.sidebar.markdown("<h3 class='gradient_text1'>Network Connectivity</h3>", unsafe_allow_html=True)
@@ -568,6 +571,10 @@ else:
 # Function to simulate model
 @st.cache_data(ttl=300)
 def run_simulation(n_oscillators, coupling_strength, frequencies, simulation_time, time_step, random_seed, adjacency_matrix=None):
+    # Convert random_seed to integer to prevent type errors
+    if random_seed is not None:
+        random_seed = int(random_seed)
+    
     model = KuramotoModel(
         n_oscillators=n_oscillators,
         coupling_strength=coupling_strength,

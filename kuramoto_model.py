@@ -30,7 +30,8 @@ class KuramotoModel:
             Adjacency matrix defining the network structure. If None, a fully connected network is used.
         """
         if random_seed is not None:
-            np.random.seed(random_seed)
+            # Convert to int to prevent dtype errors
+            np.random.seed(int(random_seed))
             
         self.n_oscillators = n_oscillators
         self.coupling_strength = coupling_strength

@@ -1,0 +1,28 @@
+TypeError: Cannot cast scalar from dtype('float64') to dtype('int64') according to the rule 'safe'
+Traceback:
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/streamlit/runtime/scriptrunner/exec_code.py", line 121, in exec_func_with_error_handling
+    result = func()
+             ^^^^^^
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/streamlit/runtime/scriptrunner/script_runner.py", line 640, in code_to_exec
+    exec(code, module.__dict__)
+File "/home/runner/workspace/app.py", line 603, in <module>
+    model, times, phases, order_parameter = run_simulation(
+                                            ^^^^^^^^^^^^^^^
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/streamlit/runtime/caching/cache_utils.py", line 219, in __call__
+    return self._get_or_create_cached_value(args, kwargs, spinner_message)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/streamlit/runtime/caching/cache_utils.py", line 261, in _get_or_create_cached_value
+    return self._handle_cache_miss(cache, value_key, func_args, func_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/streamlit/runtime/caching/cache_utils.py", line 320, in _handle_cache_miss
+    computed_value = self._info.func(*func_args, **func_kwargs)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "/home/runner/workspace/app.py", line 571, in run_simulation
+    model = KuramotoModel(
+            ^^^^^^^^^^^^^^
+File "/home/runner/workspace/kuramoto_model.py", line 33, in __init__
+    np.random.seed(random_seed)
+File "numpy/random/mtrand.pyx", line 4829, in numpy.random.mtrand.seed
+File "numpy/random/mtrand.pyx", line 254, in numpy.random.mtrand.RandomState.seed
+File "_mt19937.pyx", line 168, in numpy.random._mt19937.MT19937._legacy_seeding
+File "_mt19937.pyx", line 188, in numpy.random._mt19937.MT19937._legacy_seeding

@@ -163,12 +163,16 @@ def display_simulation_results(model, times, phases, order_parameter, n_oscillat
             # Ensure we have a valid number of timepoints
             n_time_points = len(times)
             
-            # Default the slider to the last frame
-            if 'time_idx' not in st.session_state:
-                st.session_state.time_idx = max(0, n_time_points - 1)
+            # Default the slider to the first frame (0 index)
+            # We already initialize this in common.py to 0
             
             # Ensure the stored time_idx is valid
-            st.session_state.time_idx = min(max(0, st.session_state.time_idx), max(0, n_time_points - 1))
+            # Reset to 0 after a new simulation is run
+            if "new_simulation_run" in st.session_state and st.session_state.new_simulation_run:
+                st.session_state.time_idx = 0
+                st.session_state.new_simulation_run = False
+            else:
+                st.session_state.time_idx = min(max(0, st.session_state.time_idx), max(0, n_time_points - 1))
             
             # Create the slider with fail-safe values
             time_idx = st.slider(
@@ -258,6 +262,20 @@ def display_simulation_results(model, times, phases, order_parameter, n_oscillat
             fig = plt.figure(figsize=(8, 8))
             ax = fig.add_subplot(111, projection='polar')
             
+            # Check if index is valid
+            if i < 0 or i >= len(phases):
+                # Display an error message if the index is invalid
+                ax.text(0, 0, "Invalid time index", 
+                      ha='center', va='center', fontsize=14)
+                ax.set_rticks([])  # Hide radial ticks
+                
+                # Save the figure to a BytesIO object
+                buf = BytesIO()
+                fig.savefig(buf, format='png', bbox_inches='tight')
+                buf.seek(0)
+                plt.close(fig)
+                return base64.b64encode(buf.read()).decode('utf-8')
+            
             # Get the current phase values
             current_phases = phases[i]
             
@@ -279,15 +297,21 @@ def display_simulation_results(model, times, phases, order_parameter, n_oscillat
             
             # Set up the plot
             ax.set_rticks([])  # Hide radial ticks
-            ax.set_title(f"t = {times[i]:.2f}", fontsize=16)
+            
+            # Make sure times index is also valid
+            if i < len(times):
+                ax.set_title(f"t = {times[i]:.2f}", fontsize=16)
+            else:
+                ax.set_title("Time not available", fontsize=16)
             
             # Add a colorbar
             cbar = fig.colorbar(scatter, ax=ax, shrink=0.8)
             cbar.set_label('Natural Frequency', fontsize=12)
             
-            # Add order parameter text
-            ax.text(0.5, -0.1, f"Order Parameter r = {order_parameter[i]:.3f}", 
-                  transform=ax.transAxes, ha='center', fontsize=14)
+            # Add order parameter text (with bounds checking)
+            if i < len(order_parameter):
+                ax.text(0.5, -0.1, f"Order Parameter r = {order_parameter[i]:.3f}", 
+                      transform=ax.transAxes, ha='center', fontsize=14)
             
             # Save the figure to a BytesIO object
             buf = BytesIO()

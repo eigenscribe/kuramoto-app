@@ -86,6 +86,9 @@ with main_tab:
                 "n_oscillators": n_oscillators,
                 "frequencies": frequencies
             }
+            
+            # Set flag to indicate a new simulation was run (for time slider reset)
+            st.session_state.new_simulation_run = True
     
     # Display simulation results if available
     if "simulation_results" in st.session_state:

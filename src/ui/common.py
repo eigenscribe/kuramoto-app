@@ -144,6 +144,10 @@ def initialize_session_state():
     # For auto-optimizing time step
     if "auto_optimize_on_run" not in st.session_state:
         st.session_state.auto_optimize_on_run = False
+        
+    # Initialize time_idx for animation to avoid starting with 399
+    if "time_idx" not in st.session_state:
+        st.session_state.time_idx = 0
 
 def load_configuration():
     """Load configuration if available in session state."""

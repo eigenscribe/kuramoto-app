@@ -10,9 +10,6 @@ import base64
 import json
 from kuramoto_model import KuramotoModel
 import time
-from database import (store_simulation, get_simulation, list_simulations, delete_simulation,
-                  save_configuration, list_configurations, get_configuration, delete_configuration,
-                  get_configuration_by_name, export_configuration_to_json, import_configuration_from_json)
 
 # Initialize session state for configuration loading
 if 'loaded_config' not in st.session_state:
@@ -587,7 +584,7 @@ if network_type == "Custom Adjacency Matrix":
             adj_matrix = None
 
 # Create tabs for different visualizations (Network is default tab)
-tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["Network", "Distributions", "Animation", "Database", "Configurations", "Machine Learning"])
+tab1, tab2, tab3 = st.tabs(["Network", "Distributions", "Animation"])
 
 # Set a unique key for each tab to force refresh of the Network tab
 if 'current_tab' not in st.session_state:

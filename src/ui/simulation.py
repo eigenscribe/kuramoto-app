@@ -109,7 +109,17 @@ def display_simulation_results(model, times, phases, order_parameter, n_oscillat
             # Create a figure for initial positions
             fig_initial = plt.figure(figsize=(5, 5))
             ax_initial = fig_initial.add_subplot(111, projection='polar')
-            ax_initial.scatter(phases[0], np.ones(n_oscillators), c=frequencies, s=80, alpha=0.8, cmap='viridis')
+            
+            # Make sure the arrays are the same length
+            if len(phases[0]) == n_oscillators:
+                ax_initial.scatter(phases[0], np.ones(n_oscillators), c=frequencies, s=80, alpha=0.8, cmap='viridis')
+            else:
+                # If there's a mismatch, adjust the arrays to match
+                min_len = min(len(phases[0]), n_oscillators)
+                ax_initial.scatter(phases[0][:min_len], np.ones(min_len), 
+                                  c=frequencies[:min_len] if len(frequencies) >= min_len else frequencies, 
+                                  s=80, alpha=0.8, cmap='viridis')
+            
             ax_initial.set_rticks([])  # Hide radial ticks
             ax_initial.set_title("t=0")
             
@@ -125,7 +135,17 @@ def display_simulation_results(model, times, phases, order_parameter, n_oscillat
             # Create a figure for final positions
             fig_final = plt.figure(figsize=(5, 5))
             ax_final = fig_final.add_subplot(111, projection='polar')
-            ax_final.scatter(phases[-1], np.ones(n_oscillators), c=frequencies, s=80, alpha=0.8, cmap='viridis')
+            
+            # Make sure the arrays are the same length
+            if len(phases[-1]) == n_oscillators:
+                ax_final.scatter(phases[-1], np.ones(n_oscillators), c=frequencies, s=80, alpha=0.8, cmap='viridis')
+            else:
+                # If there's a mismatch, adjust the arrays to match
+                min_len = min(len(phases[-1]), n_oscillators)
+                ax_final.scatter(phases[-1][:min_len], np.ones(min_len), 
+                               c=frequencies[:min_len] if len(frequencies) >= min_len else frequencies, 
+                               s=80, alpha=0.8, cmap='viridis')
+                
             ax_final.set_rticks([])  # Hide radial ticks
             ax_final.set_title(f"t={times[-1]:.1f}")
             
@@ -159,7 +179,17 @@ def display_simulation_results(model, times, phases, order_parameter, n_oscillat
             # Create a figure for the selected time
             fig_selected = plt.figure(figsize=(5, 5))
             ax_selected = fig_selected.add_subplot(111, projection='polar')
-            ax_selected.scatter(phases[time_idx], np.ones(n_oscillators), c=frequencies, s=80, alpha=0.8, cmap='viridis')
+            
+            # Make sure the arrays are the same length
+            if len(phases[time_idx]) == n_oscillators:
+                ax_selected.scatter(phases[time_idx], np.ones(n_oscillators), c=frequencies, s=80, alpha=0.8, cmap='viridis')
+            else:
+                # If there's a mismatch, adjust the arrays to match
+                min_len = min(len(phases[time_idx]), n_oscillators)
+                ax_selected.scatter(phases[time_idx][:min_len], np.ones(min_len), 
+                                   c=frequencies[:min_len] if len(frequencies) >= min_len else frequencies, 
+                                   s=80, alpha=0.8, cmap='viridis')
+                
             ax_selected.set_rticks([])  # Hide radial ticks
             
             # Plot mean phase as a red line
@@ -213,10 +243,17 @@ def display_simulation_results(model, times, phases, order_parameter, n_oscillat
             # Get the current phase values
             current_phases = phases[i]
             
-            # Scatter plot of oscillator positions
-            scatter = ax.scatter(current_phases, np.ones(n_oscillators), 
-                             c=frequencies, cmap='viridis', 
-                             s=150, alpha=0.8)
+            # Make sure the arrays are the same length
+            if len(current_phases) == n_oscillators:
+                scatter = ax.scatter(current_phases, np.ones(n_oscillators), 
+                                   c=frequencies, cmap='viridis', 
+                                   s=150, alpha=0.8)
+            else:
+                # If there's a mismatch, adjust the arrays to match
+                min_len = min(len(current_phases), n_oscillators)
+                scatter = ax.scatter(current_phases[:min_len], np.ones(min_len), 
+                                   c=frequencies[:min_len] if len(frequencies) >= min_len else frequencies, 
+                                   s=150, alpha=0.8, cmap='viridis')
             
             # Plot mean phase as a red line
             mean_phase = np.mean(current_phases)
@@ -400,7 +437,7 @@ def display_simulation_results(model, times, phases, order_parameter, n_oscillat
                 
                 <h5>Critical Coupling</h5>
                 <p>Theoretical Kc: {critical_k:.3f}</p>
-                <p>K/Kc ratio: {coupling_strength / critical_k if critical_k > 0 else 'N/A':.2f}</p>
+                <p>K/Kc ratio: {model.coupling_strength / critical_k if critical_k > 0 else 'N/A':.2f}</p>
             </div>
             """, unsafe_allow_html=True)
             
@@ -452,7 +489,7 @@ def display_simulation_results(model, times, phases, order_parameter, n_oscillat
                 if n_oscillators <= 20:
                     pos = nx.circular_layout(G)
                 else:
-                    pos = nx.spring_layout(G, seed=random_seed)
+                    pos = nx.spring_layout(G, seed=42)  # Use a default seed
                 
                 # Create a colormap based on oscillator frequencies
                 node_colors = frequencies
@@ -602,10 +639,10 @@ def display_simulation_results(model, times, phases, order_parameter, n_oscillat
             
             param_data = {
                 "Number of Oscillators": n_oscillators,
-                "Coupling Strength (K)": coupling_strength,
-                "Simulation Time": simulation_time,
+                "Coupling Strength (K)": model.coupling_strength,
+                "Simulation Time": model.simulation_time,
                 "Time Step": model.time_step,
-                "Random Seed": random_seed,
+                "Random Seed": model.random_seed if hasattr(model, 'random_seed') else 42,
                 "Network Type": model.network_type if hasattr(model, 'network_type') else "Custom",
                 "Mean Natural Frequency": np.mean(frequencies),
                 "Std. Dev. of Natural Frequencies": np.std(frequencies)
@@ -700,7 +737,7 @@ def display_simulation_results(model, times, phases, order_parameter, n_oscillat
             # Input field for simulation name
             simulation_name = st.text_input(
                 "Simulation Name",
-                value=f"Simulation_N{n_oscillators}_K{coupling_strength}",
+                value=f"Simulation_N{n_oscillators}_K{model.coupling_strength}",
                 help="Enter a name for this simulation to save it to the database"
             )
             

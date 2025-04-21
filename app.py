@@ -896,7 +896,7 @@ with tab1:
     if network_type_internal == "Custom Adjacency Matrix" and network_adj_matrix.shape[0] == 10 and np.count_nonzero(network_adj_matrix) >= 40:
         st.markdown("""
         <div class='section'>
-            <p>The network visualization shows the <b>Etz Hayim</b> (Tree of Life) configuration:</p>
+            <p>Figure Description:</p>
             <ul>
                 <li><b>Left:</b> Graph representing the ten Sephirot (emanations) in the Kabbalistic Tree of Life, arranged in their traditional positions</li>
                 <li><b>Right:</b> Adjacency matrix showing the 22 paths connecting the Sephirot</li>
@@ -920,12 +920,11 @@ with tab1:
     else:
         st.markdown("""
         <div class='section'>
-            <p>The network visualization shows:</p>
+            <p>Figure Description:</p>
             <ul>
                 <li><b>Left:</b> Graph representation of oscillator connections, with nodes colored by natural frequency</li>
                 <li><b>Right:</b> Adjacency matrix representation, where each cell (i,j) represents the connection strength between oscillators</li>
             </ul>
-            <p>The structure of this network affects how synchronization patterns emerge and propagate through the system.</p>
         </div>
         """, unsafe_allow_html=True)
 

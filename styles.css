@@ -261,6 +261,23 @@ a:hover {
     backdrop-filter: blur(10px);
 }
 
+/* JSON text area alignment */
+.sidebar textarea {
+    font-size: 0.85rem !important;
+    font-family: monospace !important;
+    text-align: left !important;
+}
+
+/* Make sidebar content left-aligned */
+.sidebar p, .sidebar div, .sidebar h3, .sidebar h4, .sidebar label {
+    text-align: left !important;
+}
+
+/* Exception for gradient headers which stay centered */
+.sidebar h3.gradient_text1, .sidebar h3 span {
+    text-align: center !important;
+}
+
 /* Sidebar scrollbar styling */
 .sidebar::-webkit-scrollbar-thumb {
     background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb);

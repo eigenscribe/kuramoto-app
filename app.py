@@ -234,7 +234,6 @@ n_oscillators = st.sidebar.slider(
     "Number of Oscillators",
     min_value=2,
     max_value=50,
-    value=st.session_state.n_oscillators,
     step=1,
     help="Number of oscillators in the system",
     key="n_oscillators"
@@ -245,7 +244,6 @@ coupling_strength = st.sidebar.slider(
     "Coupling Strength (K)",
     min_value=0.0,
     max_value=10.0,
-    value=st.session_state.coupling_strength,
     step=0.1,
     help="Strength of coupling between oscillators",
     key="coupling_strength"
@@ -262,18 +260,18 @@ freq_type = st.sidebar.selectbox(
 
 # Parameters for frequency distribution
 if freq_type == "Normal":
-    freq_mean = st.sidebar.slider("Mean", -2.0, 2.0, st.session_state.freq_mean, 0.1, key="freq_mean")
-    freq_std = st.sidebar.slider("Standard Deviation", 0.1, 3.0, st.session_state.freq_std, 0.1, key="freq_std")
+    freq_mean = st.sidebar.slider("Mean", -2.0, 2.0, step=0.1, key="freq_mean")
+    freq_std = st.sidebar.slider("Standard Deviation", 0.1, 3.0, step=0.1, key="freq_std")
     frequencies = np.random.normal(freq_mean, freq_std, n_oscillators)
     
 elif freq_type == "Uniform":
-    freq_min = st.sidebar.slider("Minimum", -5.0, 0.0, st.session_state.freq_min, 0.1, key="freq_min")
-    freq_max = st.sidebar.slider("Maximum", 0.0, 5.0, st.session_state.freq_max, 0.1, key="freq_max")
+    freq_min = st.sidebar.slider("Minimum", -5.0, 0.0, step=0.1, key="freq_min")
+    freq_max = st.sidebar.slider("Maximum", 0.0, 5.0, step=0.1, key="freq_max")
     frequencies = np.random.uniform(freq_min, freq_max, n_oscillators)
     
 elif freq_type == "Bimodal":
-    peak1 = st.sidebar.slider("Peak 1", -5.0, 0.0, st.session_state.peak1, 0.1, key="peak1")
-    peak2 = st.sidebar.slider("Peak 2", 0.0, 5.0, st.session_state.peak2, 0.1, key="peak2")
+    peak1 = st.sidebar.slider("Peak 1", -5.0, 0.0, step=0.1, key="peak1")
+    peak2 = st.sidebar.slider("Peak 2", 0.0, 5.0, step=0.1, key="peak2")
     mix = np.random.choice([0, 1], size=n_oscillators)
     freq1 = np.random.normal(peak1, 0.3, n_oscillators)
     freq2 = np.random.normal(peak2, 0.3, n_oscillators)
@@ -319,7 +317,6 @@ simulation_time = st.sidebar.slider(
     "Simulation Time",
     min_value=1.0,
     max_value=100.0,
-    value=st.session_state.simulation_time,
     step=1.0,
     help="Total simulation time",
     key="simulation_time"
@@ -329,7 +326,6 @@ time_step = st.sidebar.slider(
     "Time Step",
     min_value=0.01,
     max_value=0.1,
-    value=st.session_state.time_step,
     step=0.01,
     help="Time step for simulation",
     key="time_step"
@@ -338,7 +334,6 @@ time_step = st.sidebar.slider(
 # Initialize model with specified parameters
 random_seed = st.sidebar.number_input(
     "Random Seed", 
-    value=st.session_state.random_seed, 
     help="Seed for reproducibility",
     key="random_seed"
 )

@@ -584,7 +584,7 @@ if network_type == "Custom Adjacency Matrix":
             adj_matrix = None
 
 # Create tabs for different visualizations (Network is default tab)
-tab1, tab2, tab3, tab4 = st.tabs(["Network", "Distributions", "Animation", "JSON Import"])
+tab1, tab2, tab3 = st.tabs(["Network", "Distributions", "Animation"])
 
 # Set a unique key for each tab to force refresh of the Network tab
 if 'current_tab' not in st.session_state:

@@ -1,0 +1,561 @@
+/* Main styling for the entire application */
+body {
+    font-family: 'Aclonica', sans-serif;
+    margin: 0;
+    padding: 0;
+    color: white;
+    text-align: center;
+}
+
+/* Adjust Streamlit default elements */
+.stApp {
+    background-color: #121212;
+    background-image: url('wisp.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+/* Center all content */
+.main .block-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Center all paragraphs and text elements */
+p, div, h1, h2, h3, h4, h5, h6 {
+    text-align: center;
+}
+
+/* Center all charts and plots */
+[data-testid="stDecoration"], [data-testid="stImage"], .element-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+}
+
+/* Gradient text styles - THESE TWO SPECIFIC GRADIENTS SHOULD BE USED */
+.gradient_text1 {
+    font-weight: bold !important;
+    background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb) !important;
+    background-image: -webkit-linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
+    text-align: center;
+}
+
+.gradient_text2 {
+    font-weight: bold;
+    background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb);
+    background-image: -webkit-linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+
+/* Add semi-transparent overlay for better content visibility */
+.main::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: -1;
+}
+
+/* Section styles */
+.section {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 30px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+.section:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.section-content {
+    color: white;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;
+    text-align: center;
+    align-items: center;
+    padding: 15px;
+    margin: 0 auto;
+}
+
+.section h2 {
+    font-weight: bold;
+    background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    margin-top: 0;
+    font-size: 1.8rem;
+    width: 100%;
+    text-align: center;
+}
+
+.section h3 {
+    font-weight: bold !important;
+    background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
+    font-size: 1.4rem;
+    text-align: center;
+}
+
+/* Feature box styling */
+.feature-box {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    backdrop-filter: blur(5px);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.feature-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.feature-box-content {
+    color: white;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;
+    text-align: center;
+    align-items: center;
+    margin: 0 auto;
+}
+
+.feature-box-content h3 {
+    font-weight: bold !important;
+    background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
+    margin-top: 0;
+    font-size: 1.5rem;
+    width: 100%;
+    text-align: center;
+}
+
+/* Button Styling */
+.btn, .stButton button, button[kind="primary"] {
+    background-image: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb);
+    box-shadow: 0 4px 15px 0 rgba(39, 170, 255, 0.5);
+    width: auto;
+    min-width: 120px;
+    font-size: 14px;
+    font-weight: 600;
+    color: white !important;
+    cursor: pointer;
+    margin: 10px auto;
+    height: 36px;
+    text-align: center;
+    border: none;
+    background-size: 300% 100%;
+    border-radius: 15px;
+    transition: all .4s ease-in-out;
+    font-family: 'Aclonica', sans-serif;
+    display: inline-block;
+    text-decoration: none;
+    line-height: 36px;
+    padding: 0 15px;
+    position: relative;
+    z-index: 1;
+}
+
+/* Button text styling to ensure visibility */
+.stButton button p, .stButton button span, .stButton button div {
+    color: white !important;
+    font-family: 'Aclonica', sans-serif !important;
+    position: relative;
+    z-index: 2;
+    margin: 0;
+    padding: 0;
+}
+
+/* Button hover effects */
+.btn:hover, .stButton button:hover, button[kind="primary"]:hover {
+    background-position: 100% 0;
+    background-image: linear-gradient(to right, #00e8ff, #0070eb);
+    filter: brightness(1.1);
+    transition: all .4s ease-in-out;
+}
+
+/* Typography improvements */
+h1, h2, h3, h4, p, div, span, a, button, input, textarea, select {
+    font-family: 'Aclonica', sans-serif;
+}
+
+/* Links */
+a {
+    color: #14b5ff;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+a:hover {
+    color: #00e8ff;
+}
+
+/* Streamlit specific styles */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 10px;
+}
+
+.stTabs [data-baseweb="tab"] {
+    background-color: rgba(20, 165, 255, 0.1);
+    border-radius: 4px 4px 0 0;
+    padding: 10px 20px;
+    border: 1px solid rgba(20, 165, 255, 0.3);
+    color: white !important;
+}
+
+.stTabs [aria-selected="true"] {
+    background-color: rgba(20, 181, 255, 0.2);
+    border-bottom: 3px solid #14b5ff;
+    color: white !important;
+}
+
+/* Sidebar customization */
+.css-1d391kg, .css-1lcbmhc {
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+}
+
+/* Sidebar scrollbar styling */
+.sidebar::-webkit-scrollbar-thumb {
+    background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb);
+    border-radius: 10px;
+    border: 2px solid rgba(0, 0, 0, 0.2);
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(to right, #00ffee, #27aaff);
+}
+
+/* Network connectivity input styling */
+.sidebar .stNumberInput > div {
+    position: relative;
+    z-index: 1;
+}
+
+.sidebar .stNumberInput > div::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    bottom: -2px;
+    left: -2px;
+    background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb);
+    border-radius: 7px;
+    z-index: -1;
+}
+
+.sidebar .stNumberInput > div > div > input {
+    border-radius: 4px;
+    background-color: #222;
+    border: none;
+    position: relative;
+    z-index: 2;
+}
+
+/* Network Connectivity section styling */
+.sidebar h3, .sidebar h3 span {
+    background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
+    font-weight: bold !important;
+    text-align: center;
+}
+
+/* Fix for sidebar buttons - ensure text is visible */
+.sidebar .stButton button {
+    color: white !important;
+    background-color: rgba(20, 181, 255, 0.8);
+    position: relative;
+    overflow: visible;
+    z-index: 100;
+    min-height: 36px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.sidebar .stButton button p, 
+.sidebar .stButton button span, 
+.sidebar .stButton button div {
+    color: white !important;
+    position: relative;
+    z-index: 101;
+    display: block;
+    margin: auto;
+    font-weight: bold;
+}
+
+/* Specific fix for optimize button */
+.sidebar button:has(+ div div button) {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+/* This ensures the emoji and text are properly centered */
+.sidebar button > div {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+/* Slider styling for the active (colored) part */
+/* This targets the left side of slider (between minimum value and thumb) */
+.stSlider [data-baseweb=slider] div[data-type="range"] div:first-child,
+.stSlider [data-baseweb=slider] [data-testid="stSliderProgress"] {
+    background: #3a98ff !important; /* Blue from our gradient */
+    height: 4px !important; /* Ensure consistent height */
+}
+
+/* Slider track styling for the inactive (grey) part */
+.stSlider [data-baseweb=slider] div[data-type="range"] div:nth-child(2) {
+    background: rgba(255, 255, 255, 0.1) !important;
+    height: 4px !important; /* Ensure consistent height */
+}
+
+/* Slider thumb styling */
+.stSlider [data-baseweb=slider] [role=slider] {
+    background: #14b5ff !important; /* Blue from our gradient */
+    border: 2px solid white !important;
+    box-shadow: 0 0 8px rgba(20, 181, 255, 0.7) !important;
+}
+
+/* Override Streamlit defaults */
+.stMarkdown {
+    color: white;
+}
+
+/* Footer style */
+footer {
+    text-align: center;
+    margin-top: 30px;
+    padding: 10px;
+    font-size: 0.8em;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Custom footer for copyright */
+.footer {
+    text-align: center;
+    margin-top: 30px;
+    padding: 15px;
+    font-size: 0.9em;
+    color: white;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+}
+
+/* Make plots more visible and centered */
+.stPlot {
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    padding: 15px;
+    margin-bottom: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Center all pyplot and plotly figures */
+.element-container > div[data-testid="stImage"], 
+.element-container > div > div[data-testid="stImage"],
+.element-container > div > div > div > div[class*="plotly"],
+.element-container > div > div > div > div[class*="js-plotly"],
+.element-container > div > div > canvas,
+.css-1kyxreq {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin: 0 auto !important;
+}
+
+/* Center matplotlib plots specifically */
+canvas.marks, div.marks, div[class*="Plot"] {
+    margin: 0 auto !important;
+}
+
+/* Progress bar styling with gradient */
+.stProgress > div > div > div {
+    background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb) !important;
+}
+
+/* Animation tab button special styling */
+[data-testid="stHorizontalBlock"] .stButton button {
+    width: auto;
+    min-width: 80px;
+    height: 40px;
+    line-height: 20px; /* Adjust line height for centered text */
+    font-size: 16px;
+    letter-spacing: 0.5px;
+    border-radius: 15px;
+    background-image: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb);
+    box-shadow: 0 5px 15px rgba(20, 165, 255, 0.4);
+    transition: all 0.3s ease;
+    text-align: center;
+    margin: 0 auto;
+    display: flex;
+    position: relative;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Special styling for Previous/Next/Play buttons */
+[data-testid="stHorizontalBlock"] .stButton button p,
+[data-testid="stHorizontalBlock"] .stButton button span {
+    color: white !important;
+    z-index: 10;
+    position: relative;
+    display: block;
+    font-weight: bold;
+}
+
+/* Hover effect for animation tab buttons */
+[data-testid="stHorizontalBlock"] .stButton button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(20, 181, 255, 0.5);
+    background-image: linear-gradient(to right, #00e8ff, #0070eb);
+}
+
+/* Card row layout for horizontal alignment */
+.card-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+/* Tech tag styling */
+.tech-tag {
+    display: inline-block;
+    background: linear-gradient(130deg, rgba(0, 232, 255, 0.2), rgba(0, 112, 235, 0.2));
+    border: 1px solid rgba(20, 181, 255, 0.3);
+    border-radius: 15px;
+    padding: 3px 10px;
+    margin: 3px;
+    font-size: 0.8rem;
+    color: white;
+}
+
+/* Dark theme adjustments */
+button, select, input, textarea {
+    background-color: #222;
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+button:hover {
+    border-color: #14b5ff;
+}
+
+/* Fix slider text */
+.stSlider label {
+    color: white !important;
+}
+
+/* Improve selectbox appearance */
+.stSelectbox > div[data-baseweb="select"] {
+    border: 2px solid;
+    border-image: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb) 1;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.stSelectbox > div[data-baseweb="select"] > div {
+    background-color: #222;
+    color: white;
+    border: none;
+    border-radius: 13px;
+}
+
+/* Improve number input appearance for all inputs */
+.stNumberInput > div > div > input {
+    border-radius: 15px;
+    background-color: #222;
+    color: white;
+    border: 2px solid #3a98ff !important; /* Blue from our gradient */
+    box-shadow: 0 0 5px rgba(58, 152, 255, 0.5);
+    padding: 5px 10px;
+}
+
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb);
+    border-radius: 10px;
+    border: 2px solid rgba(0, 0, 0, 0.2);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(to right, #00ffee, #27aaff);
+}
+
+/* Radio button styling - using blue from our gradient */
+[data-testid="stRadio"] [data-baseweb="radio"] div[data-checked="true"] div:first-child {
+    background: #14b5ff !important; /* Blue from our gradient */
+    border: 2px solid white !important;
+    box-shadow: 0 0 5px rgba(20, 181, 255, 0.7) !important;
+}

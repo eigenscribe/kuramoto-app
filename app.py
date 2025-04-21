@@ -1814,9 +1814,14 @@ with tab4:
         </div>
         """, unsafe_allow_html=True)
     
-    # Display text area for JSON input
+    # Initialize session state for JSON example if not present
+    if 'json_example' not in st.session_state:
+        st.session_state.json_example = ""
+    
+    # Display text area for JSON input, using session state value if available
     json_input = st.text_area(
         "JSON Configuration",
+        value=st.session_state.json_example,
         height=300,
         placeholder='Paste your JSON configuration here...',
         help="Enter a valid JSON configuration for the Kuramoto simulation"
@@ -1825,49 +1830,55 @@ with tab4:
     # Add import button and logic
     if st.button("Import Parameters", key="import_json_button"):
         if json_input.strip():
-            # Parse the JSON input
-            params, error = parse_json_parameters(json_input)
-            
-            if error:
-                st.error(f"Error parsing JSON: {error}")
-            else:
-                # Update session state with the parsed parameters
-                st.session_state.n_oscillators = params["n_oscillators"]
-                st.session_state.coupling_strength = params["coupling_strength"]
-                st.session_state.network_type = params["network_type"]
-                st.session_state.simulation_time = params["simulation_time"]
-                st.session_state.time_step = params["time_step"]
-                st.session_state.random_seed = params["random_seed"]
-                st.session_state.freq_type = params["frequency_distribution"]
+            try:
+                # Parse the JSON input
+                params, error = parse_json_parameters(json_input)
                 
-                # Update frequency parameters based on distribution type
-                if params["frequency_distribution"] == "Normal":
-                    st.session_state.freq_mean = params["frequency_parameters"]["mean"]
-                    st.session_state.freq_std = params["frequency_parameters"]["std"]
-                elif params["frequency_distribution"] == "Uniform":
-                    st.session_state.freq_min = params["frequency_parameters"]["min"]
-                    st.session_state.freq_max = params["frequency_parameters"]["max"]
-                elif params["frequency_distribution"] == "Custom" and "custom_values" in params["frequency_parameters"]:
-                    st.session_state.custom_freqs = ", ".join(str(x) for x in params["frequency_parameters"]["custom_values"])
-                
-                # Handle custom adjacency matrix if present
-                if params["adjacency_matrix"] is not None:
-                    matrix = params["adjacency_matrix"]
-                    
-                    # Convert matrix to string representation for the text area
-                    matrix_str = ""
-                    for row in matrix:
-                        matrix_str += ", ".join(str(val) for val in row) + "\n"
-                    
-                    # Update session state for adjacency matrix
-                    st.session_state.adj_matrix_input = matrix_str.strip()
-                    st.session_state.loaded_adj_matrix = matrix
-                
-                # Show success message
-                st.success("Parameters imported successfully! Go to the Network tab to view the simulation.")
-                
-                # Rerun the app to apply the changes
-                st.rerun()
+                if error:
+                    st.error(f"Error parsing JSON: {error}")
+                else:
+                    # Update session state with the parsed parameters
+                    if params is not None:
+                        st.session_state.n_oscillators = params["n_oscillators"]
+                        st.session_state.coupling_strength = params["coupling_strength"]
+                        st.session_state.network_type = params["network_type"]
+                        st.session_state.simulation_time = params["simulation_time"]
+                        st.session_state.time_step = params["time_step"]
+                        st.session_state.random_seed = params["random_seed"]
+                        st.session_state.freq_type = params["frequency_distribution"]
+                        
+                        # Update frequency parameters based on distribution type
+                        if params["frequency_distribution"] == "Normal":
+                            st.session_state.freq_mean = params["frequency_parameters"]["mean"]
+                            st.session_state.freq_std = params["frequency_parameters"]["std"]
+                        elif params["frequency_distribution"] == "Uniform":
+                            st.session_state.freq_min = params["frequency_parameters"]["min"]
+                            st.session_state.freq_max = params["frequency_parameters"]["max"]
+                        elif params["frequency_distribution"] == "Custom" and "custom_values" in params["frequency_parameters"]:
+                            st.session_state.custom_freqs = ", ".join(str(x) for x in params["frequency_parameters"]["custom_values"])
+                        
+                        # Handle custom adjacency matrix if present
+                        if params["adjacency_matrix"] is not None:
+                            matrix = params["adjacency_matrix"]
+                            
+                            # Convert matrix to string representation for the text area
+                            matrix_str = ""
+                            for row in matrix:
+                                matrix_str += ", ".join(str(val) for val in row) + "\n"
+                            
+                            # Update session state for adjacency matrix
+                            st.session_state.adj_matrix_input = matrix_str.strip()
+                            st.session_state.loaded_adj_matrix = matrix
+                        
+                        # Show success message
+                        st.success("Parameters imported successfully! Go to the Network tab to view the simulation.")
+                        
+                        # Rerun the app to apply the changes
+                        st.rerun()
+                    else:
+                        st.error("Failed to parse JSON parameters. Please check your input format.")
+            except Exception as e:
+                st.error(f"Error processing parameters: {str(e)}")
         else:
             st.warning("Please enter JSON configuration before importing.")
     
@@ -1931,7 +1942,7 @@ with tab4:
         
         # Button to load the example into the text area
         if st.button("Use This Example", key="use_complex_example"):
-            # Use the complex example
-            json_input = json.dumps(complex_example, indent=4)
-            # Need to set this outside the button callback
-            st.session_state.json_example = json_input
+            # Set the complex example in session state
+            st.session_state.json_example = json.dumps(complex_example, indent=4)
+            # Rerun the app to show the example in the text area
+            st.rerun()

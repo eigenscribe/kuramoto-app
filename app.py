@@ -128,6 +128,46 @@ def parse_json_parameters(json_string):
 if 'loaded_config' not in st.session_state:
     st.session_state.loaded_config = None
 
+# Check for temp imported parameters and apply them
+# This handles imports from the JSON Parameter Import Section
+if 'temp_imported_params' in st.session_state:
+    params = st.session_state.temp_imported_params
+    
+    # Update session state with the parsed parameters
+    st.session_state.n_oscillators = params["n_oscillators"]
+    st.session_state.coupling_strength = params["coupling_strength"]
+    st.session_state.network_type = params["network_type"]
+    st.session_state.simulation_time = params["simulation_time"]
+    st.session_state.time_step = params["time_step"]
+    st.session_state.random_seed = params["random_seed"]
+    st.session_state.freq_type = params["frequency_distribution"]
+    
+    # Update frequency parameters based on distribution type
+    if params["frequency_distribution"] == "Normal":
+        st.session_state.freq_mean = params["frequency_parameters"]["mean"]
+        st.session_state.freq_std = params["frequency_parameters"]["std"]
+    elif params["frequency_distribution"] == "Uniform":
+        st.session_state.freq_min = params["frequency_parameters"]["min"]
+        st.session_state.freq_max = params["frequency_parameters"]["max"]
+    elif params["frequency_distribution"] == "Custom" and "custom_values" in params["frequency_parameters"]:
+        st.session_state.custom_freqs = ", ".join(str(x) for x in params["frequency_parameters"]["custom_values"])
+    
+    # Handle custom adjacency matrix if present
+    if params["adjacency_matrix"] is not None:
+        matrix = params["adjacency_matrix"]
+        
+        # Convert matrix to string representation for the text area
+        matrix_str = ""
+        for row in matrix:
+            matrix_str += ", ".join(str(val) for val in row) + "\n"
+        
+        # Update session state for adjacency matrix
+        st.session_state.adj_matrix_input = matrix_str.strip()
+        st.session_state.loaded_adj_matrix = matrix
+    
+    # Clear the temp parameters to avoid reapplying
+    del st.session_state.temp_imported_params
+
 # Apply loaded configuration if available
 if st.session_state.loaded_config is not None:
     config = st.session_state.loaded_config
@@ -327,6 +367,16 @@ if time_step_col1.button("🧠 Optimize", help="Automatically calculate optimal 
     # Need to get the random seed value from session state before using it
     current_random_seed = st.session_state.random_seed if "random_seed" in st.session_state else 42
     
+    # Get the current number of oscillators from session state
+    current_n_oscillators = st.session_state.n_oscillators if "n_oscillators" in st.session_state else 10
+    
+    # Get the current coupling strength from session state
+    current_coupling_strength = st.session_state.coupling_strength if "coupling_strength" in st.session_state else 1.0
+    
+    # Create a temporary frequencies array based on the current settings
+    # We'll use a simple normal distribution as a placeholder for optimization
+    temp_frequencies = np.random.normal(0, 1, current_n_oscillators)
+    
     # Check for adjacency matrix in session state
     adjacency_matrix_for_optimization = None
     if 'loaded_adj_matrix' in st.session_state:
@@ -335,9 +385,9 @@ if time_step_col1.button("🧠 Optimize", help="Automatically calculate optimal 
     
     # Create a temporary model to calculate optimal time step
     temp_model = KuramotoModel(
-        n_oscillators=n_oscillators,
-        coupling_strength=coupling_strength,
-        frequencies=frequencies,
+        n_oscillators=current_n_oscillators,
+        coupling_strength=current_coupling_strength,
+        frequencies=temp_frequencies,
         simulation_time=simulation_time,
         time_step=time_step,
         random_seed=current_random_seed,
@@ -471,39 +521,12 @@ if st.sidebar.button("Import Parameters", key="sidebar_import_json_button"):
             else:
                 # Update session state with the parsed parameters
                 if params is not None:
-                    st.session_state.n_oscillators = params["n_oscillators"]
-                    st.session_state.coupling_strength = params["coupling_strength"]
-                    st.session_state.network_type = params["network_type"]
-                    st.session_state.simulation_time = params["simulation_time"]
-                    st.session_state.time_step = params["time_step"]
-                    st.session_state.random_seed = params["random_seed"]
-                    st.session_state.freq_type = params["frequency_distribution"]
-                    
-                    # Update frequency parameters based on distribution type
-                    if params["frequency_distribution"] == "Normal":
-                        st.session_state.freq_mean = params["frequency_parameters"]["mean"]
-                        st.session_state.freq_std = params["frequency_parameters"]["std"]
-                    elif params["frequency_distribution"] == "Uniform":
-                        st.session_state.freq_min = params["frequency_parameters"]["min"]
-                        st.session_state.freq_max = params["frequency_parameters"]["max"]
-                    elif params["frequency_distribution"] == "Custom" and "custom_values" in params["frequency_parameters"]:
-                        st.session_state.custom_freqs = ", ".join(str(x) for x in params["frequency_parameters"]["custom_values"])
-                    
-                    # Handle custom adjacency matrix if present
-                    if params["adjacency_matrix"] is not None:
-                        matrix = params["adjacency_matrix"]
-                        
-                        # Convert matrix to string representation for the text area
-                        matrix_str = ""
-                        for row in matrix:
-                            matrix_str += ", ".join(str(val) for val in row) + "\n"
-                        
-                        # Update session state for adjacency matrix
-                        st.session_state.adj_matrix_input = matrix_str.strip()
-                        st.session_state.loaded_adj_matrix = matrix
+                    # Store all parameters in a temporary variable in session state
+                    # This is to avoid the error when trying to change widget values after initialization
+                    st.session_state.temp_imported_params = params
                     
                     # Show success message
-                    st.sidebar.success("Parameters imported successfully!")
+                    st.sidebar.success("Parameters imported successfully! Applying settings...")
                     
                     # Rerun the app to apply the changes
                     st.rerun()

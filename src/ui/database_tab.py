@@ -42,19 +42,27 @@ def render_database_tab():
                 # Convert timestamp to string for display
                 timestamp_str = sim['timestamp'].strftime('%Y-%m-%d %H:%M:%S')
                 
-                # Add to data list
+                # Add to data list with explicit type conversion to avoid PyArrow errors
                 sim_data.append({
-                    'ID': sim['id'],
-                    'Name': sim['name'],
-                    'Oscillators': sim['n_oscillators'],
-                    'Coupling': sim['coupling_strength'],
-                    'Network': sim['network_type'],
-                    'Final Sync': sim['final_sync'],
-                    'Date': timestamp_str
+                    'ID': int(sim['id']),
+                    'Name': str(sim['name']),
+                    'Oscillators': int(sim['n_oscillators']),
+                    'Coupling': float(sim['coupling_strength']),
+                    'Network': str(sim['network_type']),
+                    'Final Sync': float(sim['final_sync']),
+                    'Date': str(timestamp_str)
                 })
             
-            # Create DataFrame
-            sim_df = pd.DataFrame(sim_data)
+            # Create DataFrame with explicit dtypes
+            sim_df = pd.DataFrame(sim_data, dtype={
+                'ID': 'int64',
+                'Name': 'str',
+                'Oscillators': 'int64',
+                'Coupling': 'float64',
+                'Network': 'str',
+                'Final Sync': 'float64',
+                'Date': 'str'
+            })
             
             # Display the DataFrame with sorting enabled
             st.dataframe(sim_df, use_container_width=True)
@@ -92,22 +100,22 @@ def render_database_tab():
                             except:
                                 freq_params_str = sim_details['frequency_params']
                         
-                        # Create parameter table
+                        # Create parameter table with explicit string conversion to avoid PyArrow errors
                         params_df = pd.DataFrame([
-                            {"Parameter": "Name", "Value": sim_details['name']},
-                            {"Parameter": "Description", "Value": sim_details['description'] or "None"},
-                            {"Parameter": "Number of Oscillators", "Value": sim_details['n_oscillators']},
-                            {"Parameter": "Coupling Strength", "Value": sim_details['coupling_strength']},
-                            {"Parameter": "Simulation Time", "Value": sim_details['simulation_time']},
-                            {"Parameter": "Time Step", "Value": sim_details['time_step']},
-                            {"Parameter": "Random Seed", "Value": sim_details['random_seed']},
-                            {"Parameter": "Network Type", "Value": sim_details['network_type']},
-                            {"Parameter": "Frequency Distribution", "Value": sim_details['frequency_distribution']},
-                            {"Parameter": "Frequency Parameters", "Value": freq_params_str},
-                            {"Parameter": "Created", "Value": sim_details['timestamp'].strftime('%Y-%m-%d %H:%M:%S')},
-                            {"Parameter": "Final Synchronization", "Value": f"{sim_details['final_sync']:.4f}"},
-                            {"Parameter": "Computation Time", "Value": f"{sim_details['computation_time']:.4f} seconds" if sim_details['computation_time'] else "Not recorded"}
-                        ])
+                            {"Parameter": "Name", "Value": str(sim_details['name'])},
+                            {"Parameter": "Description", "Value": str(sim_details['description'] or "None")},
+                            {"Parameter": "Number of Oscillators", "Value": str(sim_details['n_oscillators'])},
+                            {"Parameter": "Coupling Strength", "Value": str(sim_details['coupling_strength'])},
+                            {"Parameter": "Simulation Time", "Value": str(sim_details['simulation_time'])},
+                            {"Parameter": "Time Step", "Value": str(sim_details['time_step'])},
+                            {"Parameter": "Random Seed", "Value": str(sim_details['random_seed'])},
+                            {"Parameter": "Network Type", "Value": str(sim_details['network_type'])},
+                            {"Parameter": "Frequency Distribution", "Value": str(sim_details['frequency_distribution'])},
+                            {"Parameter": "Frequency Parameters", "Value": str(freq_params_str)},
+                            {"Parameter": "Created", "Value": str(sim_details['timestamp'].strftime('%Y-%m-%d %H:%M:%S'))},
+                            {"Parameter": "Final Synchronization", "Value": str(f"{sim_details['final_sync']:.4f}")},
+                            {"Parameter": "Computation Time", "Value": str(f"{sim_details['computation_time']:.4f} seconds" if sim_details['computation_time'] else "Not recorded")}
+                        ], dtype={"Parameter": "str", "Value": "str"})
                         
                         st.dataframe(params_df, use_container_width=True, hide_index=True)
                     
@@ -387,20 +395,29 @@ def render_database_tab():
                 # Create a comparison table
                 st.markdown("<h4>Parameter Comparison</h4>", unsafe_allow_html=True)
                 
-                # Create a DataFrame with the parameters to compare
+                # Create a DataFrame with the parameters to compare - with explicit type conversion
                 comparison_data = []
                 for sim in sims_to_compare:
                     comparison_data.append({
-                        'Name': sim['name'],
-                        'Oscillators': sim['n_oscillators'],
-                        'Coupling': sim['coupling_strength'],
-                        'Network': sim['network_type'],
-                        'Frequency Dist.': sim['frequency_distribution'],
-                        'Final Sync': sim['final_sync'],
-                        'Simulation Time': sim['simulation_time']
+                        'Name': str(sim['name']),
+                        'Oscillators': int(sim['n_oscillators']),
+                        'Coupling': float(sim['coupling_strength']),
+                        'Network': str(sim['network_type']),
+                        'Frequency Dist.': str(sim['frequency_distribution']),
+                        'Final Sync': float(sim['final_sync']),
+                        'Simulation Time': float(sim['simulation_time'])
                     })
                 
-                comparison_df = pd.DataFrame(comparison_data)
+                # Create DataFrame with explicit dtypes to avoid PyArrow conversion errors
+                comparison_df = pd.DataFrame(comparison_data, dtype={
+                    'Name': 'str',
+                    'Oscillators': 'int64',
+                    'Coupling': 'float64',
+                    'Network': 'str',
+                    'Frequency Dist.': 'str',
+                    'Final Sync': 'float64',
+                    'Simulation Time': 'float64'
+                })
                 st.dataframe(comparison_df, use_container_width=True)
     
     # TAB 2: CONFIGURATIONS
@@ -423,18 +440,25 @@ def render_database_tab():
                 # Convert timestamp to string for display
                 timestamp_str = config['timestamp'].strftime('%Y-%m-%d %H:%M:%S')
                 
-                # Add to data list
+                # Add to data list with explicit type conversion
                 config_data.append({
-                    'ID': config['id'],
-                    'Name': config['name'],
-                    'Oscillators': config['n_oscillators'],
-                    'Coupling': config['coupling_strength'],
-                    'Network': config['network_type'],
-                    'Date': timestamp_str
+                    'ID': int(config['id']),
+                    'Name': str(config['name']),
+                    'Oscillators': int(config['n_oscillators']),
+                    'Coupling': float(config['coupling_strength']),
+                    'Network': str(config['network_type']),
+                    'Date': str(timestamp_str)
                 })
             
-            # Create DataFrame
-            config_df = pd.DataFrame(config_data)
+            # Create DataFrame with explicit dtypes to avoid PyArrow conversion errors
+            config_df = pd.DataFrame(config_data, dtype={
+                'ID': 'int64',
+                'Name': 'str',
+                'Oscillators': 'int64',
+                'Coupling': 'float64',
+                'Network': 'str',
+                'Date': 'str'
+            })
             
             # Display the DataFrame with sorting enabled
             st.dataframe(config_df, use_container_width=True)
@@ -472,20 +496,20 @@ def render_database_tab():
                             except:
                                 freq_params_str = config_details['frequency_params']
                         
-                        # Create parameter table
+                        # Create parameter table with explicit string conversion to avoid PyArrow errors
                         params_df = pd.DataFrame([
-                            {"Parameter": "Name", "Value": config_details['name']},
-                            {"Parameter": "Number of Oscillators", "Value": config_details['n_oscillators']},
-                            {"Parameter": "Coupling Strength", "Value": config_details['coupling_strength']},
-                            {"Parameter": "Simulation Time", "Value": config_details['simulation_time']},
-                            {"Parameter": "Time Step", "Value": config_details['time_step']},
-                            {"Parameter": "Random Seed", "Value": config_details['random_seed']},
-                            {"Parameter": "Network Type", "Value": config_details['network_type']},
-                            {"Parameter": "Frequency Distribution", "Value": config_details['frequency_distribution']},
-                            {"Parameter": "Frequency Parameters", "Value": freq_params_str},
-                            {"Parameter": "Created", "Value": config_details['timestamp'].strftime('%Y-%m-%d %H:%M:%S')},
-                            {"Parameter": "Custom Adjacency Matrix", "Value": "Yes" if config_details['adjacency_matrix'] is not None else "No"}
-                        ])
+                            {"Parameter": "Name", "Value": str(config_details['name'])},
+                            {"Parameter": "Number of Oscillators", "Value": str(config_details['n_oscillators'])},
+                            {"Parameter": "Coupling Strength", "Value": str(config_details['coupling_strength'])},
+                            {"Parameter": "Simulation Time", "Value": str(config_details['simulation_time'])},
+                            {"Parameter": "Time Step", "Value": str(config_details['time_step'])},
+                            {"Parameter": "Random Seed", "Value": str(config_details['random_seed'])},
+                            {"Parameter": "Network Type", "Value": str(config_details['network_type'])},
+                            {"Parameter": "Frequency Distribution", "Value": str(config_details['frequency_distribution'])},
+                            {"Parameter": "Frequency Parameters", "Value": str(freq_params_str)},
+                            {"Parameter": "Created", "Value": str(config_details['timestamp'].strftime('%Y-%m-%d %H:%M:%S'))},
+                            {"Parameter": "Custom Adjacency Matrix", "Value": str("Yes" if config_details['adjacency_matrix'] is not None else "No")}
+                        ], dtype={"Parameter": "str", "Value": "str"})
                         
                         st.dataframe(params_df, use_container_width=True, hide_index=True)
                     

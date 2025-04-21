@@ -460,7 +460,7 @@ if network_type == "Custom Adjacency Matrix":
                 st.sidebar.success("Adjacency matrix validated successfully!")
                 
                 # Add a dedicated button to force network visualization refresh
-                if st.sidebar.button("Refresh Network Visualization", key="force_refresh_btn"):
+                if st.sidebar.button("🔄 Refresh", key="force_refresh_btn"):
                     st.session_state.refresh_network = True
                     print("Network refresh requested via button")
                     st.rerun()
@@ -469,7 +469,7 @@ if network_type == "Custom Adjacency Matrix":
                 with st.sidebar.expander("Save as Preset"):
                     preset_name = st.text_input("Preset Name", key="preset_name", 
                                              placeholder="Enter a name for this matrix")
-                    if st.button("Save Preset", key="save_preset_btn"):
+                    if st.button("💾 Save Preset", key="save_preset_btn"):
                         if preset_name:
                             # Save the configuration with current parameters
                             config_id = save_configuration(
@@ -1424,16 +1424,29 @@ with tab3:
     animation_speed = 3.0  # Fixed moderate animation speed
     
     # Previous frame button
-    if col1.button("⏮ Previous", use_container_width=True):
+    if col1.button("⏪ Previous", use_container_width=True):
         if st.session_state.time_index > 0:
             st.session_state.time_index -= 1
             st.rerun()
     
-    # Play Animation button
-    animate = col2.button("▶ Play", use_container_width=True)
+    # Play Animation button (toggle between play and pause)
+    if 'is_playing' not in st.session_state:
+        st.session_state.is_playing = False
+        
+    if st.session_state.is_playing:
+        # Show pause button when animation is playing
+        if col2.button("⏸️ Pause", use_container_width=True):
+            st.session_state.is_playing = False
+            st.rerun()
+    else:
+        # Show play button when animation is paused
+        if col2.button("▶️ Play", use_container_width=True):
+            st.session_state.is_playing = True
+            animate = True
+            st.rerun()
     
     # Next frame button
-    if col3.button("⏭ Next", use_container_width=True):
+    if col3.button("⏩ Next", use_container_width=True):
         if st.session_state.time_index < len(times) - 1:
             st.session_state.time_index += 1
             st.rerun()

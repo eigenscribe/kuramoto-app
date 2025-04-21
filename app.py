@@ -254,8 +254,8 @@ coupling_strength = st.sidebar.slider(
 # Frequency distribution type
 freq_type = st.sidebar.selectbox(
     "Frequency Distribution",
-    ["Normal", "Uniform", "Bimodal", "Custom"],
-    index=["Normal", "Uniform", "Bimodal", "Custom"].index(st.session_state.freq_type),
+    ["Normal", "Uniform", "Bimodal", "Golden Ratio", "Custom"],
+    index=["Normal", "Uniform", "Bimodal", "Golden Ratio", "Custom"].index(st.session_state.freq_type) if st.session_state.freq_type in ["Normal", "Uniform", "Bimodal", "Golden Ratio", "Custom"] else 0,
     help="Distribution of natural frequencies",
     key="freq_type"
 )
@@ -278,6 +278,24 @@ elif freq_type == "Bimodal":
     freq1 = np.random.normal(peak1, 0.3, n_oscillators)
     freq2 = np.random.normal(peak2, 0.3, n_oscillators)
     frequencies = mix * freq1 + (1 - mix) * freq2
+
+elif freq_type == "Golden Ratio":
+    # The golden ratio (phi) ≈ 1.618033988749895
+    phi = (1 + 5**0.5) / 2
+    
+    # Create a golden ratio sequence starting at -3
+    golden_ratio_start = -3.0
+    st.sidebar.markdown(f"""
+    <div style="background-color: rgba(255,200,0,0.15); padding: 10px; border-radius: 5px;">
+    <p><b>Golden Ratio Distribution</b></p>
+    <p>This creates a sequence where each frequency follows the golden ratio (φ ≈ 1.618), 
+    starting from {golden_ratio_start}.</p>
+    <p>Each oscillator's frequency is: {golden_ratio_start} + i·φ</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Generate frequencies that follow the golden ratio in sequence
+    frequencies = np.array([golden_ratio_start + i * phi for i in range(n_oscillators)])
     
 else:  # Custom
     custom_freqs = st.sidebar.text_area(
@@ -1451,6 +1469,8 @@ with tab3:
             freq_params = {"min": freq_min, "max": freq_max}
         elif freq_type == "Bimodal":
             freq_params = {"peak1": peak1, "peak2": peak2}
+        elif freq_type == "Golden Ratio":
+            freq_params = {"start": -3.0}
         elif freq_type == "Custom":
             freq_params = {"values": custom_freqs}
         
@@ -1552,6 +1572,8 @@ with tab4:
             freq_params = {"min": freq_min, "max": freq_max}
         elif freq_type == "Bimodal":
             freq_params = {"peak1": peak1, "peak2": peak2}
+        elif freq_type == "Golden Ratio":
+            freq_params = {"start": -3.0}
         elif freq_type == "Custom":
             freq_params = {"custom_values": custom_freqs}
         
@@ -1723,6 +1745,8 @@ with tab5:
             freq_params = {"min": freq_min, "max": freq_max}
         elif freq_type == "Bimodal":
             freq_params = {"peak1": peak1, "peak2": peak2}
+        elif freq_type == "Golden Ratio":
+            freq_params = {"start": -3.0}
         elif freq_type == "Custom":
             freq_params = {"values": custom_freqs}
         

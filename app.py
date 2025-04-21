@@ -724,18 +724,18 @@ with tab1:
     elif network_type_internal == "Custom Adjacency Matrix" and network_adj_matrix.shape[0] == 10 and np.count_nonzero(network_adj_matrix) >= 40:
         # This appears to be our special Etz Hayim matrix - use a custom tree-like layout
         # Create a dictionary with fixed positions for this specific matrix
-        # These positions follow a traditional Sephirotic tree arrangement
+        # These positions follow a traditional Sephirotic tree arrangement with improved spacing
         fixed_positions = {
-            0: (0.0, 0.75),    # Keter (Crown) - top position
-            1: (-0.5, 0.5),    # Chokhmah (Wisdom) - upper right
-            2: (0.5, 0.5),     # Binah (Understanding) - upper left
-            3: (-0.6, 0.0),    # Chesed (Kindness) - middle right
-            4: (0.6, 0.0),     # Gevurah (Strength) - middle left
-            5: (0.0, 0.0),     # Tiferet (Beauty) - center
-            6: (-0.5, -0.5),   # Netzach (Victory) - lower right
-            7: (0.5, -0.5),    # Hod (Splendor) - lower left
-            8: (0.0, -0.5),    # Yesod (Foundation) - bottom center
-            9: (0.0, -0.75)    # Malkhut (Kingdom) - bottom
+            0: (0.0, 1.0),     # Keter (Crown) - top position
+            1: (-0.4, 0.8),    # Chokhmah (Wisdom) - upper right
+            2: (0.4, 0.8),     # Binah (Understanding) - upper left
+            3: (-0.7, 0.4),    # Chesed (Kindness) - middle right
+            4: (0.7, 0.4),     # Gevurah (Strength) - middle left
+            5: (0.0, 0.4),     # Tiferet (Beauty) - center
+            6: (-0.7, 0.0),    # Netzach (Victory) - lower right
+            7: (0.7, 0.0),     # Hod (Splendor) - lower left
+            8: (0.0, -0.4),    # Yesod (Foundation) - bottom center
+            9: (0.0, -0.8)     # Malkhut (Kingdom) - bottom
         }
         pos = fixed_positions
         

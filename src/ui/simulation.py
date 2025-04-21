@@ -198,14 +198,29 @@ def display_simulation_results(model, times, phases, order_parameter, n_oscillat
             if 0 <= time_idx < len(phases):
                 # Make sure the arrays are the same length
                 if len(phases[time_idx]) == n_oscillators:
+                    # Add a glow effect with a larger, more transparent point underneath
+                    ax_selected.scatter(phases[time_idx], np.ones(n_oscillators), 
+                                     c=frequencies, cmap='viridis', 
+                                     s=160, alpha=0.3, edgecolor=None)
+                    
+                    # Main scatter points
                     scatter = ax_selected.scatter(phases[time_idx], np.ones(n_oscillators), 
-                                                 c=frequencies, s=80, alpha=0.8, cmap='viridis')
+                                                 c=frequencies, s=80, alpha=0.8, 
+                                                 cmap='viridis', edgecolor='white', linewidth=1.5)
                 else:
                     # If there's a mismatch, adjust the arrays to match
                     min_len = min(len(phases[time_idx]), n_oscillators)
+                    
+                    # Add a glow effect with a larger, more transparent point underneath
+                    ax_selected.scatter(phases[time_idx][:min_len], np.ones(min_len), 
+                                     c=frequencies[:min_len] if len(frequencies) >= min_len else frequencies, 
+                                     cmap='viridis', s=160, alpha=0.3, edgecolor=None)
+                    
+                    # Main scatter points
                     scatter = ax_selected.scatter(phases[time_idx][:min_len], np.ones(min_len), 
                                                 c=frequencies[:min_len] if len(frequencies) >= min_len else frequencies, 
-                                                s=80, alpha=0.8, cmap='viridis')
+                                                s=80, alpha=0.8, cmap='viridis', 
+                                                edgecolor='white', linewidth=1.5)
                 
                 ax_selected.set_rticks([])  # Hide radial ticks
                 
@@ -283,13 +298,23 @@ def display_simulation_results(model, times, phases, order_parameter, n_oscillat
             if len(current_phases) == n_oscillators:
                 scatter = ax.scatter(current_phases, np.ones(n_oscillators), 
                                    c=frequencies, cmap='viridis', 
-                                   s=150, alpha=0.8)
+                                   s=150, alpha=0.8, edgecolor='white', linewidth=2)
+                
+                # Add a glow effect with a larger, more transparent point underneath
+                ax.scatter(current_phases, np.ones(n_oscillators), 
+                         c=frequencies, cmap='viridis', 
+                         s=250, alpha=0.3, edgecolor=None)
             else:
                 # If there's a mismatch, adjust the arrays to match
                 min_len = min(len(current_phases), n_oscillators)
                 scatter = ax.scatter(current_phases[:min_len], np.ones(min_len), 
                                    c=frequencies[:min_len] if len(frequencies) >= min_len else frequencies, 
-                                   s=150, alpha=0.8, cmap='viridis')
+                                   s=150, alpha=0.8, cmap='viridis', edgecolor='white', linewidth=2)
+                
+                # Add a glow effect with a larger, more transparent point underneath
+                ax.scatter(current_phases[:min_len], np.ones(min_len), 
+                         c=frequencies[:min_len] if len(frequencies) >= min_len else frequencies, 
+                         s=250, alpha=0.3, cmap='viridis', edgecolor=None)
             
             # Plot mean phase as a red line
             mean_phase = np.mean(current_phases)
@@ -377,9 +402,17 @@ def display_simulation_results(model, times, phases, order_parameter, n_oscillat
         norm = plt.Normalize(np.min(frequencies), np.max(frequencies))
         cmap = plt.cm.viridis
         
-        for i in range(n_oscillators):
-            color = cmap(norm(frequencies[i]))
-            phase_ax.plot(times, phases_unwrapped[:, i], color=color, alpha=0.7, lw=1.5)
+        # Ensure the shapes match before plotting
+        if phases_unwrapped.shape[1] == n_oscillators:
+            for i in range(n_oscillators):
+                color = cmap(norm(frequencies[i]))
+                phase_ax.plot(times, phases_unwrapped[:, i], color=color, alpha=0.7, lw=1.5)
+        else:
+            # Handle shape mismatch case - use min length
+            min_oscillators = min(phases_unwrapped.shape[1], n_oscillators)
+            for i in range(min_oscillators):
+                color = cmap(norm(frequencies[i] if i < len(frequencies) else 0))
+                phase_ax.plot(times, phases_unwrapped[:, i], color=color, alpha=0.7, lw=1.5)
         
         # Plot mean phase trajectory
         phase_ax.plot(times, mean_phases, 'r-', lw=2.5, label='Mean Phase')
@@ -408,9 +441,17 @@ def display_simulation_results(model, times, phases, order_parameter, n_oscillat
         diff_fig, diff_ax = plt.subplots(figsize=(10, 6))
         
         # Plot phase differences with color based on natural frequency
-        for i in range(n_oscillators):
-            color = cmap(norm(frequencies[i]))
-            diff_ax.plot(times, phase_diffs[:, i], color=color, alpha=0.7, lw=1.5)
+        # Ensure the shapes match before plotting
+        if phase_diffs.shape[1] == n_oscillators:
+            for i in range(n_oscillators):
+                color = cmap(norm(frequencies[i]))
+                diff_ax.plot(times, phase_diffs[:, i], color=color, alpha=0.7, lw=1.5)
+        else:
+            # Handle shape mismatch case - use min length
+            min_oscillators = min(phase_diffs.shape[1], n_oscillators)
+            for i in range(min_oscillators):
+                color = cmap(norm(frequencies[i] if i < len(frequencies) else 0))
+                diff_ax.plot(times, phase_diffs[:, i], color=color, alpha=0.7, lw=1.5)
         
         # Add reference line at zero
         diff_ax.axhline(y=0, color='r', linestyle='--', lw=2)

@@ -332,11 +332,14 @@ time_step = st.sidebar.slider(
     key="time_step"
 )
 
-# Time step optimization controls
+# Time step optimization controls - smaller buttons with adjusted size
 time_step_col1, time_step_col2 = st.sidebar.columns([1, 1])
 
-# Add an auto-optimize time step button in column 1
-if time_step_col1.button("🧠 Auto-Optimize", help="Automatically calculate optimal time step for stability and accuracy"):
+# Add an auto-optimize time step button in column 1 with smaller text
+if time_step_col1.button("🧠 Optimize", help="Automatically calculate optimal time step for stability and accuracy"):
+    # Need to get the random seed value from session state before using it
+    current_random_seed = st.session_state.random_seed if "random_seed" in st.session_state else 42
+    
     # Create a temporary model to calculate optimal time step
     temp_model = KuramotoModel(
         n_oscillators=n_oscillators,
@@ -344,7 +347,7 @@ if time_step_col1.button("🧠 Auto-Optimize", help="Automatically calculate opt
         frequencies=frequencies,
         simulation_time=simulation_time,
         time_step=time_step,
-        random_seed=random_seed,
+        random_seed=current_random_seed,
         adjacency_matrix=adj_matrix
     )
     
@@ -547,7 +550,7 @@ if network_type == "Custom Adjacency Matrix":
                                 coupling_strength=coupling_strength,
                                 simulation_time=simulation_time,
                                 time_step=time_step,
-                                random_seed=random_seed,
+                                random_seed=current_random_seed,
                                 network_type="Custom Adjacency Matrix",
                                 frequency_distribution=freq_type,
                                 frequency_params=json.dumps({
@@ -708,6 +711,9 @@ if adj_matrix is not None:
                 # Extend by cycling through existing values if too few
                 frequencies = np.resize(frequencies, sim_n_oscillators)
 
+# Get current random seed from session state
+current_random_seed = st.session_state.random_seed if "random_seed" in st.session_state else 42
+
 # Run simulation with auto-optimization if enabled
 model, times, phases, order_parameter, optimized_time_step = run_simulation(
     n_oscillators=sim_n_oscillators,
@@ -715,7 +721,7 @@ model, times, phases, order_parameter, optimized_time_step = run_simulation(
     frequencies=frequencies,
     simulation_time=simulation_time,
     time_step=time_step,
-    random_seed=random_seed,
+    random_seed=current_random_seed,
     adjacency_matrix=adj_matrix,
     auto_optimize=auto_optimize_on_run
 )
@@ -767,7 +773,7 @@ with tab1:
             network_adj_matrix[i, (i+1) % n_oscillators] = 1
     elif network_type_internal == "Random":
         # For random, create random connections with 20% probability
-        np.random.seed(random_seed)  # Use same seed for reproducibility
+        np.random.seed(current_random_seed)  # Use same seed for reproducibility
         network_adj_matrix = np.random.random((n_oscillators, n_oscillators)) < 0.2
         network_adj_matrix = network_adj_matrix.astype(float)
         np.fill_diagonal(network_adj_matrix, 0)  # No self-connections
@@ -870,7 +876,7 @@ with tab1:
         st.info("Using special 'Etz Hayim' (Tree of Life) layout for this adjacency matrix.")
     elif n_oscillators <= 20:
         # Spring layout for smaller networks
-        pos = nx.spring_layout(G, seed=random_seed)
+        pos = nx.spring_layout(G, seed=current_random_seed)
     else:
         # Circular layout is better for visualization with many nodes
         pos = nx.circular_layout(G)

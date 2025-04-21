@@ -1443,7 +1443,7 @@ with tab3:
         if col2.button("▶️ Play", use_container_width=True):
             st.session_state.is_playing = True
             animate = True
-            st.rerun()
+            # Don't rerun here - let the animation code run
     
     # Next frame button
     if col3.button("⏩ Next", use_container_width=True):
@@ -1519,7 +1519,7 @@ with tab3:
         <p>The <b>top plot</b> shows oscillator phases over time. Each horizontal trace represents one oscillator's phase trajectory with consistent coloring based on the oscillator's natural frequency.</p>
         <p>The <b>bottom left plot</b> shows oscillators on a unit circle. Each colored dot represents an oscillator at its current phase position. The blue arrow shows the mean field vector, with length equal to the order parameter r.</p>
         <p>The <b>bottom right plot</b> shows the order parameter over time, with color-coded dots showing the synchronization level from 0 (no synchronization) to 1 (complete synchronization).</p>
-        <p>Click "Play Animation" to watch all three visualizations animate together to see the synchronization process in real-time.</p>
+        <p>Click "▶️ Play" to watch all three visualizations animate together to see the synchronization process in real-time.</p>
     </div>
     """, unsafe_allow_html=True)
     

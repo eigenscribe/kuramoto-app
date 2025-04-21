@@ -53,16 +53,8 @@ def render_database_tab():
                     'Date': str(timestamp_str)
                 })
             
-            # Create DataFrame with explicit dtypes
-            sim_df = pd.DataFrame(sim_data, dtype={
-                'ID': 'int64',
-                'Name': 'str',
-                'Oscillators': 'int64',
-                'Coupling': 'float64',
-                'Network': 'str',
-                'Final Sync': 'float64',
-                'Date': 'str'
-            })
+            # Create DataFrame
+            sim_df = pd.DataFrame(sim_data)
             
             # Display the DataFrame with sorting enabled
             st.dataframe(sim_df, use_container_width=True)
@@ -115,7 +107,7 @@ def render_database_tab():
                             {"Parameter": "Created", "Value": str(sim_details['timestamp'].strftime('%Y-%m-%d %H:%M:%S'))},
                             {"Parameter": "Final Synchronization", "Value": str(f"{sim_details['final_sync']:.4f}")},
                             {"Parameter": "Computation Time", "Value": str(f"{sim_details['computation_time']:.4f} seconds" if sim_details['computation_time'] else "Not recorded")}
-                        ], dtype={"Parameter": "str", "Value": "str"})
+                        ])
                         
                         st.dataframe(params_df, use_container_width=True, hide_index=True)
                     
@@ -408,16 +400,8 @@ def render_database_tab():
                         'Simulation Time': float(sim['simulation_time'])
                     })
                 
-                # Create DataFrame with explicit dtypes to avoid PyArrow conversion errors
-                comparison_df = pd.DataFrame(comparison_data, dtype={
-                    'Name': 'str',
-                    'Oscillators': 'int64',
-                    'Coupling': 'float64',
-                    'Network': 'str',
-                    'Frequency Dist.': 'str',
-                    'Final Sync': 'float64',
-                    'Simulation Time': 'float64'
-                })
+                # Create DataFrame 
+                comparison_df = pd.DataFrame(comparison_data)
                 st.dataframe(comparison_df, use_container_width=True)
     
     # TAB 2: CONFIGURATIONS
@@ -450,15 +434,8 @@ def render_database_tab():
                     'Date': str(timestamp_str)
                 })
             
-            # Create DataFrame with explicit dtypes to avoid PyArrow conversion errors
-            config_df = pd.DataFrame(config_data, dtype={
-                'ID': 'int64',
-                'Name': 'str',
-                'Oscillators': 'int64',
-                'Coupling': 'float64',
-                'Network': 'str',
-                'Date': 'str'
-            })
+            # Create DataFrame
+            config_df = pd.DataFrame(config_data)
             
             # Display the DataFrame with sorting enabled
             st.dataframe(config_df, use_container_width=True)
@@ -509,7 +486,7 @@ def render_database_tab():
                             {"Parameter": "Frequency Parameters", "Value": str(freq_params_str)},
                             {"Parameter": "Created", "Value": str(config_details['timestamp'].strftime('%Y-%m-%d %H:%M:%S'))},
                             {"Parameter": "Custom Adjacency Matrix", "Value": str("Yes" if config_details['adjacency_matrix'] is not None else "No")}
-                        ], dtype={"Parameter": "str", "Value": "str"})
+                        ])
                         
                         st.dataframe(params_df, use_container_width=True, hide_index=True)
                     

@@ -649,15 +649,16 @@ def display_simulation_results(model, times, phases, order_parameter, n_oscillat
                 "Std. Dev. of Natural Frequencies": np.std(frequencies)
             }
             
-            # Convert to DataFrame for better display
-            param_df = pd.DataFrame(list(param_data.items()), columns=["Parameter", "Value"])
-            
-            # Format floats before display
-            for i, val in enumerate(param_df["Value"]):
-                if isinstance(val, float):
-                    param_df.loc[i, "Value"] = f"{val:.4f}"
+            # Format values as strings before creating DataFrame
+            formatted_data = []
+            for param, value in param_data.items():
+                if isinstance(value, float):
+                    formatted_data.append([param, f"{value:.4f}"])
                 else:
-                    param_df.loc[i, "Value"] = str(val)
+                    formatted_data.append([param, str(value)])
+                    
+            # Convert to DataFrame for better display
+            param_df = pd.DataFrame(formatted_data, columns=["Parameter", "Value"])
             
             # Apply custom styling
             st.dataframe(
@@ -679,15 +680,16 @@ def display_simulation_results(model, times, phases, order_parameter, n_oscillat
                 "Computation Time": f"{model.computation_time:.4f} seconds" if hasattr(model, 'computation_time') else "Not recorded"
             }
             
-            # Convert to DataFrame for better display
-            results_df = pd.DataFrame(list(results_data.items()), columns=["Metric", "Value"])
-            
-            # Format floats before display
-            for i, val in enumerate(results_df["Value"]):
-                if isinstance(val, float):
-                    results_df.loc[i, "Value"] = f"{val:.4f}"
+            # Format values as strings before creating DataFrame
+            formatted_results = []
+            for metric, value in results_data.items():
+                if isinstance(value, float):
+                    formatted_results.append([metric, f"{value:.4f}"])
                 else:
-                    results_df.loc[i, "Value"] = str(val)
+                    formatted_results.append([metric, str(value)])
+                    
+            # Convert to DataFrame for better display
+            results_df = pd.DataFrame(formatted_results, columns=["Metric", "Value"])
             
             # Apply custom styling
             st.dataframe(

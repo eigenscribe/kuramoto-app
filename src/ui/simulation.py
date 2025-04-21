@@ -529,7 +529,7 @@ def display_simulation_results(model, times, phases, order_parameter, n_oscillat
                 if n_oscillators <= 20:
                     pos = nx.circular_layout(G)
                 else:
-                    pos = nx.spring_layout(G, seed=random_seed)
+                    pos = nx.spring_layout(G, seed=42)  # Use fixed seed for consistency
                 
                 # Create a colormap for phases
                 phase_colors = phases[-1]
@@ -597,7 +597,7 @@ def display_simulation_results(model, times, phases, order_parameter, n_oscillat
                 if n_oscillators <= 20:
                     pos = nx.circular_layout(G)
                 else:
-                    pos = nx.spring_layout(G, seed=random_seed)
+                    pos = nx.spring_layout(G, seed=42)  # Use fixed seed for consistency
                 
                 # Draw the network structure
                 nx.draw_networkx_nodes(G, pos, 

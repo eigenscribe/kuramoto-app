@@ -173,7 +173,7 @@ def create_network_topology_dataset(name="network_topology_dataset", n_oscillato
                 'network_type': network_type,
                 'random_seed': 1000 + i,
                 'frequency_distribution': 'normal',
-                'frequency_params': {'mean': 0.0, 'std': a0.1}
+                'frequency_params': {'mean': 0.0, 'std': 0.1}
             })
     
     # Base configuration

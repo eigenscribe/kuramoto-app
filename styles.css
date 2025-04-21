@@ -4,6 +4,7 @@ body {
     margin: 0;
     padding: 0;
     color: white;
+    text-align: center;
 }
 
 /* Adjust Streamlit default elements */
@@ -16,10 +17,34 @@ body {
     background-attachment: fixed;
 }
 
+/* Center all content */
+.main .block-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Center all paragraphs and text elements */
+p, div, h1, h2, h3, h4, h5, h6 {
+    text-align: center;
+}
+
+/* Center all charts and plots */
+[data-testid="stDecoration"], [data-testid="stImage"], .element-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+}
+
 .container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
+    text-align: center;
 }
 
 /* Gradient text styles - THESE TWO SPECIFIC GRADIENTS SHOULD BE USED */
@@ -78,9 +103,10 @@ body {
     flex-direction: column;
     height: 100%;
     justify-content: space-between;
-    text-align: left;
-    align-items: flex-start;
+    text-align: center;
+    align-items: center;
     padding: 15px;
+    margin: 0 auto;
 }
 
 .section h2 {
@@ -132,8 +158,9 @@ body {
     flex-direction: column;
     height: 100%;
     justify-content: space-between;
-    text-align: left;
-    align-items: flex-start;
+    text-align: center;
+    align-items: center;
+    margin: 0 auto;
 }
 
 .feature-box-content h3 {
@@ -370,12 +397,35 @@ footer {
     backdrop-filter: blur(5px);
 }
 
-/* Make plots more visible */
+/* Make plots more visible and centered */
 .stPlot {
     background-color: rgba(255, 255, 255, 0.9);
     border-radius: 15px;
     padding: 15px;
     margin-bottom: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Center all pyplot and plotly figures */
+.element-container > div[data-testid="stImage"], 
+.element-container > div > div[data-testid="stImage"],
+.element-container > div > div > div > div[class*="plotly"],
+.element-container > div > div > div > div[class*="js-plotly"],
+.element-container > div > div > canvas,
+.css-1kyxreq {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin: 0 auto !important;
+}
+
+/* Center matplotlib plots specifically */
+canvas.marks, div.marks, div[class*="Plot"] {
+    margin: 0 auto !important;
 }
 
 /* Progress bar styling with gradient */

@@ -160,46 +160,63 @@ def display_simulation_results(model, times, phases, order_parameter, n_oscillat
             # Create an interactive time slider for viewing phases at different times
             st.subheader("Phase Development Over Time")
             
+            # Ensure we have a valid number of timepoints
+            n_time_points = len(times)
+            
             # Default the slider to the last frame
             if 'time_idx' not in st.session_state:
-                st.session_state.time_idx = len(times) - 1
+                st.session_state.time_idx = max(0, n_time_points - 1)
             
-            # Create the slider
+            # Ensure the stored time_idx is valid
+            st.session_state.time_idx = min(max(0, st.session_state.time_idx), max(0, n_time_points - 1))
+            
+            # Create the slider with fail-safe values
             time_idx = st.slider(
                 "Time",
                 min_value=0,
-                max_value=len(times) - 1,
+                max_value=max(0, n_time_points - 1),  # Ensure we don't get negative slider values
                 value=st.session_state.time_idx,
                 format="t=%d",
                 key="time_idx"
             )
             
-            # Show actual time value
-            st.markdown(f"*t = {times[time_idx]:.2f}*")
+            # Show actual time value (with bounds checking)
+            if 0 <= time_idx < n_time_points:
+                st.markdown(f"*t = {times[time_idx]:.2f}*")
+            else:
+                st.markdown("*Invalid time index*")
             
             # Create a figure for the selected time
             fig_selected = plt.figure(figsize=(5, 5))
             ax_selected = fig_selected.add_subplot(111, projection='polar')
             
-            # Make sure the arrays are the same length
-            if len(phases[time_idx]) == n_oscillators:
-                ax_selected.scatter(phases[time_idx], np.ones(n_oscillators), c=frequencies, s=80, alpha=0.8, cmap='viridis')
-            else:
-                # If there's a mismatch, adjust the arrays to match
-                min_len = min(len(phases[time_idx]), n_oscillators)
-                ax_selected.scatter(phases[time_idx][:min_len], np.ones(min_len), 
-                                   c=frequencies[:min_len] if len(frequencies) >= min_len else frequencies, 
-                                   s=80, alpha=0.8, cmap='viridis')
+            # Ensure time_idx is within bounds
+            if 0 <= time_idx < len(phases):
+                # Make sure the arrays are the same length
+                if len(phases[time_idx]) == n_oscillators:
+                    scatter = ax_selected.scatter(phases[time_idx], np.ones(n_oscillators), 
+                                                 c=frequencies, s=80, alpha=0.8, cmap='viridis')
+                else:
+                    # If there's a mismatch, adjust the arrays to match
+                    min_len = min(len(phases[time_idx]), n_oscillators)
+                    scatter = ax_selected.scatter(phases[time_idx][:min_len], np.ones(min_len), 
+                                                c=frequencies[:min_len] if len(frequencies) >= min_len else frequencies, 
+                                                s=80, alpha=0.8, cmap='viridis')
                 
-            ax_selected.set_rticks([])  # Hide radial ticks
-            
-            # Plot mean phase as a red line
-            mean_phase = np.mean(phases[time_idx])
-            ax_selected.plot([mean_phase, mean_phase], [0, 1], 'r-', lw=2)
-            
-            # Add a colorbar to indicate the natural frequencies
-            cbar = fig_selected.colorbar(ax_selected.collections[0], ax=ax_selected, shrink=0.8)
-            cbar.set_label('Natural Frequency')
+                ax_selected.set_rticks([])  # Hide radial ticks
+                
+                # Plot mean phase as a red line
+                mean_phase = np.mean(phases[time_idx])
+                ax_selected.plot([mean_phase, mean_phase], [0, 1], 'r-', lw=2)
+                
+                # Add a colorbar to indicate the natural frequencies
+                cbar = fig_selected.colorbar(scatter, ax=ax_selected, shrink=0.8)
+                cbar.set_label('Natural Frequency')
+            else:
+                # Display an error message on the plot if time_idx is invalid
+                ax_selected.text(0, 0, "No data to display", 
+                                ha='center', va='center', fontsize=12)
+                ax_selected.set_rticks([])
             
             st.pyplot(fig_selected)
         
@@ -293,31 +310,39 @@ def display_simulation_results(model, times, phases, order_parameter, n_oscillat
             # Calculate frames to display
             frame_indices = range(start_idx, len(times), frame_interval)
             
-            # Create and display first frame
-            first_frame_base64 = create_animation_frame(frame_indices[0])
-            img_html = f'<img src="data:image/png;base64,{first_frame_base64}" style="width: 100%;">'
-            animation_container.markdown(img_html, unsafe_allow_html=True)
-            
-            # Animate subsequent frames
-            for i in frame_indices[1:]:
-                if not st.session_state.animation_playing:
-                    break
-                
-                # Create and update the frame
-                frame_base64 = create_animation_frame(i)
-                img_html = f'<img src="data:image/png;base64,{frame_base64}" style="width: 100%;">'
+            # Safely get frame indices
+            if len(frame_indices) > 0:
+                # Create and display first frame
+                first_frame_base64 = create_animation_frame(frame_indices[0])
+                img_html = f'<img src="data:image/png;base64,{first_frame_base64}" style="width: 100%;">'
                 animation_container.markdown(img_html, unsafe_allow_html=True)
                 
-                # Control animation speed
-                time.sleep(0.1 / st.session_state.animation_speed)
+                # Animate subsequent frames
+                for i in frame_indices[1:]:
+                    if not st.session_state.animation_playing:
+                        break
+                    
+                    # Create and update the frame
+                    frame_base64 = create_animation_frame(i)
+                    img_html = f'<img src="data:image/png;base64,{frame_base64}" style="width: 100%;">'
+                    animation_container.markdown(img_html, unsafe_allow_html=True)
+                    
+                    # Control animation speed
+                    time.sleep(0.1 / st.session_state.animation_speed)
+            else:
+                # No valid frames to show
+                animation_container.warning("No frames available for animation")
                 
             # Once animation is done, update playing state
             st.session_state.animation_playing = False
         else:
-            # Display static frame at current time index
-            static_frame_base64 = create_animation_frame(time_idx)
-            img_html = f'<img src="data:image/png;base64,{static_frame_base64}" style="width: 100%;">'
-            animation_container.markdown(img_html, unsafe_allow_html=True)
+            # Display static frame at current time index (make sure it's valid)
+            if 0 <= time_idx < len(times):
+                static_frame_base64 = create_animation_frame(time_idx)
+                img_html = f'<img src="data:image/png;base64,{static_frame_base64}" style="width: 100%;">'
+                animation_container.markdown(img_html, unsafe_allow_html=True)
+            else:
+                animation_container.warning("No valid frame to display")
         
         # Phase trajectory plot (unwrapped phases over time)
         st.markdown("<h3 class='gradient_text1'>Phase Trajectories</h3>", unsafe_allow_html=True)
@@ -649,23 +674,40 @@ def display_simulation_results(model, times, phases, order_parameter, n_oscillat
                 "Std. Dev. of Natural Frequencies": np.std(frequencies)
             }
             
-            # Format values as strings before creating DataFrame
-            formatted_data = []
-            for param, value in param_data.items():
-                if isinstance(value, float):
-                    formatted_data.append([param, f"{value:.4f}"])
-                else:
-                    formatted_data.append([param, str(value)])
-                    
-            # Convert to DataFrame for better display
-            param_df = pd.DataFrame(formatted_data, columns=["Parameter", "Value"])
+            # Format as a Bootstrap-style table
+            param_table_html = """
+            <div style="background-color: rgba(0,0,0,0.2); padding: 10px; border-radius: 15px;">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th style="width: 50%;">Parameter</th>
+                        <th style="width: 50%;">Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+            """
             
-            # Apply custom styling
-            st.dataframe(
-                param_df,
-                hide_index=True,
-                use_container_width=True
-            )
+            for param, value in param_data.items():
+                # Format numerical values to 4 decimal places
+                if isinstance(value, float):
+                    value_str = f"{value:.4f}"
+                else:
+                    value_str = str(value)
+                
+                param_table_html += f"""
+                <tr>
+                    <td>{param}</td>
+                    <td>{value_str}</td>
+                </tr>
+                """
+            
+            param_table_html += """
+                </tbody>
+            </table>
+            </div>
+            """
+            
+            st.markdown(param_table_html, unsafe_allow_html=True)
             
             # Display results summary
             st.markdown("<h4>Results Summary</h4>", unsafe_allow_html=True)
@@ -680,23 +722,39 @@ def display_simulation_results(model, times, phases, order_parameter, n_oscillat
                 "Computation Time": f"{model.computation_time:.4f} seconds" if hasattr(model, 'computation_time') else "Not recorded"
             }
             
-            # Format values as strings before creating DataFrame
-            formatted_results = []
+            # Format as a Bootstrap-style table
+            results_table_html = """
+            <div style="background-color: rgba(0,0,0,0.2); padding: 10px; border-radius: 15px;">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th style="width: 50%;">Metric</th>
+                        <th style="width: 50%;">Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+            """
+            
             for metric, value in results_data.items():
                 if isinstance(value, float):
-                    formatted_results.append([metric, f"{value:.4f}"])
+                    value_str = f"{value:.4f}"
                 else:
-                    formatted_results.append([metric, str(value)])
-                    
-            # Convert to DataFrame for better display
-            results_df = pd.DataFrame(formatted_results, columns=["Metric", "Value"])
+                    value_str = str(value)
+                
+                results_table_html += f"""
+                <tr>
+                    <td>{metric}</td>
+                    <td>{value_str}</td>
+                </tr>
+                """
             
-            # Apply custom styling
-            st.dataframe(
-                results_df,
-                hide_index=True,
-                use_container_width=True
-            )
+            results_table_html += """
+                </tbody>
+            </table>
+            </div>
+            """
+            
+            st.markdown(results_table_html, unsafe_allow_html=True)
         
         with data_col2:
             # Create a section for saving the results to the database

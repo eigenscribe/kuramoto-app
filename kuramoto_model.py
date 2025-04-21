@@ -54,9 +54,6 @@ class KuramotoModel:
         # Initialize phases randomly
         self.initial_phases = 2 * np.pi * np.random.random(n_oscillators)
         
-        # Save random seed for future reference
-        self.random_seed = random_seed
-        
         # Results storage
         self.times = None
         self.phases = None

@@ -11,7 +11,7 @@ This module provides utilities and examples for:
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from src.utils.database import (
+from database import (
     create_ml_dataset,
     add_simulation_to_dataset,
     extract_features,
@@ -20,7 +20,7 @@ from src.utils.database import (
     run_batch_simulations,
     list_ml_datasets
 )
-from src.models.kuramoto_model import KuramotoModel
+from kuramoto_model import KuramotoModel
 
 
 def generate_parameter_sweep(param_grid):

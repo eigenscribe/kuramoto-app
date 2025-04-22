@@ -419,38 +419,38 @@ a:hover {
     color: white;
 }
 
-/* Force all sidebar text to be left-aligned */
-.sidebar .css-183lzff {
-    text-align: left !important;
-}
-
-/* Make sidebar headers left-aligned except gradient ones */
-.sidebar h1, .sidebar h2, .sidebar h3, .sidebar h4, .sidebar h5, .sidebar h6 {
-    text-align: left !important;
-}
-
-/* Keep gradient headers centered */
-.sidebar h1.gradient_text1, .sidebar h2.gradient_text1, .sidebar h3.gradient_text1, 
-.sidebar h4.gradient_text1, .sidebar h5.gradient_text1, .sidebar h6.gradient_text1 {
-    text-align: center !important;
-}
-
-/* Target the actual widgets label-value displays in sidebar */
-[data-testid="stSidebar"] .row-widget > label,
-[data-testid="stSidebar"] .row-widget > div,
-[data-testid="stSidebar"] .row-widget [data-testid="stVerticalBlock"] {
+/* Direct targeting of the widget wrapper - the most critical part */
+section[data-testid="stSidebar"] [class*="css"] {
     text-align: left !important;
     justify-content: flex-start !important;
-    display: flex !important;
+}
+
+/* Force all text in sidebar content to be left-aligned by overriding everything */
+section[data-testid="stSidebar"] * {
+    text-align: left !important;
+}
+
+/* Get the actual widget labels and values */
+section[data-testid="stSidebar"] .css-1inwz65,
+section[data-testid="stSidebar"] [class*="css"],
+section[data-testid="stSidebar"] .row-widget > label,
+section[data-testid="stSidebar"] .row-widget > div,
+section[data-testid="stSidebar"] .row-widget [data-testid="stVerticalBlock"],
+section[data-testid="stSidebar"] .element-container {
+    text-align: left !important;
+    justify-content: flex-start !important;
     align-items: flex-start !important;
 }
 
-/* Force specific Streamlit form field labels to be left-aligned */
-[data-testid="stSidebar"] .st-af,
-[data-testid="stSidebar"] .st-ae,
-[data-testid="stSidebar"] .st-ag {
-    text-align: left !important;
-    justify-content: flex-start !important;
+/* Keep gradient headers centered */
+section[data-testid="stSidebar"] h1.gradient_text1, 
+section[data-testid="stSidebar"] h2.gradient_text1, 
+section[data-testid="stSidebar"] h3.gradient_text1, 
+section[data-testid="stSidebar"] h4.gradient_text1, 
+section[data-testid="stSidebar"] h5.gradient_text1, 
+section[data-testid="stSidebar"] h6.gradient_text1,
+section[data-testid="stSidebar"] .gradient_text1 {
+    text-align: center !important;
 }
 
 /* Footer style */

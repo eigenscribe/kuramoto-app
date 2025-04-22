@@ -232,12 +232,36 @@ a:hover {
     background: linear-gradient(to right, #00ffee, #27aaff);
 }
 
-/* Explicitly force all sidebar widgets to be left-aligned */
-[data-testid="stSidebar"] .element-container div {
+/* Target sidebar elements for left alignment but maintain their structure */
+[data-testid="stSidebar"] div.row-widget label {
     text-align: left !important;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    width: 100% !important;
+}
+
+/* Ensure slider values are left aligned */
+[data-testid="stSidebar"] .stSlider span[aria-valuetext] {
+    text-align: left !important;
+}
+
+/* Widget container alignment */
+[data-testid="stSidebar"] .row-widget {
+    text-align: left !important;
+}
+
+/* Selectbox left alignment */
+[data-testid="stSidebar"] div[data-baseweb="select"] {
+    text-align: left !important;
+}
+
+/* Text input and text area left alignment */
+[data-testid="stSidebar"] .stTextInput label,
+[data-testid="stSidebar"] .stTextArea label {
+    text-align: left !important;
+}
+
+/* Number inputs */
+[data-testid="stSidebar"] .stNumberInput label {
+    text-align: left !important;
 }
 
 /* Network Connectivity section styling */

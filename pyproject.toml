@@ -8,6 +8,7 @@ dependencies = [
     "matplotlib>=3.10.1",
     "networkx>=3.4.2",
     "numpy>=2.2.4",
+    "pandas>=2.2.3",
     "plotly>=6.0.1",
     "scipy>=1.15.2",
     "sqlalchemy>=2.0.40",

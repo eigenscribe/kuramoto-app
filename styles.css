@@ -274,12 +274,17 @@ a:hover {
 }
 
 /* Make sidebar content left-aligned */
-.sidebar p, .sidebar div, .sidebar h3, .sidebar h4, .sidebar label {
+.sidebar p, .sidebar div, .sidebar h3, .sidebar h4, .sidebar label, .sidebar span, .sidebar .stMarkdown, .sidebar .stText {
+    text-align: left !important;
+}
+
+/* Make sure all text inputs, sliders, and other widgets are left-aligned */
+.sidebar .stTextInput, .sidebar .stNumberInput, .sidebar .stSlider, .sidebar .stSelectbox, .sidebar .stRadio, .sidebar .stCheckbox {
     text-align: left !important;
 }
 
 /* Exception for gradient headers which stay centered */
-.sidebar h3.gradient_text1, .sidebar h3 span {
+.sidebar h3.gradient_text1, .sidebar h2.gradient_text1, .sidebar h3 span.gradient_text1, .sidebar h2 span.gradient_text1 {
     text-align: center !important;
 }
 
@@ -395,6 +400,22 @@ a:hover {
 /* Override Streamlit defaults */
 .stMarkdown {
     color: white;
+}
+
+/* Force all sidebar text to be left-aligned */
+.sidebar .css-183lzff {
+    text-align: left !important;
+}
+
+/* Make sidebar headers left-aligned except gradient ones */
+.sidebar h1, .sidebar h2, .sidebar h3, .sidebar h4, .sidebar h5, .sidebar h6 {
+    text-align: left !important;
+}
+
+/* Keep gradient headers centered */
+.sidebar h1.gradient_text1, .sidebar h2.gradient_text1, .sidebar h3.gradient_text1, 
+.sidebar h4.gradient_text1, .sidebar h5.gradient_text1, .sidebar h6.gradient_text1 {
+    text-align: center !important;
 }
 
 /* Footer style */

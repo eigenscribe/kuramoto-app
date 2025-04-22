@@ -8,53 +8,10 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Add direct CSS rule to force sidebar text alignment - with !important flags and additional selectors
+# Let's strip down all CSS in the app to the minimum needed
 st.markdown("""
 <style>
-    /* Force all sidebar text to be left-aligned with maximum specificity */
-    [data-testid="stSidebar"] [data-baseweb="tab-panel"] *,
-    [data-testid="stSidebar"] [data-testid="stVerticalBlock"] *,
-    [data-testid="stSidebar"] [data-testid="stForm"] *,
-    [data-testid="stSidebar"] .stMarkdown *,
-    [data-testid="stSidebar"] label,
-    [data-testid="stSidebar"] div,
-    [data-testid="stSidebar"] p,
-    [data-testid="stSidebar"] span,
-    [data-testid="stSidebar"] .row-widget,
-    [data-testid="stSidebar"] .row-widget > div,
-    [data-testid="stSidebar"] .row-widget > label,
-    [data-testid="stSidebar"] .row-widget .stSlider,
-    [data-testid="stSidebar"] .row-widget .stSelectbox,
-    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"],
-    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] > div,
-    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] > p,
-    [data-testid="stSidebar"] .element-container {
-        text-align: left !important;
-        justify-content: flex-start !important;
-        align-items: flex-start !important;
-    }
-    
-    /* Super important override for Streamlit's core text alignment */
-    div.css-183lzff {
-        text-align: left !important;
-    }
-    
-    /* Direct style overrides for row-widgets */
-    .css-1inwz65 {
-        justify-content: flex-start !important;
-        text-align: left !important;
-    }
-    
-    /* Keep gradient headers centered - highest specificity */
-    [data-testid="stSidebar"] .gradient_text1,
-    [data-testid="stSidebar"] h1.gradient_text1,
-    [data-testid="stSidebar"] h2.gradient_text1,
-    [data-testid="stSidebar"] h3.gradient_text1,
-    [data-testid="stSidebar"] h4.gradient_text1,
-    [data-testid="stSidebar"] h5.gradient_text1,
-    [data-testid="stSidebar"] h6.gradient_text1 {
-        text-align: center !important;
-    }
+    /* No special styling - let Streamlit's defaults handle alignment */
 </style>
 """, unsafe_allow_html=True)
 
@@ -392,20 +349,7 @@ st.sidebar.markdown("<h2 class='gradient_text1'>Simulation Parameters</h2>", uns
 # Add Time Controls Section first
 st.sidebar.markdown("<h3 class='gradient_text1'>Time Controls</h3>", unsafe_allow_html=True)
 
-# Force inline alignment on all sidebar content
-st.sidebar.markdown("""
-<style>
-    /* This targets specifically the sidebar content */
-    section[data-testid="stSidebar"] .block-container {
-        text-align: left !important;
-    }
-    
-    /* Target widget labels and values */
-    .stSlider div[data-baseweb="slider"] > div {
-        text-align: left !important;
-    }
-</style>
-""", unsafe_allow_html=True)
+# We now use a simplified approach in the CSS file
 
 # Simulation time parameters
 simulation_time = st.sidebar.slider(

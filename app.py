@@ -1560,11 +1560,19 @@ with tab3:
     # Set time index from session state
     time_index = st.session_state.time_index
     
+    # Safety check to prevent index out of bounds errors
+    max_valid_index = len(times) - 1
+    if time_index > max_valid_index:
+        # Reset the time index to a valid value
+        time_index = max_valid_index
+        st.session_state.time_index = max_valid_index
+        st.warning(f"Time index was reset to maximum value ({max_valid_index})")
+    
     # Initialize animation variables
     animate = False
     animation_speed = 3.0
     
-    # Get time and order parameter values for the current time index
+    # Get time and order parameter values for the current time index (now with bounds checking)
     current_time = times[time_index]
     current_r = order_parameter[time_index]
     
@@ -1573,6 +1581,9 @@ with tab3:
     
     # Function to create the phase visualization
     def create_phase_plot(time_idx):
+        # Add bounds checking to prevent index errors
+        max_valid_idx = min(time_idx, len(times) - 1)
+        
         # Create visualization with enhanced visuals for dark theme
         fig_circle = plt.figure(figsize=(5, 5))
         ax_circle = fig_circle.add_subplot(111)
@@ -1596,10 +1607,23 @@ with tab3:
                          linewidth=1.5, alpha=0.8, zorder=4)
         ax_circle.add_patch(circle)
         
-        # Plot oscillators
-        phases_at_time = phases[:, time_idx]
-        x = np.cos(phases_at_time)
-        y = np.sin(phases_at_time)
+        # Plot oscillators - with bounds checking
+        # Make sure we're using a valid time index
+        safe_time_idx = max_valid_idx
+        
+        # Safety check for phase data dimensions
+        if safe_time_idx < phases.shape[1]:
+            phases_at_time = phases[:, safe_time_idx]
+            x = np.cos(phases_at_time)
+            y = np.sin(phases_at_time)
+        else:
+            # Fallback to initial phases if time index is beyond data
+            initial_phases = phases[:, 0]
+            x = np.cos(initial_phases)
+            y = np.sin(initial_phases)
+            # Show a warning in the plot
+            ax_circle.text(0, 0, "Invalid time index", 
+                         ha='center', va='center', color='red', fontsize=12)
         
         # Create custom colormap that matches our gradient_text1 theme
         custom_cmap = LinearSegmentedColormap.from_list("kuramoto_colors", 
@@ -1679,6 +1703,9 @@ with tab3:
     
     # Function to create oscillator phases over time plot (as dots)
     def create_oscillator_phases_plot(time_idx):
+        # Add bounds checking to prevent index errors
+        max_valid_idx = min(time_idx, len(times) - 1)
+        
         fig, ax = plt.subplots(figsize=(12, 3.5))
         
         # Add background
@@ -1893,25 +1920,34 @@ with tab3:
         # Get the current time index as the starting point
         start_idx = st.session_state.time_index
         
+        # Ensure we're not starting beyond the available data
+        max_valid_index = len(times) - 1
+        if start_idx > max_valid_index:
+            start_idx = 0
+            st.session_state.time_index = 0
+        
         # Calculate how many frames to skip based on speed
         frame_skip = max(1, int(11 - animation_speed))
         
         # Set up a progress bar
         progress_bar = st.progress(0)
         
-        # Animation loop
-        for i in range(start_idx, len(times), frame_skip):
+        # Animation loop with bounds checking
+        for i in range(start_idx, min(len(times), max_valid_index + 1), frame_skip):
             # Update the session state
             st.session_state.time_index = i
             
-            # Update progress bar
-            progress = (i - start_idx) / (len(times) - 1 - start_idx) if i < len(times) - 1 else 1.0
+            # Update progress bar - with safeguards to prevent division by zero
+            denominator = max(1, max_valid_index - start_idx)  # Ensure non-zero denominator
+            progress = min(1.0, (i - start_idx) / denominator)
             progress_bar.progress(progress)
             
             # Update all three plots
-            circle_plot_placeholder.pyplot(create_phase_plot(i))
-            phases_plot_placeholder.pyplot(create_oscillator_phases_plot(i))
-            order_plot_placeholder.pyplot(create_order_parameter_plot(i))
+            # Safety checks for index values
+            plot_idx = min(i, max_valid_index)
+            circle_plot_placeholder.pyplot(create_phase_plot(plot_idx))
+            phases_plot_placeholder.pyplot(create_oscillator_phases_plot(plot_idx))
+            order_plot_placeholder.pyplot(create_order_parameter_plot(plot_idx))
             
             # Add a short pause to control animation speed
             time.sleep(0.1 / animation_speed)

@@ -1729,6 +1729,9 @@ with tab3:
         for i, idx in enumerate(sorted_indices):
             oscillator_colors[idx] = custom_cmap(color_indices[i])
         
+        # Use the safety bounds check variable
+        safe_time_idx = max_valid_idx
+        
         # Plot all oscillators as dots up to the current time point
         for i in range(n_oscillators):
             color = oscillator_colors[i]
@@ -1740,16 +1743,16 @@ with tab3:
             bright_color = tuple(min(1.0, c * 1.5) for c in rgb)
             
             # Plot oscillator phases as filled dots with color gradient
-            ax.scatter(times[:time_idx+1], phases[i, :time_idx+1] % (2 * np.pi), 
+            ax.scatter(times[:safe_time_idx+1], phases[i, :safe_time_idx+1] % (2 * np.pi), 
                      facecolors=color, edgecolor=bright_color, alpha=0.7, s=50, 
                      linewidth=0.5, zorder=5)
             
             # Add a subtle connecting line with low opacity
-            ax.plot(times[:time_idx+1], phases[i, :time_idx+1] % (2 * np.pi), 
+            ax.plot(times[:safe_time_idx+1], phases[i, :safe_time_idx+1] % (2 * np.pi), 
                   color=color, alpha=0.2, linewidth=0.8, zorder=2)
             
             # Highlight current position with a larger filled marker
-            ax.scatter([times[time_idx]], [phases[i, time_idx] % (2 * np.pi)], 
+            ax.scatter([times[safe_time_idx]], [phases[i, safe_time_idx] % (2 * np.pi)], 
                      s=140, facecolors=color, edgecolor=bright_color, 
                      linewidth=1.0, zorder=15)
         
@@ -1762,7 +1765,7 @@ with tab3:
         # Plot styling
         ax.set_xlabel('Time', fontsize=13, fontweight='bold', color='white')
         ax.set_ylabel('Phase (mod 2π)', fontsize=13, fontweight='bold', color='white')
-        ax.set_title(f'Oscillator Phases at t={times[time_idx]:.2f}', 
+        ax.set_title(f'Oscillator Phases at t={times[safe_time_idx]:.2f}', 
                    fontsize=14, fontweight='bold', color='white', pad=15)
         ax.set_ylim(0, 2 * np.pi)
         ax.set_yticks([0, np.pi/2, np.pi, 3*np.pi/2, 2*np.pi])
@@ -1784,6 +1787,9 @@ with tab3:
     
     # Create a function to create order parameter plot over time (as a dot plot)
     def create_order_parameter_plot(time_idx):
+        # Add bounds checking to prevent index errors
+        max_valid_idx = min(time_idx, len(times) - 1)
+        
         fig, ax = plt.subplots(figsize=(5, 5))
         
         # Add background gradient
@@ -1798,8 +1804,11 @@ with tab3:
                                              ["#00c2dd", "#109ae8", "#0070db"], 
                                              N=256)
         
+        # Use the safe index for all references
+        safe_time_idx = max_valid_idx
+        
         # Plot order parameter with filled gradient dots and brighter outline
-        base_colors = [cmap(r) for r in order_parameter[:time_idx+1]]
+        base_colors = [cmap(r) for r in order_parameter[:safe_time_idx+1]]
         edge_colors = []
         
         # Create brighter versions of each color for the outlines
@@ -1809,22 +1818,22 @@ with tab3:
             bright_color = tuple(min(1.0, c * 1.5) for c in rgb)
             edge_colors.append(bright_color)
         
-        scatter = ax.scatter(times[:time_idx+1], order_parameter[:time_idx+1],
+        scatter = ax.scatter(times[:safe_time_idx+1], order_parameter[:safe_time_idx+1],
                           facecolors=base_colors, edgecolors=edge_colors,
                           s=70, alpha=0.9, linewidth=0.5, zorder=10)
         
         # Add a connecting line with low opacity
-        ax.plot(times[:time_idx+1], order_parameter[:time_idx+1], 
+        ax.plot(times[:safe_time_idx+1], order_parameter[:safe_time_idx+1], 
               color='white', alpha=0.3, linewidth=1, zorder=5)
         
         # Highlight current position with a larger filled marker
-        if time_idx > 0:
+        if safe_time_idx > 0:
             # Get color and make brighter version for outline
-            current_color = cmap(order_parameter[time_idx])
+            current_color = cmap(order_parameter[safe_time_idx])
             rgb = matplotlib.colors.to_rgb(current_color)
             bright_current = tuple(min(1.0, c * 1.5) for c in rgb)
             
-            ax.scatter([times[time_idx]], [order_parameter[time_idx]], 
+            ax.scatter([times[safe_time_idx]], [order_parameter[safe_time_idx]], 
                      s=180, facecolors=current_color, 
                      edgecolors=bright_current, 
                      linewidth=1.0, zorder=15)
@@ -1840,7 +1849,7 @@ with tab3:
         ax.set_ylim(0, 1.05)
         ax.set_xlabel('Time', fontsize=13, fontweight='bold', color='white')
         ax.set_ylabel('Order Parameter r(t)', fontsize=13, fontweight='bold', color='white')
-        ax.set_title(f'Phase Synchronization at t={times[time_idx]:.2f}', 
+        ax.set_title(f'Phase Synchronization at t={times[safe_time_idx]:.2f}', 
                    fontsize=14, fontweight='bold', color='white', pad=15)
         
         # Create custom grid

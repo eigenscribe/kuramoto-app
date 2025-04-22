@@ -1225,7 +1225,8 @@ with tab1:
     # Calculate dynamic node size based on number of nodes
     # Larger size for fewer nodes, smaller size for many nodes
     n_nodes = len(G.nodes)
-    node_size = max(100, int(1000 * (1 / (0.1 * n_nodes + 0.5))))  # Formula for scaling
+    # Reduced node size with a smaller base and adjusted scaling
+    node_size = max(80, int(600 * (1 / (0.15 * n_nodes + 0.7))))  # Formula for smaller nodes
     
     # Generate brighter versions of node colors for edges
     bright_node_colors = []
@@ -1280,8 +1281,13 @@ with tab1:
                                              ["#00c2dd", "#109ae8", "#0070db"], 
                                              N=256)
     # Apply custom colormap - dark blue for 0s, light blue for 1s
-    im = ax2.imshow(network_adj_matrix, cmap=blue_cmap)
+    # Using binary data without text annotations
+    im = ax2.imshow(network_adj_matrix, cmap=blue_cmap, interpolation='nearest')
     plt.colorbar(im, ax=ax2, label='Connection Strength')
+    
+    # Remove the actual 0/1 text annotations by turning off tick labels
+    ax2.set_xticks([])
+    ax2.set_yticks([])
     
     # Add labels and styling
     ax2.set_title(f'Adjacency Matrix', color='white', fontsize=14)

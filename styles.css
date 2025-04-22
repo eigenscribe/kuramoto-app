@@ -4,7 +4,6 @@ body {
     margin: 0;
     padding: 0;
     color: white;
-    text-align: center;
 }
 
 /* Adjust Streamlit default elements */
@@ -17,39 +16,10 @@ body {
     background-attachment: fixed;
 }
 
-/* Center all content */
-.main .block-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-/* Text alignment: Headers centered, other text left-aligned */
-h1, h2, h3, h4, h5, h6 {
-    text-align: center;
-}
-
-/* Default to left-aligned text for regular content */
-p, div, li, label, .stMarkdown, .stText {
-    text-align: left;
-}
-
-/* Center all charts and plots */
-[data-testid="stDecoration"], [data-testid="stImage"], .element-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 0 auto;
-}
-
 .container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
-    text-align: center;
 }
 
 /* Gradient text styles - THESE TWO SPECIFIC GRADIENTS SHOULD BE USED */
@@ -111,7 +81,6 @@ p, div, li, label, .stMarkdown, .stText {
     text-align: left;
     align-items: flex-start;
     padding: 15px;
-    margin: 0 auto;
 }
 
 .section h2 {
@@ -165,7 +134,6 @@ p, div, li, label, .stMarkdown, .stText {
     justify-content: space-between;
     text-align: left;
     align-items: flex-start;
-    margin: 0 auto;
 }
 
 .feature-box-content h3 {
@@ -185,36 +153,23 @@ p, div, li, label, .stMarkdown, .stText {
 .btn, .stButton button, button[kind="primary"] {
     background-image: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb);
     box-shadow: 0 4px 15px 0 rgba(39, 170, 255, 0.5);
-    width: auto;
-    min-width: 120px;
-    font-size: 14px;
+    width: 100%;
+    min-width: 200px;
+    font-size: 16px;
     font-weight: 600;
-    color: white !important;
+    color: white;
     cursor: pointer;
     margin: 10px auto;
-    height: 36px;
+    height: 50px;
     text-align: center;
     border: none;
     background-size: 300% 100%;
     border-radius: 15px;
     transition: all .4s ease-in-out;
     font-family: 'Aclonica', sans-serif;
-    display: inline-block;
+    display: block;
     text-decoration: none;
-    line-height: 36px;
-    padding: 0 15px;
-    position: relative;
-    z-index: 1;
-}
-
-/* Button text styling to ensure visibility */
-.stButton button p, .stButton button span, .stButton button div {
-    color: white !important;
-    font-family: 'Aclonica', sans-serif !important;
-    position: relative;
-    z-index: 2;
-    margin: 0;
-    padding: 0;
+    line-height: 50px;
 }
 
 /* Button hover effects */
@@ -266,45 +221,6 @@ a:hover {
     backdrop-filter: blur(10px);
 }
 
-/* JSON text area alignment */
-.sidebar textarea {
-    font-size: 0.85rem !important;
-    font-family: monospace !important;
-    text-align: left !important;
-}
-
-/* Target specific Streamlit sidebar elements */
-[data-testid="stSidebar"] p, 
-[data-testid="stSidebar"] div, 
-[data-testid="stSidebar"] label, 
-[data-testid="stSidebar"] span, 
-[data-testid="stSidebar"] .stMarkdown, 
-[data-testid="stSidebar"] .stText,
-[data-testid="stSidebar"] [data-baseweb="slider"] + div,
-[data-testid="stSidebar"] .stSlider [data-testid="stMarkdownContainer"] > div > p,
-[data-testid="stSidebar"] [data-testid="stVerticalBlock"] > div {
-    text-align: left !important;
-}
-
-/* Force specific Streamlit components to be left-aligned */
-[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] > div > p,
-[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] > p {
-    text-align: left !important;
-    display: block !important;
-    width: 100% !important;
-}
-
-/* Exception for gradient headers which stay centered */
-[data-testid="stSidebar"] h1.gradient_text1, 
-[data-testid="stSidebar"] h2.gradient_text1, 
-[data-testid="stSidebar"] h3.gradient_text1, 
-[data-testid="stSidebar"] h4.gradient_text1, 
-[data-testid="stSidebar"] h5.gradient_text1, 
-[data-testid="stSidebar"] h6.gradient_text1,
-[data-testid="stSidebar"] .gradient_text1 {
-    text-align: center !important;
-}
-
 /* Sidebar scrollbar styling */
 .sidebar::-webkit-scrollbar-thumb {
     background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb);
@@ -316,30 +232,12 @@ a:hover {
     background: linear-gradient(to right, #00ffee, #27aaff);
 }
 
-/* Network connectivity input styling */
-.sidebar .stNumberInput > div {
-    position: relative;
-    z-index: 1;
-}
-
-.sidebar .stNumberInput > div::before {
-    content: '';
-    position: absolute;
-    top: -2px;
-    right: -2px;
-    bottom: -2px;
-    left: -2px;
-    background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb);
-    border-radius: 7px;
-    z-index: -1;
-}
-
-.sidebar .stNumberInput > div > div > input {
-    border-radius: 4px;
-    background-color: #222;
-    border: none;
-    position: relative;
-    z-index: 2;
+/* Explicitly force all sidebar widgets to be left-aligned */
+[data-testid="stSidebar"] .element-container div {
+    text-align: left !important;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
 
 /* Network Connectivity section styling */
@@ -351,46 +249,6 @@ a:hover {
     color: transparent !important;
     font-weight: bold !important;
     text-align: center;
-}
-
-/* Fix for sidebar buttons - ensure text is visible */
-.sidebar .stButton button {
-    color: white !important;
-    background-color: rgba(20, 181, 255, 0.8);
-    position: relative;
-    overflow: visible;
-    z-index: 100;
-    min-height: 36px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.sidebar .stButton button p, 
-.sidebar .stButton button span, 
-.sidebar .stButton button div {
-    color: white !important;
-    position: relative;
-    z-index: 101;
-    display: block;
-    margin: auto;
-    font-weight: bold;
-}
-
-/* Specific fix for optimize button */
-.sidebar button:has(+ div div button) {
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-}
-
-/* This ensures the emoji and text are properly centered */
-.sidebar button > div {
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
 }
 
 /* Slider styling for the active (colored) part */
@@ -419,35 +277,6 @@ a:hover {
     color: white;
 }
 
-/* Only gradient headers should be centered */
-.gradient_text1 {
-    text-align: center !important;
-}
-
-/* Target all widget containers with extreme specificity */
-[data-testid="stSidebar"] [role="slider"],
-[data-testid="stSidebar"] [data-baseweb],
-[data-testid="stSidebar"] label,
-[data-testid="stSidebar"] div[data-testid],
-[data-testid="stSidebar"] div[data-stale],
-[data-testid="stSidebar"] div.row-widget {
-    text-align: left !important;
-    justify-content: flex-start !important;
-}
-
-/* Force left alignment for slider widgets specifically */
-[data-testid="stSidebar"] div.stSlider label {
-    text-align: left;
-    width: 100%;
-}
-
-/* Attack the label alignment directly */
-[data-testid="stSidebar"] div.css-1inwz65 {
-    text-align: left !important;
-    display: flex !important;
-    justify-content: flex-start !important;
-}
-
 /* Footer style */
 footer {
     text-align: center;
@@ -470,35 +299,12 @@ footer {
     backdrop-filter: blur(5px);
 }
 
-/* Make plots more visible and centered */
+/* Make plots more visible */
 .stPlot {
     background-color: rgba(255, 255, 255, 0.9);
-    border-radius: 15px;
+    border-radius: 8px;
     padding: 15px;
     margin-bottom: 20px;
-    margin-left: auto;
-    margin-right: auto;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-/* Center all pyplot and plotly figures */
-.element-container > div[data-testid="stImage"], 
-.element-container > div > div[data-testid="stImage"],
-.element-container > div > div > div > div[class*="plotly"],
-.element-container > div > div > div > div[class*="js-plotly"],
-.element-container > div > div > canvas,
-.css-1kyxreq {
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    margin: 0 auto !important;
-}
-
-/* Center matplotlib plots specifically */
-canvas.marks, div.marks, div[class*="Plot"] {
-    margin: 0 auto !important;
 }
 
 /* Progress bar styling with gradient */
@@ -506,38 +312,23 @@ canvas.marks, div.marks, div[class*="Plot"] {
     background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb) !important;
 }
 
-/* Animation tab button special styling */
-[data-testid="stHorizontalBlock"] .stButton button {
-    width: auto;
-    min-width: 80px;
-    height: 40px;
-    line-height: 20px; /* Adjust line height for centered text */
-    font-size: 16px;
+/* Play Animation button special styling */
+[data-testid="stHorizontalBlock"] [data-testid="column"][data-testid="stVerticalBlock"]:nth-of-type(2) .stButton button {
+    width: 100%;
+    min-width: 250px;
+    height: 55px;
+    line-height: 55px;
+    font-size: 18px;
     letter-spacing: 0.5px;
-    border-radius: 15px;
+    border-radius: 12px;
     background-image: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb);
     box-shadow: 0 5px 15px rgba(20, 165, 255, 0.4);
     transition: all 0.3s ease;
     text-align: center;
     margin: 0 auto;
-    display: flex;
-    position: relative;
-    align-items: center;
-    justify-content: center;
 }
 
-/* Special styling for Previous/Next/Play buttons */
-[data-testid="stHorizontalBlock"] .stButton button p,
-[data-testid="stHorizontalBlock"] .stButton button span {
-    color: white !important;
-    z-index: 10;
-    position: relative;
-    display: block;
-    font-weight: bold;
-}
-
-/* Hover effect for animation tab buttons */
-[data-testid="stHorizontalBlock"] .stButton button:hover {
+[data-testid="stHorizontalBlock"] [data-testid="column"][data-testid="stVerticalBlock"]:nth-of-type(2) .stButton button:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(20, 181, 255, 0.5);
     background-image: linear-gradient(to right, #00e8ff, #0070eb);

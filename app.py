@@ -343,43 +343,8 @@ st.markdown(f"""
 # Title
 st.markdown("<h1 class='gradient_text1'>Kuramoto Model Simulator</h1>", unsafe_allow_html=True)
 
-# First let's ensure we have styling that forces left alignment for the sidebar
-st.markdown("""
-<style>
-    /* Force left alignment in sidebar for everything except gradient headers */
-    section[data-testid="stSidebar"] .stSlider label,
-    section[data-testid="stSidebar"] .stSlider div, 
-    section[data-testid="stSidebar"] .stSelectbox label, 
-    section[data-testid="stSidebar"] .stNumberInput label,
-    section[data-testid="stSidebar"] .stCheckbox label,
-    section[data-testid="stSidebar"] .stTextArea label,
-    section[data-testid="stSidebar"] .stTextInput label,
-    section[data-testid="stSidebar"] .stButton,
-    section[data-testid="stSidebar"] .stText,
-    section[data-testid="stSidebar"] p {
-        text-align: left !important;
-        display: flex !important;
-        justify-content: flex-start !important;
-    }
-    
-    /* Make sure numbers in sliders are left-aligned */
-    section[data-testid="stSidebar"] .stSlider > div {
-        width: 100%;
-        display: flex;
-        justify-content: flex-start;
-    }
-    
-    /* Ensure widget labels are left aligned */
-    section[data-testid="stSidebar"] .row-widget.stRadio > div,
-    section[data-testid="stSidebar"] .row-widget.stSlider > div,
-    section[data-testid="stSidebar"] .row-widget.stSelectbox > div,
-    section[data-testid="stSidebar"] .row-widget.stTextInput > div {
-        width: 100%;
-        display: flex;
-        justify-content: flex-start;
-    }
-</style>
-""", unsafe_allow_html=True)
+# Let Streamlit handle the styling
+# No custom CSS needed here
 
 # Create main sidebar parameters header at the top
 st.sidebar.markdown("<h2 class='gradient_text1'>Simulation Parameters</h2>", unsafe_allow_html=True)

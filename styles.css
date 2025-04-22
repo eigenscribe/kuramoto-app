@@ -336,25 +336,43 @@ footer {
     background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb) !important;
 }
 
-/* Play Animation button special styling */
-[data-testid="stHorizontalBlock"] [data-testid="column"][data-testid="stVerticalBlock"]:nth-of-type(2) .stButton button {
-    width: 100%;
-    min-width: 250px;
-    height: 55px;
-    line-height: 55px;
-    font-size: 18px;
-    letter-spacing: 0.5px;
-    border-radius: 12px;
+/* Animation buttons compact styling */
+[data-testid="stHorizontalBlock"] .stButton button {
+    width: auto;
+    min-width: 60px;  /* Smaller width */
+    max-width: 70px;  /* Add max-width to constrain */
+    height: 30px;     /* Shorter height */
+    line-height: 16px; /* Adjusted line height */
+    font-size: 12px;   /* Smaller font */
+    letter-spacing: 0.3px;
+    padding: 2px 8px;  /* Compact padding */
+    border-radius: 8px; /* Smaller radius */
     background-image: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb);
-    box-shadow: 0 5px 15px rgba(20, 165, 255, 0.4);
+    box-shadow: 0 3px 10px rgba(20, 165, 255, 0.4);
     transition: all 0.3s ease;
     text-align: center;
+    margin: 0 2px;    /* Closer buttons */
+    display: flex;
+    position: relative;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden; /* Prevent text overflow */
+    white-space: nowrap;
+}
+
+/* Play button - slightly larger */
+[data-testid="stHorizontalBlock"] [data-testid="column"][data-testid="stVerticalBlock"]:nth-of-type(2) .stButton button {
+    width: auto;
+    min-width: 80px;
+    height: 35px;
+    line-height: 20px;
+    font-size: 14px;
     margin: 0 auto;
 }
 
-[data-testid="stHorizontalBlock"] [data-testid="column"][data-testid="stVerticalBlock"]:nth-of-type(2) .stButton button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(20, 181, 255, 0.5);
+[data-testid="stHorizontalBlock"] .stButton button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(20, 181, 255, 0.5);
     background-image: linear-gradient(to right, #00e8ff, #0070eb);
 }
 

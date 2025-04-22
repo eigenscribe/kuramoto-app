@@ -1225,8 +1225,8 @@ with tab1:
     # Calculate dynamic node size based on number of nodes
     # Larger size for fewer nodes, smaller size for many nodes
     n_nodes = len(G.nodes)
-    # Reduced node size with a smaller base and adjusted scaling
-    node_size = max(80, int(600 * (1 / (0.15 * n_nodes + 0.7))))  # Formula for smaller nodes
+    # Adjusted node size to be moderately sized - not too big, not too small
+    node_size = max(150, int(800 * (1 / (0.12 * n_nodes + 0.6))))  # Balanced node size
     
     # Generate brighter versions of node colors for edges
     bright_node_colors = []

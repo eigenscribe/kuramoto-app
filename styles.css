@@ -419,9 +419,33 @@ a:hover {
     color: white;
 }
 
-/* Start fresh - only center gradient headers in sidebar */
+/* Only gradient headers should be centered */
 .gradient_text1 {
     text-align: center !important;
+}
+
+/* Target all widget containers with extreme specificity */
+[data-testid="stSidebar"] [role="slider"],
+[data-testid="stSidebar"] [data-baseweb],
+[data-testid="stSidebar"] label,
+[data-testid="stSidebar"] div[data-testid],
+[data-testid="stSidebar"] div[data-stale],
+[data-testid="stSidebar"] div.row-widget {
+    text-align: left !important;
+    justify-content: flex-start !important;
+}
+
+/* Force left alignment for slider widgets specifically */
+[data-testid="stSidebar"] div.stSlider label {
+    text-align: left;
+    width: 100%;
+}
+
+/* Attack the label alignment directly */
+[data-testid="stSidebar"] div.css-1inwz65 {
+    text-align: left !important;
+    display: flex !important;
+    justify-content: flex-start !important;
 }
 
 /* Footer style */

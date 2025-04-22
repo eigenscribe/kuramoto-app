@@ -1,4 +1,37 @@
 import streamlit as st
+
+# Set page config must be the first Streamlit command
+st.set_page_config(
+    page_title="Kuramoto Model Simulator",
+    page_icon="🔄",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
+
+# Add direct CSS rule to force sidebar text alignment
+st.markdown("""
+<style>
+    /* Force all sidebar text to be left-aligned */
+    [data-testid="stSidebar"] [data-baseweb="tab-panel"] *,
+    [data-testid="stSidebar"] [data-testid="stVerticalBlock"] *,
+    [data-testid="stSidebar"] [data-testid="stForm"] *,
+    [data-testid="stSidebar"] .stMarkdown * {
+        text-align: left !important;
+    }
+    
+    /* Keep gradient headers centered */
+    [data-testid="stSidebar"] .gradient_text1,
+    [data-testid="stSidebar"] h3.gradient_text1 {
+        text-align: center !important;
+    }
+    
+    /* Override any existing text alignment in sidebar */
+    [data-testid="stSidebar"] div[style*="text-align: center"] {
+        text-align: left !important;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors
@@ -267,13 +300,8 @@ plt.rcParams.update({
     'lines.linewidth': 2,
 })
 
-# Set page title and configuration
-st.set_page_config(
-    page_title="Kuramoto Model Simulator",
-    page_icon="🔄",
-    layout="wide",
-    initial_sidebar_state="expanded",
-)
+# Page config is now at the top of the file
+# This comment is kept to maintain file structure
 
 # Import Aclonica font from Google Fonts
 st.markdown("""

@@ -273,18 +273,35 @@ a:hover {
     text-align: left !important;
 }
 
-/* Make sidebar content left-aligned */
-.sidebar p, .sidebar div, .sidebar h3, .sidebar h4, .sidebar label, .sidebar span, .sidebar .stMarkdown, .sidebar .stText {
+/* Target specific Streamlit sidebar elements */
+[data-testid="stSidebar"] p, 
+[data-testid="stSidebar"] div, 
+[data-testid="stSidebar"] label, 
+[data-testid="stSidebar"] span, 
+[data-testid="stSidebar"] .stMarkdown, 
+[data-testid="stSidebar"] .stText,
+[data-testid="stSidebar"] [data-baseweb="slider"] + div,
+[data-testid="stSidebar"] .stSlider [data-testid="stMarkdownContainer"] > div > p,
+[data-testid="stSidebar"] [data-testid="stVerticalBlock"] > div {
     text-align: left !important;
 }
 
-/* Make sure all text inputs, sliders, and other widgets are left-aligned */
-.sidebar .stTextInput, .sidebar .stNumberInput, .sidebar .stSlider, .sidebar .stSelectbox, .sidebar .stRadio, .sidebar .stCheckbox {
+/* Force specific Streamlit components to be left-aligned */
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] > div > p,
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] > p {
     text-align: left !important;
+    display: block !important;
+    width: 100% !important;
 }
 
 /* Exception for gradient headers which stay centered */
-.sidebar h3.gradient_text1, .sidebar h2.gradient_text1, .sidebar h3 span.gradient_text1, .sidebar h2 span.gradient_text1 {
+[data-testid="stSidebar"] h1.gradient_text1, 
+[data-testid="stSidebar"] h2.gradient_text1, 
+[data-testid="stSidebar"] h3.gradient_text1, 
+[data-testid="stSidebar"] h4.gradient_text1, 
+[data-testid="stSidebar"] h5.gradient_text1, 
+[data-testid="stSidebar"] h6.gradient_text1,
+[data-testid="stSidebar"] .gradient_text1 {
     text-align: center !important;
 }
 
@@ -416,6 +433,24 @@ a:hover {
 .sidebar h1.gradient_text1, .sidebar h2.gradient_text1, .sidebar h3.gradient_text1, 
 .sidebar h4.gradient_text1, .sidebar h5.gradient_text1, .sidebar h6.gradient_text1 {
     text-align: center !important;
+}
+
+/* Target the actual widgets label-value displays in sidebar */
+[data-testid="stSidebar"] .row-widget > label,
+[data-testid="stSidebar"] .row-widget > div,
+[data-testid="stSidebar"] .row-widget [data-testid="stVerticalBlock"] {
+    text-align: left !important;
+    justify-content: flex-start !important;
+    display: flex !important;
+    align-items: flex-start !important;
+}
+
+/* Force specific Streamlit form field labels to be left-aligned */
+[data-testid="stSidebar"] .st-af,
+[data-testid="stSidebar"] .st-ae,
+[data-testid="stSidebar"] .st-ag {
+    text-align: left !important;
+    justify-content: flex-start !important;
 }
 
 /* Footer style */

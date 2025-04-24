@@ -1,0 +1,661 @@
+</style>
+""", unsafe_allow_html=True)
+
+# Title
+st.markdown("<h1 class='gradient_text1'>Kuramoto Model Simulator</h1>", unsafe_allow_html=True)
+
+# Let Streamlit handle the styling
+# No custom CSS needed here
+
+# Create main sidebar parameters header at the top
+st.sidebar.markdown("<h2 class='gradient_text1'>Simulation Parameters</h2>", unsafe_allow_html=True)
+
+# Add Time Controls Section first
+st.sidebar.markdown("<h3 class='gradient_text1'>Time Controls</h3>", unsafe_allow_html=True)
+
+# Simulation time parameters
+simulation_time = st.sidebar.slider(
+    "Simulation Time",
+    min_value=1.0,
+    max_value=100.0,
+    step=1.0,
+    help="Total simulation time",
+    key="simulation_time"
+)
+
+# Time Step Controls
+time_step = st.sidebar.slider(
+    "Time Step",
+    min_value=0.001,
+    max_value=0.1,
+    step=0.001,
+    format="%.3f",
+    help="Time step for simulation (smaller = more accurate but slower)",
+    key="time_step"
+)
+
+# Time step optimization controls - smaller buttons with adjusted size
+time_step_col1, time_step_col2 = st.sidebar.columns([1, 1])
+
+# Add an auto-optimize time step button in column 1 with smaller text
+if time_step_col1.button("🧠 Optimize", help="Automatically calculate optimal time step for stability and accuracy"):
+    # Need to get the random seed value from session state before using it
+    current_random_seed = st.session_state.random_seed if "random_seed" in st.session_state else 42
+    
+    # Get the current number of oscillators from session state
+    current_n_oscillators = st.session_state.n_oscillators if "n_oscillators" in st.session_state else 10
+    
+    # Get the current coupling strength from session state
+    current_coupling_strength = st.session_state.coupling_strength if "coupling_strength" in st.session_state else 1.0
+    
+    # Create a temporary frequencies array based on the current settings
+    # We'll use a simple normal distribution as a placeholder for optimization
+    temp_frequencies = np.random.normal(0, 1, current_n_oscillators)
+    
+    # Check for adjacency matrix in session state
+    adjacency_matrix_for_optimization = None
+    if 'loaded_adj_matrix' in st.session_state:
+        adjacency_matrix_for_optimization = st.session_state.loaded_adj_matrix
+        print(f"Using adjacency matrix from session state for optimization, shape: {adjacency_matrix_for_optimization.shape if hasattr(adjacency_matrix_for_optimization, 'shape') else 'unknown'}")
+    
+    # Create a temporary model to calculate optimal time step
+    temp_model = KuramotoModel(
+        n_oscillators=current_n_oscillators,
+        coupling_strength=current_coupling_strength,
+        frequencies=temp_frequencies,
+        simulation_time=simulation_time,
+        time_step=time_step,
+        random_seed=current_random_seed,
+        adjacency_matrix=adjacency_matrix_for_optimization
+    )
+    
+    # Get the optimization results
+    optimization_results = temp_model.compute_optimal_time_step(safety_factor=0.85)
+    
+    # Store the optimized time step in a different session state variable
+    # Rather than directly changing the slider's value
+    st.session_state.optimized_time_step = optimization_results['optimal_time_step']
+    
+    # Display a success message with the explanation
+    st.sidebar.success(f"""
+    Time step optimized to {optimization_results['optimal_time_step']:.4f}
+    
+    Please manually set this value in the Time Step slider above.
+    """)
+    
+    # Display detailed optimization information in an expander
+    with st.sidebar.expander("Optimization Details"):
+        st.markdown(f"""
+        **Stability Level:** {optimization_results['stability_level']}  
+        **Accuracy Level:** {optimization_results['accuracy_level']}  
+        **Computation Efficiency:** {optimization_results['computation_level']}
+        
+        {optimization_results['explanation']}
+        """)
+    
+    # We don't rerun because we can't automatically update the slider widget
+
+# Add checkbox in column 2 to always auto-optimize on simulation run
+if "auto_optimize_on_run" not in st.session_state:
+    st.session_state.auto_optimize_on_run = False
+    
+auto_optimize_on_run = time_step_col2.checkbox(
+    "Auto on Run", 
+    value=st.session_state.auto_optimize_on_run,
+    help="Automatically optimize time step each time the simulation runs",
+    key="auto_optimize_on_run"
+)
+
+# Add JSON Parameter Import Section
+st.sidebar.markdown("<h3 class='gradient_text1'>JSON Configuration</h3>", unsafe_allow_html=True)
+
+# Initialize session state for JSON example if not present
+if 'json_example' not in st.session_state:
+    st.session_state.json_example = ""
+
+# Display text area for JSON input (larger and left-aligned)
+json_input = st.sidebar.text_area(
+    "Import/Export Parameters",
+    value=st.session_state.json_example,
+    height=200,
+    placeholder='Paste your JSON configuration here...',
+    help="Enter a valid JSON configuration for the Kuramoto simulation"
+)
+
+# Add a collapsible section with examples but without parameter details
+with st.sidebar.expander("Examples", expanded=False):
+    example_json = {
+        "n_oscillators": 10,
+        "coupling_strength": 1.0,
+        "network_type": "All-to-All", 
+        "simulation_time": 10.0,
+        "time_step": 0.1,
+        "auto_optimize": True,
+        "random_seed": 42,
+        "frequency_distribution": "Normal",
+        "frequency_parameters": {
+            "mean": 0.0,
+            "std": 0.2
+        }
+    }
+    
+    st.code(json.dumps(example_json, indent=2), language="json")
+    
+    # Add small-world network example
+    st.markdown("**Small-world network example:**")
+    
+    # Generate a sample small-world network
+    n = 10
+    sample_matrix = np.zeros((n, n))
+    for i in range(n):
+        # Connect to neighbors
+        for j in range(1, 3):
+            sample_matrix[i, (i+j) % n] = 1
+            sample_matrix[i, (i-j) % n] = 1
+            
+    # Add a few random long-range connections
+    np.random.seed(42)
+    for _ in range(5):
+        i = np.random.randint(0, n)
+        j = np.random.randint(0, n)
+        if i != j and sample_matrix[i, j] == 0:
+            sample_matrix[i, j] = 1
+            sample_matrix[j, i] = 1
+            
+    # Create example with matrix
+    complex_example = {
+        "n_oscillators": n,
+        "coupling_strength": 0.8,
+        "network_type": "Custom Adjacency Matrix",
+        "simulation_time": 20.0,
+        "time_step": 0.05,
+        "auto_optimize": True,
+        "random_seed": 42,
+        "frequency_distribution": "Normal",
+        "frequency_parameters": {
+            "mean": 0.0,
+            "std": 0.1
+        },
+        "adjacency_matrix": sample_matrix.tolist()
+    }
+    
+    # Add button to use this example - with smaller text
+    if st.button("Use Small-World", key="small_world_btn"):
+        st.session_state.json_example = json.dumps(complex_example, indent=2)
+        st.rerun()
+
+# Add import button and logic
+if st.sidebar.button("Import Parameters", key="sidebar_import_json_button"):
+    if json_input.strip():
+        try:
+            # Parse the JSON input
+            params, error = parse_json_parameters(json_input)
+            
+            if error:
+                st.sidebar.error(f"Error parsing JSON: {error}")
+            else:
+                # Update session state with the parsed parameters
+                if params is not None:
+                    # Store all parameters in a temporary variable in session state
+                    # This is to avoid the error when trying to change widget values after initialization
+                    st.session_state.temp_imported_params = params
+                    
+                    # Show success message
+                    st.sidebar.success("Parameters imported successfully! Applying settings...")
+                    
+                    # Rerun the app to apply the changes
+                    st.rerun()
+                else:
+                    st.sidebar.error("Failed to parse JSON parameters. Please check your input format.")
+        except Exception as e:
+            st.sidebar.error(f"Error processing parameters: {str(e)}")
+    else:
+        st.sidebar.warning("Please enter JSON configuration before importing.")
+
+# Add separator before individual parameters
+st.sidebar.markdown("<hr style='margin: 15px 0px; border-color: rgba(255,255,255,0.2);'>", unsafe_allow_html=True)
+
+# Create subheading for manual parameters
+st.sidebar.markdown("<h3 class='gradient_text1'>Manual Configuration</h3>", unsafe_allow_html=True)
+
+# Initialize session state for parameters if they don't exist
+if 'n_oscillators' not in st.session_state:
+    st.session_state.n_oscillators = 10
+if 'coupling_strength' not in st.session_state:
+    st.session_state.coupling_strength = 1.0
+if 'freq_type' not in st.session_state:
+    st.session_state.freq_type = "Normal"
+if 'freq_mean' not in st.session_state:
+    st.session_state.freq_mean = 0.0
+if 'freq_std' not in st.session_state:
+    st.session_state.freq_std = 1.0
+if 'freq_min' not in st.session_state:
+    st.session_state.freq_min = -1.0
+if 'freq_max' not in st.session_state:
+    st.session_state.freq_max = 1.0
+if 'peak1' not in st.session_state:
+    st.session_state.peak1 = -1.0
+if 'peak2' not in st.session_state:
+    st.session_state.peak2 = 1.0
+if 'custom_freqs' not in st.session_state:
+    st.session_state.custom_freqs = "0.5, 1.0, 1.5, 2.0, 2.5, 3.0, -0.5, -1.0, -1.5, -2.0"
+if 'simulation_time' not in st.session_state:
+    st.session_state.simulation_time = 20.0
+if 'time_step' not in st.session_state:
+    st.session_state.time_step = 0.05
+# random_seed is now initialized directly in the widget section
+if 'network_type' not in st.session_state:
+    st.session_state.network_type = "All-to-All"
+if 'adj_matrix_input' not in st.session_state:
+    # Create a default example matrix for a 5x5 ring topology
+    default_matrix = "0, 1, 0, 0, 1\n1, 0, 1, 0, 0\n0, 1, 0, 1, 0\n0, 0, 1, 0, 1\n1, 0, 0, 1, 0"
+    st.session_state.adj_matrix_input = default_matrix
+
+# For auto-adjusting oscillator count based on matrix dimensions
+if 'next_n_oscillators' not in st.session_state:
+    st.session_state.next_n_oscillators = None
+    
+# If we have a pending oscillator count update from the previous run, apply it now
+if st.session_state.next_n_oscillators is not None:
+    print(f"Updating oscillator count from {st.session_state.n_oscillators} to {st.session_state.next_n_oscillators}")
+    st.session_state.n_oscillators = st.session_state.next_n_oscillators
+    st.session_state.next_n_oscillators = None  # Clear the pending update
+
+# Number of oscillators slider
+n_oscillators = st.sidebar.slider(
+    "Number of Oscillators",
+    min_value=2,
+    max_value=50,
+    step=1,
+    help="Number of oscillators in the system",
+    key="n_oscillators"
+)
+
+# Coupling strength slider
+coupling_strength = st.sidebar.slider(
+    "Coupling Strength (K)",
+    min_value=0.0,
+    max_value=10.0,
+    step=0.1,
+    help="Strength of coupling between oscillators",
+    key="coupling_strength"
+)
+
+# Frequency distribution type
+freq_type = st.sidebar.selectbox(
+    "Frequency Distribution",
+    ["Normal", "Uniform", "Bimodal", "Golden Ratio", "Custom"],
+    index=["Normal", "Uniform", "Bimodal", "Golden Ratio", "Custom"].index(st.session_state.freq_type) if st.session_state.freq_type in ["Normal", "Uniform", "Bimodal", "Golden Ratio", "Custom"] else 0,
+    help="Distribution of natural frequencies",
+    key="freq_type"
+)
+
+# Parameters for frequency distribution
+if freq_type == "Normal":
+    freq_mean = st.sidebar.slider("Mean", -2.0, 2.0, step=0.1, key="freq_mean")
+    freq_std = st.sidebar.slider("Standard Deviation", 0.1, 3.0, step=0.1, key="freq_std")
+    frequencies = np.random.normal(freq_mean, freq_std, n_oscillators)
+    
+elif freq_type == "Uniform":
+    freq_min = st.sidebar.slider("Minimum", -5.0, 0.0, step=0.1, key="freq_min")
+    freq_max = st.sidebar.slider("Maximum", 0.0, 5.0, step=0.1, key="freq_max")
+    frequencies = np.random.uniform(freq_min, freq_max, n_oscillators)
+    
+elif freq_type == "Bimodal":
+    peak1 = st.sidebar.slider("Peak 1", -5.0, 0.0, step=0.1, key="peak1")
+    peak2 = st.sidebar.slider("Peak 2", 0.0, 5.0, step=0.1, key="peak2")
+    mix = np.random.choice([0, 1], size=n_oscillators)
+    freq1 = np.random.normal(peak1, 0.3, n_oscillators)
+    freq2 = np.random.normal(peak2, 0.3, n_oscillators)
+    frequencies = mix * freq1 + (1 - mix) * freq2
+
+elif freq_type == "Golden Ratio":
+    # The golden ratio (phi) ≈ 1.618033988749895
+    phi = (1 + 5**0.5) / 2
+    
+    # Create a golden ratio sequence starting at -3
+    golden_ratio_start = -3.0
+    st.sidebar.markdown(f"""
+    <div style="background-color: rgba(255,200,0,0.15); padding: 10px; border-radius: 5px;">
+    <p><b>Golden Ratio Distribution</b></p>
+    <p>This creates a sequence where each frequency follows the golden ratio (φ ≈ 1.618), 
+    starting from {golden_ratio_start}.</p>
+    <p>Each oscillator's frequency is: {golden_ratio_start} + i·φ</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Generate frequencies that follow the golden ratio in sequence
+    frequencies = np.array([golden_ratio_start + i * phi for i in range(n_oscillators)])
+    
+else:  # Custom
+    custom_freqs = st.sidebar.text_area(
+        "Enter custom frequencies (comma-separated)",
+        value=st.session_state.custom_freqs,
+        height=150,
+        key="custom_freqs"
+    )
+    try:
+        frequencies = np.array([float(x.strip()) for x in custom_freqs.split(',')])
+        # Ensure we have the right number of frequencies
+        if len(frequencies) < n_oscillators:
+            # Repeat the pattern if not enough values
+            frequencies = np.tile(frequencies, int(np.ceil(n_oscillators / len(frequencies))))
+        frequencies = frequencies[:n_oscillators]  # Trim if too many
+    except:
+        st.sidebar.error("Invalid frequency input. Using normal distribution instead.")
+        frequencies = np.random.normal(0, 1, n_oscillators)
+
+# Time controls removed from here - moved to the top of the sidebar
+
+# Initialize model with specified parameters
+# Use session state to prevent warnings about duplicate initialization
+if "random_seed" not in st.session_state:
+    st.session_state.random_seed = 42
+
+random_seed = int(st.sidebar.number_input(
+    "Random Seed", 
+    min_value=0,
+    step=1,
+    help="Seed for reproducibility",
+    key="random_seed"
+))
+
+# Network Connectivity Configuration
+st.sidebar.markdown("<h3 class='gradient_text1'>Network Connectivity</h3>", unsafe_allow_html=True)
+network_type = st.sidebar.radio(
+    "Network Type",
+    options=["All-to-All", "Nearest Neighbor", "Random", "Custom Adjacency Matrix"],
+    index=["All-to-All", "Nearest Neighbor", "Random", "Custom Adjacency Matrix"].index(st.session_state.network_type),
+    help="Define how oscillators are connected to each other",
+    key="network_type"
+)
+
+# Custom adjacency matrix input
+adj_matrix = None
+# Check if we have a loaded adjacency matrix from a configuration
+if 'loaded_adj_matrix' in st.session_state:
+    adj_matrix = st.session_state.loaded_adj_matrix
+    print(f"Retrieved adjacency matrix from session state with shape {adj_matrix.shape if hasattr(adj_matrix, 'shape') else 'unknown'}")
+    
+    # Safety check to ensure matrix is valid
+    if hasattr(adj_matrix, 'shape') and adj_matrix.shape[0] > 0:
+        print(f"Matrix looks valid: shape={adj_matrix.shape}, sum={np.sum(adj_matrix)}, non-zeros={np.count_nonzero(adj_matrix)}")
+        
+        # CRITICAL: We need to force the correct network type
+        # This needs to take precedence over what's selected in the UI radio button
+        if network_type != "Custom Adjacency Matrix":
+            print("Detected loaded matrix with network type that doesn't match 'Custom Adjacency Matrix'.")
+            print(f"Current network_type is '{network_type}' but will use matrix internally")
+    else:
+        print("Warning: Found loaded_adj_matrix in session state but it appears invalid:")
+        print(f"Matrix type: {type(adj_matrix)}")
+        if hasattr(adj_matrix, 'shape'):
+            print(f"Shape: {adj_matrix.shape}")
+        adj_matrix = None  # Reset to None if invalid matrix
+
+if network_type == "Custom Adjacency Matrix":
+    st.sidebar.markdown("""
+    <div style="font-size: 0.85em;">
+    Enter your adjacency matrix as comma-separated values. Each row should be on a new line.
+    <br>Example for 3 oscillators:
+    <pre style="background-color: #222; padding: 5px; border-radius: 3px;">
+0, 1, 0.5
+1, 0, 0.8
+0.5, 0.8, 0</pre>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Create a default example matrix if no prior matrix exists
+    if not st.session_state.adj_matrix_input:
+        # Create a simple default example for smaller number of oscillators
+        default_matrix = ""
+        for i in range(min(5, n_oscillators)):
+            row = []
+            for j in range(min(5, n_oscillators)):
+                if i == j:
+                    row.append("0")  # No self-connections
+                elif abs(i-j) == 1 or abs(i-j) == min(5, n_oscillators)-1:  # Ring-neighbors
+                    row.append("1")  # Connected
+                else:
+                    row.append("0")  # Not connected
+            default_matrix += ", ".join(row) + "\n"
+                
+    # Make sure we have a non-empty value for the text area
+    if network_type == "Custom Adjacency Matrix" and not st.session_state.adj_matrix_input:
+        print("Custom matrix selected but no existing input - initializing default")
+        st.session_state.adj_matrix_input = default_matrix
+        
+    adj_matrix_input = st.sidebar.text_area(
+        "Adjacency Matrix",
+        value=st.session_state.adj_matrix_input,
+        height=200,
+        help="Enter the adjacency matrix as comma-separated values, each row on a new line",
+        key="adj_matrix_input"
+    )
+    
+    # Process the input adjacency matrix
+    if adj_matrix_input:
+        try:
+            # Parse the input text into a numpy array
+            rows = adj_matrix_input.strip().split('\n')
+            
+            # Ensure we have at least one row
+            if len(rows) == 0:
+                raise ValueError("No data found in matrix input")
+                
+            # Process each row, removing extra spaces and parsing values
+            adj_matrix = []
+            for row in rows:
+                # Skip empty rows
+                if not row.strip():
+                    continue
+                    
+                # Process values in this row
+                values = []
+                for val in row.split(','):
+                    # Convert to float, handling extra whitespace
+                    cleaned_val = val.strip()
+                    if cleaned_val:  # Skip empty entries
+                        values.append(float(cleaned_val))
+                
+                # Ensure row has data
+                if values:
+                    adj_matrix.append(values)
+            
+            # Make sure we have a valid matrix with data
+            if not adj_matrix:
+                raise ValueError("Could not find valid numeric data in input")
+                
+            # Convert to numpy array for faster processing
+            adj_matrix = np.array(adj_matrix)
+            
+            # Validate the adjacency matrix
+            if adj_matrix.shape[0] != adj_matrix.shape[1]:
+                st.sidebar.error(f"The adjacency matrix must be square. Current shape: {adj_matrix.shape}")
+            elif adj_matrix.shape[0] != n_oscillators:
+                # We can't modify widget session state once widgets are created,
+                # so we'll save the desired dimension in a different session state variable
+                matrix_dim = adj_matrix.shape[0]
+                
+                # Log information
+                print(f"Matrix dimensions ({matrix_dim}) don't match current oscillator count ({n_oscillators})")
+                
+                # Store the matrix as is, don't try to resize it
+                st.session_state.next_n_oscillators = matrix_dim
+                
+                # Show message explaining what's happening
+                st.sidebar.info(f"""
+                Matrix size ({matrix_dim}×{matrix_dim}) differs from current oscillator count ({n_oscillators}).
+                The matrix will be used as-is for this simulation. Next time you interact with the UI, 
+                the oscillator count will automatically update to match your matrix dimensions.
+                """)
+                
+                # Keep local variable as is, use adj_matrix without modification
+            else:
+                st.sidebar.success("Adjacency matrix validated successfully!")
+                
+                # Add a dedicated button to force network visualization refresh
+                if st.sidebar.button("🔄 Refresh", key="force_refresh_btn"):
+                    st.session_state.refresh_network = True
+                    print("Network refresh requested via button")
+                    st.rerun()
+                
+                # Add save preset button and input field
+                with st.sidebar.expander("Save as Preset"):
+                    preset_name = st.text_input("Preset Name", key="preset_name", 
+                                             placeholder="Enter a name for this matrix")
+                    if st.button("💾 Save Preset", key="save_preset_btn"):
+                        if preset_name:
+                            # Save the configuration with current parameters
+                            config_id = save_configuration(
+                                name=preset_name,
+                                n_oscillators=adj_matrix.shape[0],
+                                coupling_strength=coupling_strength,
+                                simulation_time=simulation_time,
+                                time_step=time_step,
+                                random_seed=current_random_seed,
+                                network_type="Custom Adjacency Matrix",
+                                frequency_distribution=freq_type,
+                                frequency_params=json.dumps({
+                                    "mean": float(freq_mean) if 'freq_mean' in locals() else 0.0,
+                                    "std": float(freq_std) if 'freq_std' in locals() else 1.0,
+                                    "min": float(freq_min) if 'freq_min' in locals() else -1.0,
+                                    "max": float(freq_max) if 'freq_max' in locals() else 1.0
+                                }),
+                                adjacency_matrix=adj_matrix
+                            )
+                            st.success(f"Saved preset '{preset_name}' successfully!")
+                            print(f"Saved matrix preset: '{preset_name}' with shape {adj_matrix.shape}")
+                        else:
+                            st.error("Please enter a preset name")
+                
+            # Store in session state for persistence
+            st.session_state.loaded_adj_matrix = adj_matrix
+            print(f"Updated adjacency matrix in session state with shape {adj_matrix.shape}")
+                
+        except Exception as e:
+            st.sidebar.error(f"Error parsing matrix: {str(e)}")
+            print(f"Matrix parsing error: {str(e)}")
+            print(f"Input was: '{adj_matrix_input}'")
+            adj_matrix = None
+
+
+
+# Create tabs for different visualizations (Network is default tab)
+tab1, tab2, tab3 = st.tabs(["Network", "Distributions", "Animation"])
+
+# Set a unique key for each tab to force refresh of the Network tab
+if 'current_tab' not in st.session_state:
+    st.session_state.current_tab = "Network"
+    
+# Add a hidden button that is programmatically clicked when checking a custom matrix
+tab_key = f"tab_refresh_{int(time.time())}"
+if st.session_state.current_tab == "Network" and adj_matrix is not None:
+    # This ensures the network tab is refreshed when the adjacency matrix changes
+    st.session_state.refresh_network = True
+
+# Determine the effective network type for display and matrix creation
+# If we have a custom matrix, ALWAYS force the network type to custom
+# regardless of what's displayed in the UI
+if adj_matrix is not None:
+    print(f"Detected valid adjacency matrix - forcing internal network type to Custom")
+    print(f"Matrix shape: {adj_matrix.shape}, sum: {np.sum(adj_matrix)}, non-zeros: {np.count_nonzero(adj_matrix)}")
+    
+    # Don't change the UI selection, but use Custom type for all internal processing
+    network_type_internal = "Custom Adjacency Matrix"
+    
+    # CRITICAL: We must NOT delete the matrix from session state until we've used it successfully
+    # Otherwise, it will be lost on the next rerun when Streamlit rebuilds the application
+    
+    # Keep a flag to signal we've saved the matrix for this session
+    if 'using_loaded_matrix' not in st.session_state:
+        st.session_state.using_loaded_matrix = True
+        print("First use of loaded matrix - will keep in session state")
+else:
+    # Use the selected network type
+    network_type_internal = network_type
+    
+    # If we don't have a custom matrix but the UI type is set to custom,
+    # we need to ensure this is communicated clearly
+    if network_type == "Custom Adjacency Matrix" and adj_matrix is None:
+        # Use custom styled message with orange background instead of the default yellow warning
+        # This matches the sidebar error messages styling
+        st.markdown("""
+        <div style="background-color: rgba(255,150,0,0.15); color: #ffaa50; 
+                    padding: 10px; border-radius: 15px; border-left: 5px solid #ff8800;">
+            <b>Matrix Input:</b> Please enter your custom adjacency matrix in the sidebar.
+            The format should be comma-separated values with each row on a new line.
+        </div>
+        """, unsafe_allow_html=True)
+        print("Warning: Custom adjacency matrix selected but no valid matrix found")
+
+# Function to simulate model
+@st.cache_data(ttl=300)
+def run_simulation(n_oscillators, coupling_strength, frequencies, simulation_time, time_step, random_seed, 
+                  adjacency_matrix=None, auto_optimize=False, safety_factor=0.8):
+    """
+    Run a Kuramoto model simulation with the specified parameters and return the results.
+    
+    Parameters:
+    -----------
+    n_oscillators : int
+        Number of oscillators
+    coupling_strength : float
+        Coupling strength parameter K
+    frequencies : ndarray
+        Natural frequencies of oscillators
+    simulation_time : float
+        Total simulation time
+    time_step : float
+        Simulation time step
+    random_seed : int
+        Seed for random number generation
+    adjacency_matrix : ndarray, optional
+        Custom adjacency matrix defining network connectivity
+    auto_optimize : bool, optional
+        Whether to automatically optimize the time step before running the simulation
+    safety_factor : float, optional
+        Safety factor for time step optimization (0-1, lower is more conservative)
+        
+    Returns:
+    --------
+    tuple
+        (model, times, phases, order_parameter, optimized_time_step)
+        Note: optimized_time_step will be None if auto_optimize=False
+    """
+    # Convert random_seed to integer to prevent type errors
+    if random_seed is not None:
+        random_seed = int(random_seed)
+    
+    # Initialize the model with given parameters
+    model = KuramotoModel(
+        n_oscillators=n_oscillators,
+        coupling_strength=coupling_strength,
+        frequencies=frequencies,
+        simulation_time=simulation_time,
+        time_step=time_step,
+        random_seed=random_seed,
+        adjacency_matrix=adjacency_matrix
+    )
+    
+    # Track if optimization was applied
+    optimized_time_step = None
+    
+    # Apply automatic time step optimization if requested
+    if auto_optimize:
+        # Get optimization results
+        opt_results = model.compute_optimal_time_step(safety_factor=safety_factor)
+        optimized_time_step = opt_results['optimal_time_step']
+        
+        # Update the model's time step
+        model.time_step = optimized_time_step
+        model.t_eval = np.arange(0, model.simulation_time, optimized_time_step)
+    
+    # Run the simulation
+    times, phases, order_parameter = model.simulate()
+    
+    # Return results along with the optimized time step (if any)
+    return model, times, phases, order_parameter, optimized_time_step
+
+# Run the simulation
+# If we have a custom adjacency matrix, adjust the oscillator count to match matrix dimensions

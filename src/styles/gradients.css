@@ -1,0 +1,70 @@
+/* Parameter section gradients */
+.parameter-section {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 15px;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Orange gradient for oscillator parameters */
+.orange-gradient {
+    background: linear-gradient(135deg, rgba(255, 140, 0, 0.15) 0%, rgba(255, 69, 0, 0.25) 100%);
+    border-left: 4px solid rgba(255, 140, 0, 0.7);
+}
+
+/* Blue gradient for network and frequency parameters */
+.blue-gradient {
+    background: linear-gradient(135deg, rgba(0, 191, 255, 0.15) 0%, rgba(0, 102, 204, 0.25) 100%);
+    border-left: 4px solid rgba(0, 191, 255, 0.7);
+}
+
+/* Green gradient for time parameters */
+.green-gradient {
+    background: linear-gradient(135deg, rgba(50, 205, 50, 0.15) 0%, rgba(0, 128, 0, 0.25) 100%);
+    border-left: 4px solid rgba(50, 205, 50, 0.7);
+}
+
+/* Gradient text styles */
+.gradient_text {
+    font-weight: bold !important;
+    background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    text-align: center !important;
+}
+
+/* Gradient text styles */
+.gradient_text1 {
+    font-weight: bold !important;
+    background: -webkit-linear-gradient(#14a5ff, #8138ff) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    color: transparent !important;
+    text-align: center !important;
+}
+
+.gradient_text2 {
+    font-weight: bold !important;
+    background: linear-gradient(#00ffee, #27aaff) !important;
+    color: transparent !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+}
+
+/* Orange-pink gradient for oscillator parameters */
+.orange-pink-text {
+    background: linear-gradient(to right, #ffcc88, #ff8855, #ff6633) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: transparent !important;
+    font-weight: bold !important;
+    letter-spacing: 0.2px !important;
+}
+
+/* Orange-pink gradient for backgrounds */
+.orange-pink-bg {
+    background: linear-gradient(to right bottom, #ffcc88, #ff8855, #ff6633) !important;
+}

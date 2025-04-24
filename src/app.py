@@ -523,15 +523,22 @@ def main():
     load_css()
     background_base64 = load_background()
     
-    # Inject background image
+    # Inject background image and font
     st.markdown(f"""
     <style>
+    @import url('https://fonts.googleapis.com/css2?family=Aclonica&display=swap');
+    
     .stApp {{
         background-image: url("data:image/jpg;base64,{background_base64}");
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
         background-attachment: fixed;
+    }}
+    
+    /* Add additional font styles to ensure they apply */
+    .stApp, h1, h2, h3, h4, p, div, span, button, .stButton, .stTextInput, .stSelectbox, .stSlider {{
+        font-family: 'Aclonica', sans-serif !important;
     }}
     </style>
     """, unsafe_allow_html=True)

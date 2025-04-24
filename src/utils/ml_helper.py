@@ -8,10 +8,68 @@ This module provides utilities and examples for:
 4. Preparing data for Lagrangian Neural Networks
 """
 
+# Define the analyze_simulation_data function for basic feature extraction
+def analyze_simulation_data(simulation_data, params):
+    """
+    Analyze simulation data to extract key features and insights.
+    
+    Parameters:
+    -----------
+    simulation_data : dict
+        The simulation results data
+    params : dict
+        The simulation parameters
+        
+    Returns:
+    --------
+    dict
+        Dictionary containing analysis results
+    """
+    if not simulation_data or not params:
+        return {"error": "Invalid simulation data or parameters"}
+    
+    results = {}
+    
+    # Extract key metrics if they exist
+    if 'order_parameter' in simulation_data and 'r' in simulation_data['order_parameter']:
+        r_values = simulation_data['order_parameter']['r']
+        results['final_sync_level'] = float(r_values[-1]) if len(r_values) > 0 else 0
+        results['max_sync_level'] = float(max(r_values)) if len(r_values) > 0 else 0
+        results['time_to_half_sync'] = None
+        
+        # Find time to reach half of max synchronization
+        if len(r_values) > 1 and max(r_values) > 0:
+            half_sync = max(r_values) / 2
+            for i, r in enumerate(r_values):
+                if r >= half_sync:
+                    results['time_to_half_sync'] = i * params.get('time_step', 0.1)
+                    break
+    
+    # Network properties if adjacency matrix is available
+    if 'adjacency_matrix' in simulation_data:
+        import numpy as np
+        adj = np.array(simulation_data['adjacency_matrix'])
+        results['network_density'] = np.sum(adj) / (adj.shape[0] * (adj.shape[0] - 1))
+        
+        # Calculate average node degree
+        results['avg_node_degree'] = np.mean(np.sum(adj, axis=1))
+    
+    # Relationship between natural frequencies and final phases
+    if 'frequencies' in simulation_data and 'phases' in simulation_data:
+        import numpy as np
+        freqs = np.array(simulation_data['frequencies'])
+        final_phases = np.array(simulation_data['phases'])[-1] if len(simulation_data['phases']) > 0 else []
+        
+        if len(final_phases) > 0 and len(freqs) == len(final_phases):
+            # Calculate correlation between frequencies and phases
+            results['freq_phase_correlation'] = float(np.corrcoef(freqs, final_phases)[0, 1])
+    
+    return results
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from database import (
+from database.database import (
     create_ml_dataset,
     add_simulation_to_dataset,
     extract_features,
@@ -20,7 +78,7 @@ from database import (
     run_batch_simulations,
     list_ml_datasets
 )
-from kuramoto_model import KuramotoModel
+from models.kuramoto_model import KuramotoModel
 
 
 def generate_parameter_sweep(param_grid):

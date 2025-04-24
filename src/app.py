@@ -479,15 +479,39 @@ def get_frequency_color(freq, min_freq, max_freq):
 # Load CSS styling
 # --------------------------------------------
 def load_css():
-    with open("src/styles/main.css") as f:
-        css = f.read()
+    try:
+        # Try first with src prefix (when run from root)
+        with open("src/styles/main.css") as f:
+            css = f.read()
+    except FileNotFoundError:
+        try:
+            # Then try with relative path (when run from src directory)
+            with open("styles/main.css") as f:
+                css = f.read()
+        except FileNotFoundError:
+            # Fall back to original path
+            with open("styles.css") as f:
+                css = f.read()
+    
     st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
 
 # Load background image
 def load_background():
     import base64
-    with open("static/images/wisp.base64", "r") as f:
-        background_base64 = f.read()
+    try:
+        # Try first with static directory (when run from root)
+        with open("static/images/wisp.base64", "r") as f:
+            background_base64 = f.read()
+    except FileNotFoundError:
+        try:
+            # Try with relative path to static (when run from src directory)
+            with open("../static/images/wisp.base64", "r") as f:
+                background_base64 = f.read()
+        except FileNotFoundError:
+            # Fall back to original path
+            with open("wisp.base64", "r") as f:
+                background_base64 = f.read()
+                
     return background_base64
 
 

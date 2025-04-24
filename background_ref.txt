@@ -1,0 +1,11 @@
+# Get the base64 encoded image
+import base64
+with open("static/images/wisp.base64", "r") as f:
+    encoded_image = f.read()
+
+# Add custom background and custom font
+st.markdown(f"""
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Aclonica&display=swap');
+    
+    .stApp {{

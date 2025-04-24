@@ -479,19 +479,74 @@ def get_frequency_color(freq, min_freq, max_freq):
 # Load CSS styling
 # --------------------------------------------
 def load_css():
+    # Load main CSS
     try:
         # Try first with src prefix (when run from root)
         with open("src/styles/main.css") as f:
-            css = f.read()
+            main_css = f.read()
     except FileNotFoundError:
         try:
             # Then try with relative path (when run from src directory)
             with open("styles/main.css") as f:
-                css = f.read()
+                main_css = f.read()
         except FileNotFoundError:
             # Fall back to original path
             with open("styles.css") as f:
-                css = f.read()
+                main_css = f.read()
+    
+    # Load gradient CSS
+    try:
+        # Try first with src prefix (when run from root)
+        with open("src/styles/gradients.css") as f:
+            gradient_css = f.read()
+    except FileNotFoundError:
+        try:
+            # Then try with relative path (when run from src directory)
+            with open("styles/gradients.css") as f:
+                gradient_css = f.read()
+        except FileNotFoundError:
+            # Fall back to default gradient styles
+            gradient_css = """
+            /* Parameter section gradients */
+            .parameter-section {
+                background: rgba(0, 0, 0, 0.3);
+                border-radius: 15px;
+                padding: 15px;
+                margin-bottom: 20px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            /* Orange gradient for oscillator parameters */
+            .orange-gradient {
+                background: linear-gradient(135deg, rgba(255, 140, 0, 0.15) 0%, rgba(255, 69, 0, 0.25) 100%);
+                border-left: 4px solid rgba(255, 140, 0, 0.7);
+            }
+
+            /* Blue gradient for network and frequency parameters */
+            .blue-gradient {
+                background: linear-gradient(135deg, rgba(0, 191, 255, 0.15) 0%, rgba(0, 102, 204, 0.25) 100%);
+                border-left: 4px solid rgba(0, 191, 255, 0.7);
+            }
+
+            /* Green gradient for time parameters */
+            .green-gradient {
+                background: linear-gradient(135deg, rgba(50, 205, 50, 0.15) 0%, rgba(0, 128, 0, 0.25) 100%);
+                border-left: 4px solid rgba(50, 205, 50, 0.7);
+            }
+
+            /* Gradient text styles */
+            .gradient_text {
+                font-weight: bold !important;
+                background: linear-gradient(to right bottom, #00e8ff, #14b5ff, #3a98ff, #0070eb) !important;
+                -webkit-background-clip: text !important;
+                background-clip: text !important;
+                -webkit-text-fill-color: transparent !important;
+                text-align: center !important;
+            }
+            """
+    
+    # Combine the CSS
+    css = main_css + "\n" + gradient_css
     
     st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
 

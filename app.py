@@ -191,7 +191,7 @@ if st.session_state.loaded_config is not None:
     st.session_state.n_oscillators = config['n_oscillators']
     st.session_state.coupling_strength = config['coupling_strength']
     st.session_state.simulation_time = config['simulation_time']
-    st.session_state.time_step = config['time_step']
+    # time_step is no longer needed - it's automatically calculated
     st.session_state.random_seed = int(config['random_seed']) # Ensure it's an integer
     st.session_state.network_type = config['network_type']
     st.session_state.freq_type = config['frequency_distribution']
@@ -767,8 +767,8 @@ if network_type == "Custom Adjacency Matrix":
                                 n_oscillators=adj_matrix.shape[0],
                                 coupling_strength=coupling_strength,
                                 simulation_time=simulation_time,
-                                time_step=time_step,
-                                random_seed=current_random_seed,
+                                time_step=0.01,  # Default value for backward compatibility
+                                random_seed=random_seed,  # Use the UI's random_seed
                                 network_type="Custom Adjacency Matrix",
                                 frequency_distribution=freq_type,
                                 frequency_params=json.dumps({
@@ -862,7 +862,8 @@ def run_simulation(n_oscillators, coupling_strength, frequencies, simulation_tim
     simulation_time : float
         Total simulation time
     time_step : float
-        Simulation time step (not used directly, kept for backward compatibility)
+        DEPRECATED: This parameter is ignored. Time step is automatically calculated
+        based on oscillator frequencies to ensure numerical stability and accuracy.
     random_seed : int
         Seed for random number generation
     adjacency_matrix : ndarray, optional
@@ -921,7 +922,7 @@ model, times, phases, order_parameter = run_simulation(
     coupling_strength=coupling_strength,
     frequencies=frequencies,
     simulation_time=simulation_time,
-    time_step=time_step,
+    time_step=None,  # Not actually used, time_step is auto-calculated
     random_seed=current_random_seed,
     adjacency_matrix=adj_matrix
 )

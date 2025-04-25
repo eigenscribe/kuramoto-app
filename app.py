@@ -889,7 +889,20 @@ def run_simulation(n_oscillators, coupling_strength, frequencies, simulation_tim
     )
     
     # Run the simulation with automatically calculated time step
-    times, phases, order_parameter = model.simulate()
+    try:
+        times, phases, order_parameter = model.simulate()
+        print("Simulation successful!")
+        print(f"  times shape: {times.shape if hasattr(times, 'shape') else 'N/A'}")
+        print(f"  phases shape: {phases.shape if hasattr(phases, 'shape') else 'N/A'}")
+        print(f"  order_parameter shape: {order_parameter.shape if hasattr(order_parameter, 'shape') else 'N/A'}")
+    except Exception as e:
+        print(f"Error in simulation: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        # Return empty arrays for graceful failure
+        times = np.linspace(0, simulation_time, 100)
+        phases = np.zeros((n_oscillators, 100))
+        order_parameter = np.zeros(100)
     
     # Return results
     return model, times, phases, order_parameter

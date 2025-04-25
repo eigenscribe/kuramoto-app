@@ -339,8 +339,8 @@ footer {
 /* Animation buttons compact styling */
 [data-testid="stHorizontalBlock"] .stButton button {
     width: auto;
-    min-width: 60px;  /* Smaller width */
-    max-width: 70px;  /* Add max-width to constrain */
+    min-width: 100px;  /* Smaller width */
+    max-width: 200px;  /* Add max-width to constrain */
     height: 30px;     /* Shorter height */
     line-height: 16px; /* Adjusted line height */
     font-size: 12px;   /* Smaller font */

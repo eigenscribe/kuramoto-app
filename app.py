@@ -87,10 +87,11 @@ def parse_json_parameters(json_string):
         if "simulation_time" in params:
             result["simulation_time"] = float(params["simulation_time"])
             
+        # time_step is now automatically calculated based on oscillator frequencies
+        # We keep this for backward compatibility with existing JSON configs
         if "time_step" in params:
-            result["time_step"] = float(params["time_step"])
-            
-        # Auto optimization feature has been removed
+            # We acknowledge the parameter but don't use it directly
+            pass
             
         if "random_seed" in params:
             result["random_seed"] = int(params["random_seed"])
@@ -152,7 +153,7 @@ if 'temp_imported_params' in st.session_state:
     st.session_state.coupling_strength = params["coupling_strength"]
     st.session_state.network_type = params["network_type"]
     st.session_state.simulation_time = params["simulation_time"]
-    st.session_state.time_step = params["time_step"]
+    # time_step is no longer used, it's automatically calculated
     st.session_state.random_seed = params["random_seed"]
     st.session_state.freq_type = params["frequency_distribution"]
     
@@ -360,18 +361,9 @@ simulation_time = st.sidebar.slider(
     key="simulation_time"
 )
 
-# Time Step Controls
-time_step = st.sidebar.slider(
-    "Time Step",
-    min_value=0.001,
-    max_value=0.1,
-    step=0.001,
-    format="%.3f",
-    help="Time step for simulation (smaller = more accurate but slower)",
-    key="time_step"
-)
-
-# Time step optimization has been removed as it was deemed unnecessary
+# Time step is now automatically calculated based on oscillator frequencies and doesn't need a UI control
+# Default value maintained for backward compatibility with database functions
+time_step = 0.01
 
 # Add JSON Parameter Import Section
 st.sidebar.markdown("<h3 class='gradient_text1'>JSON Configuration</h3>", unsafe_allow_html=True)
@@ -396,7 +388,6 @@ with st.sidebar.expander("Examples", expanded=False):
         "coupling_strength": 1.0,
         "network_type": "All-to-All", 
         "simulation_time": 10.0,
-        "time_step": 0.1,
         "random_seed": 42,
         "frequency_distribution": "Normal",
         "frequency_parameters": {
@@ -434,7 +425,6 @@ with st.sidebar.expander("Examples", expanded=False):
         "coupling_strength": 0.8,
         "network_type": "Custom Adjacency Matrix",
         "simulation_time": 20.0,
-        "time_step": 0.05,
         "random_seed": 42,
         "frequency_distribution": "Normal",
         "frequency_parameters": {
@@ -506,8 +496,8 @@ if 'custom_freqs' not in st.session_state:
     st.session_state.custom_freqs = "0.5, 1.0, 1.5, 2.0, 2.5, 3.0, -0.5, -1.0, -1.5, -2.0"
 if 'simulation_time' not in st.session_state:
     st.session_state.simulation_time = 20.0
-if 'time_step' not in st.session_state:
-    st.session_state.time_step = 0.05
+# Default time_step value maintained for backward compatibility
+time_step = 0.01
 # random_seed is now initialized directly in the widget section
 if 'network_type' not in st.session_state:
     st.session_state.network_type = "All-to-All"

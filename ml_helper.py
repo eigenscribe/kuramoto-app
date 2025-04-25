@@ -20,7 +20,7 @@ from database import (
     run_batch_simulations,
     list_ml_datasets
 )
-from kuramoto_model import KuramotoModel
+from src.models.kuramoto_model import KuramotoModel
 
 
 def generate_parameter_sweep(param_grid):

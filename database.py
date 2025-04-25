@@ -1488,7 +1488,7 @@ def run_batch_simulations(config_variations, base_config, dataset_name=None):
     dict
         Dictionary with results of the batch run
     """
-    from kuramoto_model import KuramotoModel
+    from src.models.kuramoto_model import KuramotoModel
     
     # Create dataset if name is provided
     dataset_id = None

@@ -25,6 +25,7 @@ from io import BytesIO
 import base64
 import json
 from src.models.kuramoto_model import KuramotoModel
+from src.database.database import save_configuration, get_configuration, list_configurations
 import time
 
 # Function to parse JSON parameters input

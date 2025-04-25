@@ -11,7 +11,7 @@ This module provides utilities and examples for:
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from database import (
+from src.database.database import (
     create_ml_dataset,
     add_simulation_to_dataset,
     extract_features,

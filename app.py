@@ -872,7 +872,7 @@ def run_simulation(n_oscillators, coupling_strength, frequencies, simulation_tim
     simulation_time : float
         Total simulation time
     time_step : float
-        Simulation time step
+        Simulation time step (not used directly, kept for backward compatibility)
     random_seed : int
         Seed for random number generation
     adjacency_matrix : ndarray, optional
@@ -886,7 +886,6 @@ def run_simulation(n_oscillators, coupling_strength, frequencies, simulation_tim
     # Convert random_seed to integer to prevent type errors
     if random_seed is not None:
         random_seed = int(random_seed)
-        np.random.seed(random_seed)
     
     # Initialize the model with given parameters
     model = KuramotoModel(
@@ -894,11 +893,12 @@ def run_simulation(n_oscillators, coupling_strength, frequencies, simulation_tim
         coupling_strength=coupling_strength,
         frequencies=frequencies,
         adjacency_matrix=adjacency_matrix,
-        simulation_time=simulation_time
+        simulation_time=simulation_time,
+        random_seed=random_seed
     )
     
-    # Run the simulation with specified time step
-    times, phases, order_parameter = model.simulate(max_step=time_step)
+    # Run the simulation with automatically calculated time step
+    times, phases, order_parameter = model.simulate()
     
     # Return results
     return model, times, phases, order_parameter

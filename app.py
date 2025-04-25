@@ -300,7 +300,7 @@ with open("styles.css") as f:
 
 # Get the base64 encoded image
 import base64
-with open("wisp.base64", "r") as f:
+with open("static/images/wisp.base64", "r") as f:
     encoded_image = f.read()
 
 # Add custom background and custom font

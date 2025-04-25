@@ -57,7 +57,7 @@ class KuramotoModel:
     # Alias for backwards compatibility
     _rhs = kuramoto_rhs
 
-    def simulate(self, rtol=1e-6, atol=1e-9, steps_per_period=20):
+    def simulate(self, rtol=1e-6, atol=1e-9, steps_per_period=20, min_time_points=500):
         """
         Run solve_ivp with adaptive RK45 and automatically calculated max_step.
 
@@ -69,6 +69,8 @@ class KuramotoModel:
             Absolute tolerance for the solver
         steps_per_period : int
             Number of steps desired per fastest natural‐frequency period.
+        min_time_points : int
+            Minimum number of time points to generate, ensuring enough data for visualization
         
         Returns
         --------
@@ -82,6 +84,13 @@ class KuramotoModel:
         else:
             T_min = 2*np.pi / ω_max
             max_step = T_min / float(steps_per_period)
+        
+        # Ensure we generate enough time points for visualization
+        # by creating a fixed t_eval array
+        t_eval = np.linspace(0, self.T, min_time_points)
+        
+        print(f"Simulating with max_step={max_step:.5f}, ω_max={ω_max:.5f}")
+        print(f"Using t_eval with {len(t_eval)} points")
 
         sol = solve_ivp(
             fun=self.kuramoto_rhs,
@@ -90,7 +99,8 @@ class KuramotoModel:
             method='RK45',
             rtol=rtol,
             atol=atol,
-            max_step=max_step
+            max_step=max_step,
+            t_eval=t_eval  # Force evaluation at these specific times
         )
 
         self.times = sol.t

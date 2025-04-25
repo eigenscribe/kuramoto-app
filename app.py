@@ -862,8 +862,9 @@ def run_simulation(n_oscillators, coupling_strength, frequencies, simulation_tim
     simulation_time : float
         Total simulation time
     time_step : float
-        DEPRECATED: This parameter is ignored. Time step is automatically calculated
-        based on oscillator frequencies to ensure numerical stability and accuracy.
+        REMOVED: This parameter is no longer used. The time step is now automatically calculated
+        based on oscillator frequencies to ensure numerical stability and accuracy. The parameter 
+        is kept for backward compatibility with saved configurations.
     random_seed : int
         Seed for random number generation
     adjacency_matrix : ndarray, optional
@@ -890,7 +891,8 @@ def run_simulation(n_oscillators, coupling_strength, frequencies, simulation_tim
     
     # Run the simulation with automatically calculated time step
     try:
-        times, phases, order_parameter = model.simulate()
+        # Force at least 500 time points for visualization, regardless of internal time step
+        times, phases, order_parameter = model.simulate(min_time_points=500)
         print("Simulation successful!")
         print(f"  times shape: {times.shape if hasattr(times, 'shape') else 'N/A'}")
         print(f"  phases shape: {phases.shape if hasattr(phases, 'shape') else 'N/A'}")

@@ -40,7 +40,7 @@ class KuramotoModel:
         dθ = self.ω + np.sum(coupling, axis=1)
         return dθ
 
-    def simulate(self, rtol=1e-6, atol=1e-9, max_step=None):
+    def simulate(self, rtol=1e-6, atol=1e-9, max_step=0.01):
         sol = solve_ivp(
             fun=self.kuramoto_rhs,
             t_span=(0, self.T),

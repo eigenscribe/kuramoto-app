@@ -40,7 +40,6 @@ def parse_json_parameters(json_string):
         "network_type": "All-to-All", 
         "simulation_time": 10.0,
         "time_step": 0.1,
-        "auto_optimize": true, (optional)
         "random_seed": 42,
         "frequency_distribution": "Normal",
         "frequency_parameters": {
@@ -64,7 +63,6 @@ def parse_json_parameters(json_string):
             "network_type": "All-to-All",
             "simulation_time": 10.0,
             "time_step": 0.1,
-            "auto_optimize": False,
             "random_seed": 42,
             "frequency_distribution": "Normal",
             "frequency_parameters": {
@@ -92,8 +90,7 @@ def parse_json_parameters(json_string):
         if "time_step" in params:
             result["time_step"] = float(params["time_step"])
             
-        if "auto_optimize" in params:
-            result["auto_optimize"] = bool(params["auto_optimize"])
+        # Auto optimization feature has been removed
             
         if "random_seed" in params:
             result["random_seed"] = int(params["random_seed"])
@@ -400,7 +397,6 @@ with st.sidebar.expander("Examples", expanded=False):
         "network_type": "All-to-All", 
         "simulation_time": 10.0,
         "time_step": 0.1,
-        "auto_optimize": True,
         "random_seed": 42,
         "frequency_distribution": "Normal",
         "frequency_parameters": {
@@ -439,7 +435,6 @@ with st.sidebar.expander("Examples", expanded=False):
         "network_type": "Custom Adjacency Matrix",
         "simulation_time": 20.0,
         "time_step": 0.05,
-        "auto_optimize": True,
         "random_seed": 42,
         "frequency_distribution": "Normal",
         "frequency_parameters": {
@@ -891,17 +886,19 @@ def run_simulation(n_oscillators, coupling_strength, frequencies, simulation_tim
     # Convert random_seed to integer to prevent type errors
     if random_seed is not None:
         random_seed = int(random_seed)
+        np.random.seed(random_seed)
     
     # Initialize the model with given parameters
     model = KuramotoModel(
         n_oscillators=n_oscillators,
         coupling_strength=coupling_strength,
         frequencies=frequencies,
+        adjacency_matrix=adjacency_matrix,
         simulation_time=simulation_time
     )
     
-    # Run the simulation
-    times, phases, order_parameter = model.simulate()
+    # Run the simulation with specified time step
+    times, phases, order_parameter = model.simulate(max_step=time_step)
     
     # Return results
     return model, times, phases, order_parameter
@@ -928,25 +925,16 @@ if adj_matrix is not None:
 # Get current random seed from session state
 current_random_seed = st.session_state.random_seed if "random_seed" in st.session_state else 42
 
-# Run simulation with auto-optimization if enabled
-model, times, phases, order_parameter, optimized_time_step = run_simulation(
+# Run simulation
+model, times, phases, order_parameter = run_simulation(
     n_oscillators=sim_n_oscillators,
     coupling_strength=coupling_strength,
     frequencies=frequencies,
     simulation_time=simulation_time,
     time_step=time_step,
     random_seed=current_random_seed,
-    adjacency_matrix=adj_matrix,
-    auto_optimize=auto_optimize_on_run
+    adjacency_matrix=adj_matrix
 )
-
-# If time step was optimized during simulation, display a note
-if optimized_time_step is not None:
-    st.sidebar.info(f"""
-    Time step was automatically optimized to {optimized_time_step:.4f}
-    
-    You can manually set this value in the Time Step slider for future runs.
-    """)
 
 ########################
 # TAB 1: NETWORK TAB

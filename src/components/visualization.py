@@ -591,6 +591,137 @@ def _render_analysis_tab(times, phases, order_parameter, n_oscillators):
 
 def plot_interactive_network(model, n_oscillators, network_type, adj_matrix):
     """Create an interactive network visualization using Plotly."""
-    # This is a placeholder for an interactive network visualization
-    # Using Plotly would be ideal here, but requires significant code
-    return None
+    # Get the network graph from the model
+    import networkx as nx
+    import plotly.graph_objects as go
+    import numpy as np
+    
+    # Create the graph based on the adjacency matrix
+    G = nx.from_numpy_array(adj_matrix)
+    
+    # Get spring layout positions
+    pos = nx.spring_layout(G, seed=42)
+    
+    # Extract coordinates from position dictionary
+    x_nodes = [pos[i][0] for i in range(n_oscillators)]
+    y_nodes = [pos[i][1] for i in range(n_oscillators)]
+    
+    # Get frequencies for node color
+    frequencies = model.natural_frequencies if hasattr(model, 'natural_frequencies') else np.zeros(n_oscillators)
+    
+    # Color the nodes based on natural frequency
+    freq_range = max(abs(frequencies.min()), abs(frequencies.max()))
+    if freq_range == 0:
+        freq_range = 1.0
+    
+    # Create a blue-based color scale for node colors
+    node_colors = []
+    for freq in frequencies:
+        # Map frequencies to the blue gradient
+        intensity = (freq + freq_range) / (2 * freq_range)  # Map to [0, 1]
+        # Create blue gradient colors - from light to dark blue
+        rgb = (0, int(176 + 79 * intensity), int(235 + 20 * intensity))
+        node_colors.append(f'rgb{rgb}')
+    
+    # Edge traces
+    edge_x = []
+    edge_y = []
+    edge_width = []
+    edge_colors = []
+    
+    # Collect edge coordinates and properties
+    for edge in G.edges():
+        i, j = edge
+        x0, y0 = pos[i]
+        x1, y1 = pos[j]
+        
+        # Add line coordinates
+        edge_x.extend([x0, x1, None])
+        edge_y.extend([y0, y1, None])
+        
+        # Edge width based on weight
+        weight = adj_matrix[i, j]
+        edge_width.append(weight * 2)
+        
+        # Edge color based on synchronization
+        if hasattr(model, 'phases') and model.phases.shape[1] > 0:
+            phase_i = model.phases[i, -1]
+            phase_j = model.phases[j, -1]
+            
+            # Calculate phase difference (wrapped to [-π, π])
+            phase_diff = (phase_i - phase_j + np.pi) % (2*np.pi) - np.pi
+            
+            # Calculate synchronization level (1 = synchronized, 0 = out of phase)
+            sync = 1 - abs(phase_diff) / np.pi
+            
+            # Use a blue gradient for edges - darker blue means more synchronized
+            blue_intensity = int(50 + 200 * sync)
+            edge_colors.append(f'rgba(0, {blue_intensity}, 255, 0.7)')
+        else:
+            edge_colors.append('rgba(100, 100, 100, 0.5)')
+    
+    # Create edge trace
+    edge_trace = go.Scatter(
+        x=edge_x, y=edge_y,
+        mode='lines',
+        line=dict(width=1, color='#888'),
+        hoverinfo='none',
+        line_color=edge_colors,
+    )
+    
+    # Create node trace
+    node_trace = go.Scatter(
+        x=x_nodes, y=y_nodes,
+        mode='markers',
+        hoverinfo='text',
+        marker=dict(
+            showscale=True,
+            colorscale=[[0, '#00e8ff'], [0.5, '#14b5ff'], [1, '#0070eb']],
+            color=frequencies,
+            size=15,
+            colorbar=dict(
+                thickness=15,
+                title='Frequency',
+                xanchor='left',
+                titleside='right'
+            ),
+            line=dict(
+                width=2,
+                color='white'
+            )
+        )
+    )
+    
+    # Add hover text with node info
+    node_info = []
+    for i in range(n_oscillators):
+        info = f"Node {i}<br>Frequency: {frequencies[i]:.3f}"
+        if hasattr(model, 'phases') and model.phases.shape[1] > 0:
+            phase = model.phases[i, -1] % (2*np.pi)
+            info += f"<br>Phase: {phase:.3f}"
+        node_info.append(info)
+    
+    node_trace.hovertext = node_info
+    
+    # Create figure with node and edge traces
+    fig = go.Figure(
+        data=[edge_trace, node_trace],
+        layout=go.Layout(
+            showlegend=False,
+            hovermode='closest',
+            margin=dict(b=20, l=5, r=5, t=40),
+            annotations=[dict(
+                text=f"{network_type} Network",
+                showarrow=False,
+                xref="paper", yref="paper",
+                x=0.005, y=-0.002
+            )],
+            xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+            yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+            plot_bgcolor='rgba(0, 0, 0, 0)',
+            paper_bgcolor='rgba(0, 0, 0, 0)',
+            font=dict(color='white')
+        )
+    )
+    
+    return fig

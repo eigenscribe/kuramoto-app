@@ -1736,9 +1736,7 @@ with tab3:
                           facecolors=base_colors, edgecolors=edge_colors,
                           s=70, alpha=0.9, linewidth=0.5, zorder=10)
         
-        # Add a connecting line with low opacity
-        ax.plot(times[:safe_time_idx+1], order_parameter[:safe_time_idx+1], 
-              color='white', alpha=0.3, linewidth=1, zorder=5)
+        # Removed connecting line as requested
         
         # Highlight current position with a larger filled marker
         if safe_time_idx > 0:
@@ -1798,26 +1796,11 @@ with tab3:
     
     # Removed "Current Time" display as requested
     
-    # Playback controls layout - now after the plots
-    playback_container = st.container()
+    # Put animation controls first (at the top)
+    # Create centered columns for control buttons
+    col1, col2, col3, col4, col5 = st.columns([1, 1, 1, 1, 1])
     
-    # Add a slider to manually control visualization time point
-    time_index = playback_container.slider(
-        "Time Point", 
-        min_value=0, 
-        max_value=len(times)-1, 
-        value=st.session_state.time_index,
-        help="Manually select a specific time point to display"
-    )
-    
-    # Update session state when slider is moved
-    if st.session_state.time_index != time_index:
-        st.session_state.time_index = time_index
-    
-    # Centered animation controls with custom styling - removed speed slider
-    col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
-    
-    # Create a placeholder for displaying time step info in fourth column
+    # Create a placeholder for displaying time step info 
     current_time_placeholder = col4.empty()
     
     # Function to update time step display
@@ -1847,27 +1830,41 @@ with tab3:
     # Set a fixed animation speed value
     animation_speed = 3.0  # Fixed moderate animation speed
     
-    # Previous frame button
-    if col1.button("⏪ Previous", use_container_width=True):
+    # Previous frame button (in second column for centering)
+    if col2.button("⏪ Previous", use_container_width=True):
         if st.session_state.time_index > 0:
             st.session_state.time_index -= 1
             st.rerun()
     
-    # Simplified Play/Pause button with text inside
+    # Simplified Play/Pause button with text inside (centered in middle column)
     play_button_text = "⏯️ Play"
-    if col2.button(play_button_text, use_container_width=True):
+    if col3.button(play_button_text, use_container_width=True):
         # Toggle animation state
         animate = True
         # Let the animation code run
     
-    # Next frame button
-    if col3.button("⏩ Next", use_container_width=True):
+    # Next frame button 
+    if col4.button("⏩ Next", use_container_width=True):
         if st.session_state.time_index < len(times) - 1:
             st.session_state.time_index += 1
             st.rerun()
     
     # Initial display of time step
     update_time_step_display(st.session_state.time_index)
+    
+    # Add a slider to manually control visualization time point AFTER the buttons
+    playback_container = st.container()
+    time_index = playback_container.slider(
+        "Time Point", 
+        min_value=0, 
+        max_value=len(times)-1, 
+        value=st.session_state.time_index,
+        help="Manually select a specific time point to display"
+    )
+    
+    # Update session state when slider is moved
+    if st.session_state.time_index != time_index:
+        st.session_state.time_index = time_index
             
     # If animation is triggered
     if animate:

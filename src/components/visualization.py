@@ -44,7 +44,7 @@ def create_simulation_tabs(model, times, phases, order_parameter, n_oscillators,
 
 def _render_animation_tab(times, phases, order_parameter, n_oscillators):
     """Render the animation tab with interactive controls."""
-    st.markdown("### Interactive Simulation Playback")
+    st.markdown("<h3 class='gradient_text1'>Interactive Simulation Playback</h3>", unsafe_allow_html=True)
     
     # Create a placeholder for the animation control buttons,
     # centered and positioned ABOVE the time slider
@@ -232,21 +232,48 @@ def _plot_order_parameter(times, order_parameter, time_idx):
 
 def _render_network_tab(model, times, phases, n_oscillators, network_type, adj_matrix):
     """Render the network visualization tab."""
-    st.markdown("### Network Visualization")
+    st.markdown("<h3 class='gradient_text1'>Network Visualization</h3>", unsafe_allow_html=True)
     
-    # Create a placeholder for the network visualization
-    net_plot_container = st.container()
+    # Create tabs for different visualization types
+    net_tabs = st.tabs(["Static Network", "Interactive Network"])
     
-    # Refresh control - only execute when requested
-    if st.session_state.refresh_network:
-        print("Refresh network requested, generating network plot...")
-        st.session_state.refresh_network = False  # Reset flag
-    
-    # Generate the network graph
-    with net_plot_container:
-        graph_info, graph_fig = plot_network_graph(model, n_oscillators, network_type, adj_matrix)
-        st.pyplot(graph_fig)
-        st.markdown(f"**Network Info**: {graph_info}")
+    # First tab - static matplotlib visualization
+    with net_tabs[0]:
+        # Create a placeholder for the network visualization
+        net_plot_container = st.container()
+        
+        # Refresh control - only execute when requested
+        if st.session_state.refresh_network:
+            print("Refresh network requested, generating network plot...")
+            st.session_state.refresh_network = False  # Reset flag
+        
+        # Generate the network graph
+        with net_plot_container:
+            graph_info, graph_fig = plot_network_graph(model, n_oscillators, network_type, adj_matrix)
+            st.pyplot(graph_fig)
+            st.markdown(f"<div style='text-align: center;'><b>Network Info</b>: {graph_info}</div>", unsafe_allow_html=True)
+
+    # Second tab - interactive Plotly visualization
+    with net_tabs[1]:
+        st.markdown("<div style='text-align: center; margin-bottom: 20px;'>Interactive network visualization allows you to explore the oscillator network dynamics.</div>", unsafe_allow_html=True)
+        
+        # Generate the interactive network
+        plotly_fig = plot_interactive_network(model, n_oscillators, network_type, adj_matrix)
+        
+        # If plotly figure was successfully created
+        if plotly_fig:
+            st.plotly_chart(plotly_fig, use_container_width=True)
+            st.markdown("""
+            <div style='background-color: rgba(0, 0, 0, 0.2); 
+                       padding: 10px; 
+                       border-radius: 5px; 
+                       border-left: 4px solid #14b5ff;'>
+                <b>💡 Tip:</b> You can zoom, pan, and hover over elements to see details. 
+                Double-click to reset the view.
+            </div>
+            """, unsafe_allow_html=True)
+        else:
+            st.warning("Interactive visualization could not be generated.")
 
 def plot_network_graph(model, n_oscillators, network_type, adj_matrix):
     """Plot the oscillator network as a graph."""
@@ -377,7 +404,7 @@ def plot_network_graph(model, n_oscillators, network_type, adj_matrix):
 
 def _render_time_evolution_tab(times, phases, order_parameter, n_oscillators):
     """Render the time evolution visualization tab."""
-    st.markdown("### Time Evolution of the System")
+    st.markdown("<h3 class='gradient_text1'>Time Evolution of the System</h3>", unsafe_allow_html=True)
     
     # Create a 2-column layout
     col1, col2 = st.columns(2)
@@ -466,7 +493,7 @@ def _render_time_evolution_tab(times, phases, order_parameter, n_oscillators):
 
 def _render_analysis_tab(times, phases, order_parameter, n_oscillators):
     """Render the analysis visualization tab."""
-    st.markdown("### System Analysis")
+    st.markdown("<h3 class='gradient_text1'>System Analysis</h3>", unsafe_allow_html=True)
     
     # Create a 2-column layout
     col1, col2 = st.columns(2)

@@ -891,7 +891,7 @@ def run_simulation(n_oscillators, coupling_strength, frequencies, simulation_tim
     
     # Run the simulation with automatically calculated time step
     try:
-        # Force at least 500 time points for visualization, regardless of internal time step
+        # Force at least 500 time points for visualization
         times, phases, order_parameter = model.simulate(min_time_points=500)
         print("Simulation successful!")
         print(f"  times shape: {times.shape if hasattr(times, 'shape') else 'N/A'}")

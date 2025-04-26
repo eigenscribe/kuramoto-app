@@ -623,6 +623,39 @@ def plot_interactive_network(model, n_oscillators, network_type, adj_matrix):
     import plotly.graph_objects as go
     import numpy as np
     
+    # If adjacency matrix is None, create a default one based on network_type
+    if adj_matrix is None:
+        # Use the one from the model or create a new one
+        if network_type == "All-to-All":
+            # Create a fully connected network (minus self-connections)
+            adj_matrix = np.ones((n_oscillators, n_oscillators)) - np.eye(n_oscillators)
+            
+        elif network_type == "Nearest Neighbor":
+            # Create a ring network where each oscillator connects to its neighbors
+            adj_matrix = np.zeros((n_oscillators, n_oscillators))
+            for i in range(n_oscillators):
+                # Connect to left and right neighbors in the ring
+                adj_matrix[i, (i-1) % n_oscillators] = 1
+                adj_matrix[i, (i+1) % n_oscillators] = 1
+                
+        elif network_type == "Random":
+            # Create a random network with ~25% connectivity
+            np.random.seed(42)  # Fixed seed for consistent visualization
+            
+            # Start with zero connectivity
+            adj_matrix = np.zeros((n_oscillators, n_oscillators))
+            
+            # For each oscillator, connect to ~25% of others randomly
+            connect_prob = 0.25
+            for i in range(n_oscillators):
+                for j in range(i+1, n_oscillators):  # Only iterate over upper triangle to ensure symmetry
+                    if np.random.random() < connect_prob:
+                        adj_matrix[i, j] = 1
+                        adj_matrix[j, i] = 1  # Ensure symmetry
+        else:
+            # Default to all-to-all if no recognized network type
+            adj_matrix = np.ones((n_oscillators, n_oscillators)) - np.eye(n_oscillators)
+    
     # Create the graph based on the adjacency matrix
     G = nx.from_numpy_array(adj_matrix)
     

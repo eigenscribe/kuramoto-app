@@ -28,12 +28,47 @@ def _apply_custom_css():
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Aclonica&display=swap');
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=Aclonica&display=swap" rel="stylesheet">
     """, unsafe_allow_html=True)
     
     # Read and apply CSS from the file
     with open("src/styles/app.css", "r") as f:
         css = f.read()
         st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
+        
+    # Apply additional CSS to fix the background
+    st.markdown("""
+    <style>
+    /* Override background settings for main elements */
+    .main .block-container {
+        background-color: rgba(0, 0, 0, 0.5);
+        border-radius: 10px;
+        padding: 20px;
+        backdrop-filter: blur(5px);
+    }
+    
+    /* Make sure the background image is visible */
+    [data-testid="stAppViewContainer"] {
+        background-image: url('/static/images/wisp.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+    
+    /* Add dark overlay on top of background */
+    [data-testid="stAppViewContainer"]::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        z-index: -1;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
 def _configure_matplotlib_style():
     """Configure matplotlib style for consistent plots."""

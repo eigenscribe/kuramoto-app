@@ -293,13 +293,13 @@ st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Aclonica&display=swap" rel="stylesheet">
 """, unsafe_allow_html=True)
 
-# Load custom CSS
-with open("styles.css") as f:
+# Load custom CSS from src/styles directory
+with open("src/styles/styles.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-# Get the base64 encoded image
+# Get the base64 encoded image from static/images directory
 import base64
-with open("wisp.base64", "r") as f:
+with open("static/images/wisp.base64", "r") as f:
     encoded_image = f.read()
 
 # Add custom background and custom font

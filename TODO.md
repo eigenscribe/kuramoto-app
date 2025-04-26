@@ -71,10 +71,9 @@
       ```
    </details>
 
-- [ ] Animation tab: Center buttons
 - [ ] Animation tab: Put buttons on top of time point slide bar
-- [ ] Animation tab: Remove blue line (time progression?)
-- [ ] Change the default setting for network connectivity from all-to-all to random 
+- [ ] Put time progression bar under time point slider
+- [ ] Make 'fill' color on time progression bar green
 - [ ] Sidebar: put time controls  above random seed parameter
 - [ ] Sidebar: make style of parameter headings have the same blue gradient as title
 - [ ] Sidebar: Increase maximum simulation time to 200

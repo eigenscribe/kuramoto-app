@@ -28,6 +28,10 @@ from src.models.kuramoto_model import KuramotoModel
 from src.database.database import save_configuration, get_configuration, list_configurations
 import time
 
+# Initialize refresh state for network refresh button
+if 'refresh_network' not in st.session_state:
+    st.session_state.refresh_network = False
+
 # Function to parse JSON parameters input
 def parse_json_parameters(json_string):
     """
@@ -511,6 +515,13 @@ random_seed = int(st.sidebar.number_input(
 
 # Network Connectivity Configuration
 st.sidebar.markdown("<h3 class='gradient_text1'>Network Connectivity</h3>", unsafe_allow_html=True)
+
+# Add a refresh button at the top of the Network Connectivity section
+if st.sidebar.button("🔄 Refresh Simulation", key="refresh_btn"):
+    st.session_state.refresh_network = True
+    print("Network refresh requested via main refresh button")
+    st.rerun()
+
 # Create radio button for network type without specifying both index and session state key
 # This fixes the warning: "widget created with default value but also had value set via Session State API"
 options = ["All-to-All", "Nearest Neighbor", "Random", "Custom Adjacency Matrix"]

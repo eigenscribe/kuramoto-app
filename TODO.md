@@ -76,5 +76,5 @@
 - [ ] Make 'fill' color on time progression bar green
 - [ ] Sidebar: put time controls  above random seed parameter
 - [ ] Sidebar: make style of parameter headings have the same blue gradient as title
-- [ ] Sidebar: Increase maximum simulation time to 200
+- [ ] Sidebar: Make random seed box have same outline gradient as frequency distribution dropdown box
 - [ ] Database implementation

@@ -1800,7 +1800,7 @@ with tab3:
     # Create centered columns for control buttons within the container
     with button_container:
         # Use wider columns for the buttons to center them better
-        bcol1, bcol2, bcol3, bcol4, bcol5 = st.columns([1, 2, 2, 2, 1])
+        bcol1, bcol2, bcol3, bcol4, bcol5 = st.columns([1, 3, 3, 3, 1])
     
         # Set a fixed animation speed value
         animation_speed = 3.0  # Fixed moderate animation speed

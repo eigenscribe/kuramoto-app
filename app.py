@@ -356,6 +356,7 @@ simulation_time = st.sidebar.slider(
     "Simulation Time",
     min_value=1.0,
     max_value=100.0,
+    value=100.0,  # Set default value to 100.0
     step=1.0,
     help="Total simulation time",
     key="simulation_time"
@@ -395,7 +396,7 @@ if 'peak2' not in st.session_state:
 if 'custom_freqs' not in st.session_state:
     st.session_state.custom_freqs = "0.5, 1.0, 1.5, 2.0, 2.5, 3.0, -0.5, -1.0, -1.5, -2.0"
 if 'simulation_time' not in st.session_state:
-    st.session_state.simulation_time = 20.0
+    st.session_state.simulation_time = 100.0
 # Default time_step value maintained for backward compatibility
 time_step = 0.01
 # random_seed is now initialized directly in the widget section
@@ -718,7 +719,7 @@ with st.sidebar.expander("Examples", expanded=False):
         "n_oscillators": 10,
         "coupling_strength": 1.0,
         "network_type": "All-to-All", 
-        "simulation_time": 10.0,
+        "simulation_time": 100.0,
         "random_seed": 42,
         "frequency_distribution": "Normal",
         "frequency_parameters": {
@@ -755,7 +756,7 @@ with st.sidebar.expander("Examples", expanded=False):
         "n_oscillators": n,
         "coupling_strength": 0.8,
         "network_type": "Custom Adjacency Matrix",
-        "simulation_time": 20.0,
+        "simulation_time": 100.0,
         "random_seed": 42,
         "frequency_distribution": "Normal",
         "frequency_parameters": {

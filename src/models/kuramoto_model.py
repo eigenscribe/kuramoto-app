@@ -103,11 +103,17 @@ class KuramotoModel:
         if max_step is None or max_step > cap:
             max_step = cap
             
-        # Create a fixed t_eval array to ensure we have enough points for visualization
-        t_eval = np.linspace(0, self.T, min_time_points)
+        # Scale the number of points based on simulation duration
+        # For longer simulations, use more points, but cap at 2000 points to avoid performance issues
+        points_per_time_unit = min_time_points / 10.0  # 500 points for a 10-unit simulation is our baseline
+        max_points = 2000  # Upper limit to prevent performance issues with very long simulations
+        scaled_points = min(max_points, max(min_time_points, int(points_per_time_unit * self.T)))
+        
+        # Create the t_eval array with scaled number of points
+        t_eval = np.linspace(0, self.T, scaled_points)
         
         print(f"Simulating with max_step={max_step:.5f}, ω_max={ω_max:.5f}, λ_max={λ_max:.5f}")
-        print(f"Using t_eval with {len(t_eval)} points")
+        print(f"Using t_eval with {len(t_eval)} points for simulation duration {self.T:.1f}")
 
         # 5) Call the integrator with this max_step and t_eval for fixed time points
         sol = solve_ivp(

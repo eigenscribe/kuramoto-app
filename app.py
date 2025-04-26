@@ -846,7 +846,7 @@ else:
 
 # Function to simulate model
 @st.cache_data(ttl=300)
-def run_simulation(n_oscillators, coupling_strength, frequencies, simulation_time, time_step, random_seed, 
+def run_simulation(n_oscillators, coupling_strength, frequencies, simulation_time, time_step=None, random_seed=None, 
                   adjacency_matrix=None):
     """
     Run a Kuramoto model simulation with the specified parameters and return the results.
@@ -861,11 +861,11 @@ def run_simulation(n_oscillators, coupling_strength, frequencies, simulation_tim
         Natural frequencies of oscillators
     simulation_time : float
         Total simulation time
-    time_step : float
-        REMOVED: This parameter is no longer used. The time step is now automatically calculated
-        based on oscillator frequencies to ensure numerical stability and accuracy. The parameter 
-        is kept for backward compatibility with saved configurations.
-    random_seed : int
+    time_step : float, optional
+        DEPRECATED: This parameter is no longer used. The time step is now automatically calculated
+        based on oscillator frequencies to ensure numerical stability and accuracy.
+        The parameter is kept for backward compatibility with saved configurations.
+    random_seed : int, optional
         Seed for random number generation
     adjacency_matrix : ndarray, optional
         Custom adjacency matrix defining network connectivity

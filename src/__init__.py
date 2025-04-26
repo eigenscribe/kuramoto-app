@@ -1,0 +1,3 @@
+"""
+Kuramoto Model Simulator package.
+"""

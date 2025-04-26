@@ -1805,10 +1805,40 @@ with tab3:
         value=st.session_state.time_index,
         help="Manually select a specific time point to display"
     )
-    st.session_state.time_index = time_index
+    
+    # Update session state when slider is moved
+    if st.session_state.time_index != time_index:
+        st.session_state.time_index = time_index
     
     # Centered animation controls with custom styling - removed speed slider
     col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
+    
+    # Create a placeholder for displaying time step info in fourth column
+    current_time_placeholder = col4.empty()
+    
+    # Function to update time step display
+    def update_time_step_display(time_idx):
+        # Calculate the actual time step (difference between consecutive time points)
+        if time_idx > 0:
+            time_step = times[time_idx] - times[time_idx-1]
+        else:
+            # Use first difference for the first point
+            if len(times) > 1:
+                time_step = times[1] - times[0]
+            else:
+                time_step = 0
+                
+        current_time = times[time_idx]
+        current_percent = (time_idx / (len(times) - 1)) * 100
+        
+        # Update the placeholder with the time step information
+        current_time_placeholder.markdown(f"""
+        <div style="padding: 10px; border-radius: 5px; background: linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(255, 0, 255, 0.2)); 
+                    border: 1px solid rgba(255, 255, 255, 0.1); text-align: center;">
+            <span style="font-size: 0.85rem; color: white;">Δt = {time_step:.5f}</span><br>
+            <span style="font-size: 0.75rem; color: rgba(255, 255, 255, 0.7);">t = {current_time:.3f}</span>
+        </div>
+        """, unsafe_allow_html=True)
     
     # Set a fixed animation speed value
     animation_speed = 3.0  # Fixed moderate animation speed
@@ -1832,23 +1862,8 @@ with tab3:
             st.session_state.time_index += 1
             st.rerun()
     
-    # Create a container for displaying current time info in fourth column
-    current_time_container = col4.container()
-    
-    # Display current time in a styled container
-    with current_time_container:
-        current_time = times[st.session_state.time_index]
-        current_percent = (st.session_state.time_index / (len(times) - 1)) * 100
-        
-        st.markdown(f"""
-        <div style="padding: 10px; border-radius: 5px; background: linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(255, 0, 255, 0.2)); 
-                    border: 1px solid rgba(255, 255, 255, 0.1); text-align: center;">
-            <span style="font-size: 0.85rem; color: white;">t = {current_time:.3f}</span><br>
-            <span style="font-size: 0.75rem; color: rgba(255, 255, 255, 0.7);">{current_percent:.1f}%</span>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    # Save button removed
+    # Initial display of time step
+    update_time_step_display(st.session_state.time_index)
             
     # If animation is triggered
     if animate:
@@ -1884,16 +1899,8 @@ with tab3:
             phases_plot_placeholder.pyplot(create_oscillator_phases_plot(plot_idx))
             order_plot_placeholder.pyplot(create_order_parameter_plot(plot_idx))
             
-            # Update the time step display
-            current_time = times[plot_idx]
-            current_percent = (plot_idx / (len(times) - 1)) * 100
-            current_time_container.markdown(f"""
-            <div style="padding: 10px; border-radius: 5px; background: linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(255, 0, 255, 0.2)); 
-                        border: 1px solid rgba(255, 255, 255, 0.1); text-align: center;">
-                <span style="font-size: 0.85rem; color: white;">t = {current_time:.3f}</span><br>
-                <span style="font-size: 0.75rem; color: rgba(255, 255, 255, 0.7);">{current_percent:.1f}%</span>
-            </div>
-            """, unsafe_allow_html=True)
+            # Update the time step display with the current time index
+            update_time_step_display(plot_idx)
             
             # Add a short pause to control animation speed
             time.sleep(0.1 / animation_speed)

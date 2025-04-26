@@ -8,6 +8,13 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
+# Let's strip down all CSS in the app to the minimum needed
+st.markdown("""
+<style>
+    /* No special styling - let Streamlit's defaults handle alignment */
+</style>
+""", unsafe_allow_html=True)
+
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors
@@ -17,25 +24,13 @@ from matplotlib.colors import LinearSegmentedColormap
 from io import BytesIO
 import base64
 import json
-from kuramoto_model import KuramotoModel
+from src.models.kuramoto_model import KuramotoModel
+from src.database.database import save_configuration, get_configuration, list_configurations
 import time
 
-# Import Aclonica font from Google Fonts
-st.markdown("""
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Aclonica&display=swap" rel="stylesheet">
-""", unsafe_allow_html=True)
-
-# Load custom CSS from src/styles directory
-try:
-    with open("src/styles/styles.css") as f:
-        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-except Exception as e:
-    st.error(f"Error loading CSS: {e}")
-
-# Title
-st.markdown("<h1 class='gradient_text1'>Kuramoto Model Simulator</h1>", unsafe_allow_html=True)
+# Initialize refresh state for network refresh button
+if 'refresh_network' not in st.session_state:
+    st.session_state.refresh_network = False
 
 # Function to parse JSON parameters input
 def parse_json_parameters(json_string):
@@ -49,7 +44,6 @@ def parse_json_parameters(json_string):
         "network_type": "All-to-All", 
         "simulation_time": 10.0,
         "time_step": 0.1,
-        "auto_optimize": true, (optional)
         "random_seed": 42,
         "frequency_distribution": "Normal",
         "frequency_parameters": {
@@ -73,7 +67,6 @@ def parse_json_parameters(json_string):
             "network_type": "All-to-All",
             "simulation_time": 10.0,
             "time_step": 0.1,
-            "auto_optimize": False,
             "random_seed": 42,
             "frequency_distribution": "Normal",
             "frequency_parameters": {
@@ -98,11 +91,11 @@ def parse_json_parameters(json_string):
         if "simulation_time" in params:
             result["simulation_time"] = float(params["simulation_time"])
             
+        # time_step is now automatically calculated based on oscillator frequencies
+        # We keep this for backward compatibility with existing JSON configs
         if "time_step" in params:
-            result["time_step"] = float(params["time_step"])
-            
-        if "auto_optimize" in params:
-            result["auto_optimize"] = bool(params["auto_optimize"])
+            # We acknowledge the parameter but don't use it directly
+            pass
             
         if "random_seed" in params:
             result["random_seed"] = int(params["random_seed"])
@@ -164,7 +157,7 @@ if 'temp_imported_params' in st.session_state:
     st.session_state.coupling_strength = params["coupling_strength"]
     st.session_state.network_type = params["network_type"]
     st.session_state.simulation_time = params["simulation_time"]
-    st.session_state.time_step = params["time_step"]
+    # time_step is no longer used, it's automatically calculated
     st.session_state.random_seed = params["random_seed"]
     st.session_state.freq_type = params["frequency_distribution"]
     
@@ -202,7 +195,7 @@ if st.session_state.loaded_config is not None:
     st.session_state.n_oscillators = config['n_oscillators']
     st.session_state.coupling_strength = config['coupling_strength']
     st.session_state.simulation_time = config['simulation_time']
-    st.session_state.time_step = config['time_step']
+    # time_step is no longer needed - it's automatically calculated
     st.session_state.random_seed = int(config['random_seed']) # Ensure it's an integer
     st.session_state.network_type = config['network_type']
     st.session_state.freq_type = config['frequency_distribution']
@@ -303,11 +296,52 @@ st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Aclonica&display=swap" rel="stylesheet">
 """, unsafe_allow_html=True)
 
-# Load custom CSS from src/styles directory
+# Load custom CSS
 with open("src/styles/styles.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-# No need to load base64 image or define custom styles since it's all in the CSS now
+# Get the base64 encoded image
+import base64
+with open("static/images/wisp.base64", "r") as f:
+    encoded_image = f.read()
+
+# Add custom background and custom font
+st.markdown(f"""
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Aclonica&display=swap');
+    
+    .stApp {{
+        background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                         url('data:image/jpeg;base64,{encoded_image}');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }}
+    
+    /* Ensure Aclonica font is applied everywhere */
+    body, div, p, h1, h2, h3, h4, h5, h6, li, span, label, button, .sidebar .sidebar-content {{
+        font-family: 'Aclonica', sans-serif !important;
+    }}
+    
+    /* Fix Streamlit buttons to use Aclonica */
+    button, .stButton button, .stDownloadButton button {{
+        font-family: 'Aclonica', sans-serif !important;
+    }}
+    
+    /* Fix Streamlit widgets text */
+    .stSlider label, .stSelectbox label, .stNumberInput label {{
+        font-family: 'Aclonica', sans-serif !important;
+    }}
+    
+    /* Apply gradient_text1 to sidebar labels */
+    .sidebar .sidebar-content label {{
+        background: -webkit-linear-gradient(#14a5ff, #8138ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: bold;
+    }}
+</style>
+""", unsafe_allow_html=True)
 
 # Title
 st.markdown("<h1 class='gradient_text1'>Kuramoto Model Simulator</h1>", unsafe_allow_html=True)
@@ -325,200 +359,16 @@ st.sidebar.markdown("<h3 class='gradient_text1'>Time Controls</h3>", unsafe_allo
 simulation_time = st.sidebar.slider(
     "Simulation Time",
     min_value=1.0,
-    max_value=100.0,
+    max_value=200.0,
+    value=100.0,  # Set default value to 100.0
     step=1.0,
     help="Total simulation time",
     key="simulation_time"
 )
 
-# Time Step Controls
-time_step = st.sidebar.slider(
-    "Time Step",
-    min_value=0.001,
-    max_value=0.1,
-    step=0.001,
-    format="%.3f",
-    help="Time step for simulation (smaller = more accurate but slower)",
-    key="time_step"
-)
-
-# Time step optimization controls - smaller buttons with adjusted size
-time_step_col1, time_step_col2 = st.sidebar.columns([1, 1])
-
-# Add an auto-optimize time step button in column 1 with smaller text
-if time_step_col1.button("🧠 Optimize", help="Automatically calculate optimal time step for stability and accuracy"):
-    # Need to get the random seed value from session state before using it
-    current_random_seed = st.session_state.random_seed if "random_seed" in st.session_state else 42
-    
-    # Get the current number of oscillators from session state
-    current_n_oscillators = st.session_state.n_oscillators if "n_oscillators" in st.session_state else 10
-    
-    # Get the current coupling strength from session state
-    current_coupling_strength = st.session_state.coupling_strength if "coupling_strength" in st.session_state else 1.0
-    
-    # Create a temporary frequencies array based on the current settings
-    # We'll use a simple normal distribution as a placeholder for optimization
-    temp_frequencies = np.random.normal(0, 1, current_n_oscillators)
-    
-    # Check for adjacency matrix in session state
-    adjacency_matrix_for_optimization = None
-    if 'loaded_adj_matrix' in st.session_state:
-        adjacency_matrix_for_optimization = st.session_state.loaded_adj_matrix
-        print(f"Using adjacency matrix from session state for optimization, shape: {adjacency_matrix_for_optimization.shape if hasattr(adjacency_matrix_for_optimization, 'shape') else 'unknown'}")
-    
-    # Create a temporary model to calculate optimal time step
-    temp_model = KuramotoModel(
-        n_oscillators=current_n_oscillators,
-        coupling_strength=current_coupling_strength,
-        frequencies=temp_frequencies,
-        simulation_time=simulation_time,
-        time_step=time_step,
-        random_seed=current_random_seed,
-        adjacency_matrix=adjacency_matrix_for_optimization
-    )
-    
-    # Get the optimization results
-    optimization_results = temp_model.compute_optimal_time_step(safety_factor=0.85)
-    
-    # Store the optimized time step in a different session state variable
-    # Rather than directly changing the slider's value
-    st.session_state.optimized_time_step = optimization_results['optimal_time_step']
-    
-    # Display a success message with the explanation
-    st.sidebar.success(f"""
-    Time step optimized to {optimization_results['optimal_time_step']:.4f}
-    
-    Please manually set this value in the Time Step slider above.
-    """)
-    
-    # Display detailed optimization information in an expander
-    with st.sidebar.expander("Optimization Details"):
-        st.markdown(f"""
-        **Stability Level:** {optimization_results['stability_level']}  
-        **Accuracy Level:** {optimization_results['accuracy_level']}  
-        **Computation Efficiency:** {optimization_results['computation_level']}
-        
-        {optimization_results['explanation']}
-        """)
-    
-    # We don't rerun because we can't automatically update the slider widget
-
-# Add checkbox in column 2 to always auto-optimize on simulation run
-if "auto_optimize_on_run" not in st.session_state:
-    st.session_state.auto_optimize_on_run = False
-    
-auto_optimize_on_run = time_step_col2.checkbox(
-    "Auto on Run", 
-    value=st.session_state.auto_optimize_on_run,
-    help="Automatically optimize time step each time the simulation runs",
-    key="auto_optimize_on_run"
-)
-
-# Add JSON Parameter Import Section
-st.sidebar.markdown("<h3 class='gradient_text1'>JSON Configuration</h3>", unsafe_allow_html=True)
-
-# Initialize session state for JSON example if not present
-if 'json_example' not in st.session_state:
-    st.session_state.json_example = ""
-
-# Display text area for JSON input (larger and left-aligned)
-json_input = st.sidebar.text_area(
-    "Import/Export Parameters",
-    value=st.session_state.json_example,
-    height=200,
-    placeholder='Paste your JSON configuration here...',
-    help="Enter a valid JSON configuration for the Kuramoto simulation"
-)
-
-# Add a collapsible section with examples but without parameter details
-with st.sidebar.expander("Examples", expanded=False):
-    example_json = {
-        "n_oscillators": 10,
-        "coupling_strength": 1.0,
-        "network_type": "All-to-All", 
-        "simulation_time": 10.0,
-        "time_step": 0.1,
-        "auto_optimize": True,
-        "random_seed": 42,
-        "frequency_distribution": "Normal",
-        "frequency_parameters": {
-            "mean": 0.0,
-            "std": 0.2
-        }
-    }
-    
-    st.code(json.dumps(example_json, indent=2), language="json")
-    
-    # Add small-world network example
-    st.markdown("**Small-world network example:**")
-    
-    # Generate a sample small-world network
-    n = 10
-    sample_matrix = np.zeros((n, n))
-    for i in range(n):
-        # Connect to neighbors
-        for j in range(1, 3):
-            sample_matrix[i, (i+j) % n] = 1
-            sample_matrix[i, (i-j) % n] = 1
-            
-    # Add a few random long-range connections
-    np.random.seed(42)
-    for _ in range(5):
-        i = np.random.randint(0, n)
-        j = np.random.randint(0, n)
-        if i != j and sample_matrix[i, j] == 0:
-            sample_matrix[i, j] = 1
-            sample_matrix[j, i] = 1
-            
-    # Create example with matrix
-    complex_example = {
-        "n_oscillators": n,
-        "coupling_strength": 0.8,
-        "network_type": "Custom Adjacency Matrix",
-        "simulation_time": 20.0,
-        "time_step": 0.05,
-        "auto_optimize": True,
-        "random_seed": 42,
-        "frequency_distribution": "Normal",
-        "frequency_parameters": {
-            "mean": 0.0,
-            "std": 0.1
-        },
-        "adjacency_matrix": sample_matrix.tolist()
-    }
-    
-    # Add button to use this example - with smaller text
-    if st.button("Use Small-World", key="small_world_btn"):
-        st.session_state.json_example = json.dumps(complex_example, indent=2)
-        st.rerun()
-
-# Add import button and logic
-if st.sidebar.button("Import Parameters", key="sidebar_import_json_button"):
-    if json_input.strip():
-        try:
-            # Parse the JSON input
-            params, error = parse_json_parameters(json_input)
-            
-            if error:
-                st.sidebar.error(f"Error parsing JSON: {error}")
-            else:
-                # Update session state with the parsed parameters
-                if params is not None:
-                    # Store all parameters in a temporary variable in session state
-                    # This is to avoid the error when trying to change widget values after initialization
-                    st.session_state.temp_imported_params = params
-                    
-                    # Show success message
-                    st.sidebar.success("Parameters imported successfully! Applying settings...")
-                    
-                    # Rerun the app to apply the changes
-                    st.rerun()
-                else:
-                    st.sidebar.error("Failed to parse JSON parameters. Please check your input format.")
-        except Exception as e:
-            st.sidebar.error(f"Error processing parameters: {str(e)}")
-    else:
-        st.sidebar.warning("Please enter JSON configuration before importing.")
+# Time step is now automatically calculated based on oscillator frequencies and doesn't need a UI control
+# Default value maintained for backward compatibility with database functions
+time_step = 0.01
 
 # Add separator before individual parameters
 st.sidebar.markdown("<hr style='margin: 15px 0px; border-color: rgba(255,255,255,0.2);'>", unsafe_allow_html=True)
@@ -548,12 +398,10 @@ if 'peak2' not in st.session_state:
 if 'custom_freqs' not in st.session_state:
     st.session_state.custom_freqs = "0.5, 1.0, 1.5, 2.0, 2.5, 3.0, -0.5, -1.0, -1.5, -2.0"
 if 'simulation_time' not in st.session_state:
-    st.session_state.simulation_time = 20.0
-if 'time_step' not in st.session_state:
-    st.session_state.time_step = 0.05
-# random_seed is now initialized directly in the widget section
-if 'network_type' not in st.session_state:
-    st.session_state.network_type = "All-to-All"
+    st.session_state.simulation_time = 100.0
+# Default time_step value maintained for backward compatibility
+time_step = 0.01
+# network_type is now initialized in the network connectivity section
 if 'adj_matrix_input' not in st.session_state:
     # Create a default example matrix for a 5x5 ring topology
     default_matrix = "0, 1, 0, 0, 1\n1, 0, 1, 0, 0\n0, 1, 0, 1, 0\n0, 0, 1, 0, 1\n1, 0, 0, 1, 0"
@@ -653,10 +501,7 @@ else:  # Custom
         st.sidebar.error("Invalid frequency input. Using normal distribution instead.")
         frequencies = np.random.normal(0, 1, n_oscillators)
 
-# Time controls removed from here - moved to the top of the sidebar
-
-# Initialize model with specified parameters
-# Use session state to prevent warnings about duplicate initialization
+# Random seed setting
 if "random_seed" not in st.session_state:
     st.session_state.random_seed = 42
 
@@ -670,13 +515,34 @@ random_seed = int(st.sidebar.number_input(
 
 # Network Connectivity Configuration
 st.sidebar.markdown("<h3 class='gradient_text1'>Network Connectivity</h3>", unsafe_allow_html=True)
+
+# Add a refresh button at the top of the Network Connectivity section
+if st.sidebar.button("🔄 Refresh Simulation", key="refresh_btn"):
+    st.session_state.refresh_network = True
+    print("Network refresh requested via main refresh button")
+    st.rerun()
+
+# Create radio button for network type without specifying both index and session state key
+# This fixes the warning: "widget created with default value but also had value set via Session State API"
+options = ["All-to-All", "Nearest Neighbor", "Random", "Custom Adjacency Matrix"]
+if "network_type" not in st.session_state:
+    # Only set this if it's not already in session state
+    st.session_state.network_type = "Random"
+
+# Get current index
+current_index = options.index(st.session_state.network_type)
+
+# Create the radio button
 network_type = st.sidebar.radio(
     "Network Type",
-    options=["All-to-All", "Nearest Neighbor", "Random", "Custom Adjacency Matrix"],
-    index=["All-to-All", "Nearest Neighbor", "Random", "Custom Adjacency Matrix"].index(st.session_state.network_type),
-    help="Define how oscillators are connected to each other",
-    key="network_type"
+    options=options,
+    index=current_index,
+    help="Define how oscillators are connected to each other"
 )
+
+# Update session state if changed
+if network_type != st.session_state.network_type:
+    st.session_state.network_type = network_type
 
 # Custom adjacency matrix input
 adj_matrix = None
@@ -820,8 +686,8 @@ if network_type == "Custom Adjacency Matrix":
                                 n_oscillators=adj_matrix.shape[0],
                                 coupling_strength=coupling_strength,
                                 simulation_time=simulation_time,
-                                time_step=time_step,
-                                random_seed=current_random_seed,
+                                time_step=0.01,  # Default value for backward compatibility
+                                random_seed=random_seed,  # Use the UI's random_seed
                                 network_type="Custom Adjacency Matrix",
                                 frequency_distribution=freq_type,
                                 frequency_params=json.dumps({
@@ -847,6 +713,109 @@ if network_type == "Custom Adjacency Matrix":
             print(f"Input was: '{adj_matrix_input}'")
             adj_matrix = None
 
+
+# Add JSON Configuration section at the bottom of the sidebar
+st.sidebar.markdown("<hr style='margin: 15px 0px; border-color: rgba(255,255,255,0.2);'>", unsafe_allow_html=True)
+st.sidebar.markdown("<h3 class='gradient_text1'>JSON Configuration</h3>", unsafe_allow_html=True)
+
+# Initialize session state for JSON example if not present
+if 'json_example' not in st.session_state:
+    st.session_state.json_example = ""
+
+# Display text area for JSON input (larger and left-aligned)
+json_input = st.sidebar.text_area(
+    "Import/Export Parameters",
+    value=st.session_state.json_example,
+    height=200,
+    placeholder='Paste your JSON configuration here...',
+    help="Enter a valid JSON configuration for the Kuramoto simulation"
+)
+
+# Add a collapsible section with examples but without parameter details
+with st.sidebar.expander("Examples", expanded=False):
+    example_json = {
+        "n_oscillators": 10,
+        "coupling_strength": 1.0,
+        "network_type": "All-to-All", 
+        "simulation_time": 100.0,
+        "random_seed": 42,
+        "frequency_distribution": "Normal",
+        "frequency_parameters": {
+            "mean": 0.0,
+            "std": 0.2
+        }
+    }
+    
+    st.code(json.dumps(example_json, indent=2), language="json")
+    
+    # Add small-world network example
+    st.markdown("**Small-world network example:**")
+    
+    # Generate a sample small-world network
+    n = 10
+    sample_matrix = np.zeros((n, n))
+    for i in range(n):
+        # Connect to neighbors
+        for j in range(1, 3):
+            sample_matrix[i, (i+j) % n] = 1
+            sample_matrix[i, (i-j) % n] = 1
+            
+    # Add a few random long-range connections
+    np.random.seed(42)
+    for _ in range(5):
+        i = np.random.randint(0, n)
+        j = np.random.randint(0, n)
+        if i != j and sample_matrix[i, j] == 0:
+            sample_matrix[i, j] = 1
+            sample_matrix[j, i] = 1
+            
+    # Create example with matrix
+    complex_example = {
+        "n_oscillators": n,
+        "coupling_strength": 0.8,
+        "network_type": "Custom Adjacency Matrix",
+        "simulation_time": 100.0,
+        "random_seed": 42,
+        "frequency_distribution": "Normal",
+        "frequency_parameters": {
+            "mean": 0.0,
+            "std": 0.1
+        },
+        "adjacency_matrix": sample_matrix.tolist()
+    }
+    
+    # Add button to use this example - with smaller text
+    if st.button("Use Small-World", key="small_world_btn"):
+        st.session_state.json_example = json.dumps(complex_example, indent=2)
+        st.rerun()
+
+# Add import button and logic
+if st.sidebar.button("Import Parameters", key="sidebar_import_json_button"):
+    if json_input.strip():
+        try:
+            # Parse the JSON input
+            params, error = parse_json_parameters(json_input)
+            
+            if error:
+                st.sidebar.error(f"Error parsing JSON: {error}")
+            else:
+                # Update session state with the parsed parameters
+                if params is not None:
+                    # Store all parameters in a temporary variable in session state
+                    # This is to avoid the error when trying to change widget values after initialization
+                    st.session_state.temp_imported_params = params
+                    
+                    # Show success message
+                    st.sidebar.success("Parameters imported successfully! Applying settings...")
+                    
+                    # Rerun the app to apply the changes
+                    st.rerun()
+                else:
+                    st.sidebar.error("Failed to parse JSON parameters. Please check your input format.")
+        except Exception as e:
+            st.sidebar.error(f"Error processing parameters: {str(e)}")
+    else:
+        st.sidebar.warning("Please enter JSON configuration before importing.")
 
 
 # Create tabs for different visualizations (Network is default tab)
@@ -899,7 +868,7 @@ else:
 
 # Function to simulate model
 @st.cache_data(ttl=300)
-def run_simulation(n_oscillators, coupling_strength, frequencies, simulation_time, random_seed, 
+def run_simulation(n_oscillators, coupling_strength, frequencies, simulation_time, time_step=None, random_seed=None, 
                   adjacency_matrix=None):
     """
     Run a Kuramoto model simulation with the specified parameters and return the results.
@@ -914,7 +883,11 @@ def run_simulation(n_oscillators, coupling_strength, frequencies, simulation_tim
         Natural frequencies of oscillators
     simulation_time : float
         Total simulation time
-    random_seed : int
+    time_step : float, optional
+        DEPRECATED: This parameter is no longer used. The time step is now automatically calculated
+        based on oscillator frequencies to ensure numerical stability and accuracy.
+        The parameter is kept for backward compatibility with saved configurations.
+    random_seed : int, optional
         Seed for random number generation
     adjacency_matrix : ndarray, optional
         Custom adjacency matrix defining network connectivity
@@ -933,13 +906,27 @@ def run_simulation(n_oscillators, coupling_strength, frequencies, simulation_tim
         n_oscillators=n_oscillators,
         coupling_strength=coupling_strength,
         frequencies=frequencies,
+        adjacency_matrix=adjacency_matrix,
         simulation_time=simulation_time,
-        random_seed=random_seed,
-        adjacency_matrix=adjacency_matrix
+        random_seed=random_seed
     )
     
-    # Run the simulation
-    times, phases, order_parameter = model.simulate()
+    # Run the simulation with automatically calculated time step
+    try:
+        # Force at least 500 time points for visualization
+        times, phases, order_parameter = model.simulate(min_time_points=500)
+        print("Simulation successful!")
+        print(f"  times shape: {times.shape if hasattr(times, 'shape') else 'N/A'}")
+        print(f"  phases shape: {phases.shape if hasattr(phases, 'shape') else 'N/A'}")
+        print(f"  order_parameter shape: {order_parameter.shape if hasattr(order_parameter, 'shape') else 'N/A'}")
+    except Exception as e:
+        print(f"Error in simulation: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        # Return empty arrays for graceful failure
+        times = np.linspace(0, simulation_time, 100)
+        phases = np.zeros((n_oscillators, 100))
+        order_parameter = np.zeros(100)
     
     # Return results
     return model, times, phases, order_parameter
@@ -966,12 +953,13 @@ if adj_matrix is not None:
 # Get current random seed from session state
 current_random_seed = st.session_state.random_seed if "random_seed" in st.session_state else 42
 
-# Run simulation 
+# Run simulation
 model, times, phases, order_parameter = run_simulation(
     n_oscillators=sim_n_oscillators,
     coupling_strength=coupling_strength,
     frequencies=frequencies,
     simulation_time=simulation_time,
+    time_step=None,  # Not actually used, time_step is auto-calculated
     random_seed=current_random_seed,
     adjacency_matrix=adj_matrix
 )
@@ -1766,9 +1754,7 @@ with tab3:
                           facecolors=base_colors, edgecolors=edge_colors,
                           s=70, alpha=0.9, linewidth=0.5, zorder=10)
         
-        # Add a connecting line with low opacity
-        ax.plot(times[:safe_time_idx+1], order_parameter[:safe_time_idx+1], 
-              color='white', alpha=0.3, linewidth=1, zorder=5)
+        # Removed connecting line as requested
         
         # Highlight current position with a larger filled marker
         if safe_time_idx > 0:
@@ -1828,10 +1814,75 @@ with tab3:
     
     # Removed "Current Time" display as requested
     
-    # Playback controls layout - now after the plots
-    playback_container = st.container()
+    # Put animation controls first (at the top) with proper containment
+    st.markdown("<h4 style='margin-bottom: 20px;'>Animation Controls</h4>", unsafe_allow_html=True)
     
-    # Add a slider to manually control visualization time point
+    # Create a container for the buttons to ensure they stay together
+    button_container = st.container()
+    
+    # Create centered columns for control buttons within the container
+    with button_container:
+        # Use wider columns for the buttons to center them better
+        bcol1, bcol2, bcol3, bcol4, bcol5 = st.columns([1, 3, 3, 3, 1])
+    
+        # Set a fixed animation speed value
+        animation_speed = 3.0  # Fixed moderate animation speed
+        
+        # Previous frame button
+        if bcol2.button("⏪ Previous", use_container_width=True):
+            if st.session_state.time_index > 0:
+                st.session_state.time_index -= 1
+                st.rerun()
+        
+        # Simplified Play/Pause button with text inside
+        play_button_text = "⏯️ Play"
+        if bcol3.button(play_button_text, use_container_width=True):
+            # Toggle animation state
+            animate = True
+            # Let the animation code run
+        
+        # Next frame button 
+        if bcol4.button("⏩ Next", use_container_width=True):
+            if st.session_state.time_index < len(times) - 1:
+                st.session_state.time_index += 1
+                st.rerun()
+    
+    # Create a separate container for time step display
+    time_info_container = st.container()
+    with time_info_container:
+        time_col1, time_col2, time_col3 = st.columns([1, 2, 1])
+        # Create a placeholder for displaying time step info 
+        current_time_placeholder = time_col2.empty()
+        
+        # Function to update time step display
+        def update_time_step_display(time_idx):
+            # Calculate the actual time step (difference between consecutive time points)
+            if time_idx > 0:
+                time_step = times[time_idx] - times[time_idx-1]
+            else:
+                # Use first difference for the first point
+                if len(times) > 1:
+                    time_step = times[1] - times[0]
+                else:
+                    time_step = 0
+                    
+            current_time = times[time_idx]
+            current_percent = (time_idx / (len(times) - 1)) * 100
+            
+            # Update the placeholder with the time step information
+            current_time_placeholder.markdown(f"""
+            <div style="padding: 10px; border-radius: 5px; background: linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(255, 0, 255, 0.2)); 
+                        border: 1px solid rgba(255, 255, 255, 0.1); text-align: center;">
+                <span style="font-size: 0.85rem; color: white;">Δt = {time_step:.5f}</span><br>
+                <span style="font-size: 0.75rem; color: rgba(255, 255, 255, 0.7);">t = {current_time:.3f}</span>
+            </div>
+            """, unsafe_allow_html=True)
+    
+    # Initial display of time step
+    update_time_step_display(st.session_state.time_index)
+    
+    # Add a slider to manually control visualization time point AFTER the buttons
+    playback_container = st.container()
     time_index = playback_container.slider(
         "Time Point", 
         min_value=0, 
@@ -1839,34 +1890,10 @@ with tab3:
         value=st.session_state.time_index,
         help="Manually select a specific time point to display"
     )
-    st.session_state.time_index = time_index
     
-    # Centered animation controls with custom styling - removed speed slider
-    col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
-    
-    # Set a fixed animation speed value
-    animation_speed = 3.0  # Fixed moderate animation speed
-    
-    # Previous frame button
-    if col1.button("⏪ Previous", use_container_width=True):
-        if st.session_state.time_index > 0:
-            st.session_state.time_index -= 1
-            st.rerun()
-    
-    # Simplified Play/Pause button with text inside
-    play_button_text = "⏯️ Play"
-    if col2.button(play_button_text, use_container_width=True):
-        # Toggle animation state
-        animate = True
-        # Let the animation code run
-    
-    # Next frame button
-    if col3.button("⏩ Next", use_container_width=True):
-        if st.session_state.time_index < len(times) - 1:
-            st.session_state.time_index += 1
-            st.rerun()
-    
-    # Save button removed
+    # Update session state when slider is moved
+    if st.session_state.time_index != time_index:
+        st.session_state.time_index = time_index
             
     # If animation is triggered
     if animate:
@@ -1901,6 +1928,9 @@ with tab3:
             circle_plot_placeholder.pyplot(create_phase_plot(plot_idx))
             phases_plot_placeholder.pyplot(create_oscillator_phases_plot(plot_idx))
             order_plot_placeholder.pyplot(create_order_parameter_plot(plot_idx))
+            
+            # Update the time step display with the current time index
+            update_time_step_display(plot_idx)
             
             # Add a short pause to control animation speed
             time.sleep(0.1 / animation_speed)

@@ -61,9 +61,28 @@ class KuramotoModel:
          rtol=1e-6,
          atol=1e-9,
          max_step=None,
-         steps_per_period=20):
+         steps_per_period=20,
+         min_time_points=500):
         """
         Run an adaptive RK45, capping the step‐size by the fastest combined ω+coupling timescale.
+        
+        Parameters
+        ----------
+        rtol : float
+            Relative tolerance for the solver
+        atol : float
+            Absolute tolerance for the solver
+        max_step : float, optional
+            Maximum time step, will be calculated if not provided
+        steps_per_period : int
+            Number of steps desired per fastest natural‐frequency period
+        min_time_points : int
+            Minimum number of time points to generate for visualization
+        
+        Returns
+        --------
+        tuple
+            (times, phases, order_parameter)
         """
         # 1) Estimate fastest rate: natural frequencies + coupling
         ω_max = np.max(np.abs(self.ω))
@@ -77,14 +96,26 @@ class KuramotoModel:
         else:
             T_eff = 2 * np.pi / λ_max
 
-        # 3) Compute our cap: “steps_per_period” per fastest period
+        # 3) Compute our cap: "steps_per_period" per fastest period
         cap = T_eff / steps_per_period
 
-        # 4) If user didn’t supply or supplied a larger cap, use ours
+        # 4) If user didn't supply or supplied a larger cap, use ours
         if max_step is None or max_step > cap:
             max_step = cap
+            
+        # Scale the number of points based on simulation duration
+        # For longer simulations, use more points, but cap at 2000 points to avoid performance issues
+        points_per_time_unit = min_time_points / 10.0  # 500 points for a 10-unit simulation is our baseline
+        max_points = 2000  # Upper limit to prevent performance issues with very long simulations
+        scaled_points = min(max_points, max(min_time_points, int(points_per_time_unit * self.T)))
+        
+        # Create the t_eval array with scaled number of points
+        t_eval = np.linspace(0, self.T, scaled_points)
+        
+        print(f"Simulating with max_step={max_step:.5f}, ω_max={ω_max:.5f}, λ_max={λ_max:.5f}")
+        print(f"Using t_eval with {len(t_eval)} points for simulation duration {self.T:.1f}")
 
-        # 5) Call the integrator with this max_step
+        # 5) Call the integrator with this max_step and t_eval for fixed time points
         sol = solve_ivp(
             fun=self._rhs,
             t_span=(0, self.T),
@@ -92,13 +123,15 @@ class KuramotoModel:
             method='RK45',
             rtol=rtol,
             atol=atol,
-            max_step=max_step
+            max_step=max_step,
+            t_eval=t_eval
         )
 
-        self.times  = sol.t
+        self.times = sol.t
         self.phases = sol.y
-        self.order  = np.abs(np.sum(np.exp(1j*self.phases), axis=0)) / self.N
-    return self.times, self.phases, self.order
+        # order parameter r(t) = |∑ e^{iθ_j}| / N
+        self.order = np.abs(np.sum(np.exp(1j*self.phases), axis=0)) / self.N
+        return self.times, self.phases, self.order
 
     def plot_order_parameter(self, ax=None):
         if self.order is None:

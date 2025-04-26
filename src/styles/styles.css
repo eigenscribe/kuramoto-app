@@ -298,7 +298,7 @@ a:hover {
 
 /* Override Streamlit defaults */
 .stMarkdown {
-    color: white;
+    color: #b5dedb;
 }
 
 /* Footer style */

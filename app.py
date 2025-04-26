@@ -517,7 +517,7 @@ random_seed = int(st.sidebar.number_input(
 st.sidebar.markdown("<h3 class='gradient_text1'>Network Connectivity</h3>", unsafe_allow_html=True)
 
 # Add a refresh button at the top of the Network Connectivity section
-if st.sidebar.button("🔄 Refresh Simulation", key="refresh_btn"):
+if st.sidebar.button("🔄 Refresh", key="refresh_btn"):
     st.session_state.refresh_network = True
     print("Network refresh requested via main refresh button")
     st.rerun()

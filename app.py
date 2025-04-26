@@ -899,8 +899,8 @@ else:
 
 # Function to simulate model
 @st.cache_data(ttl=300)
-def run_simulation(n_oscillators, coupling_strength, frequencies, simulation_time, time_step, random_seed, 
-                  adjacency_matrix=None, auto_optimize=False, safety_factor=0.8):
+def run_simulation(n_oscillators, coupling_strength, frequencies, simulation_time, random_seed, 
+                  adjacency_matrix=None):
     """
     Run a Kuramoto model simulation with the specified parameters and return the results.
     
@@ -914,22 +914,15 @@ def run_simulation(n_oscillators, coupling_strength, frequencies, simulation_tim
         Natural frequencies of oscillators
     simulation_time : float
         Total simulation time
-    time_step : float
-        Simulation time step
     random_seed : int
         Seed for random number generation
     adjacency_matrix : ndarray, optional
         Custom adjacency matrix defining network connectivity
-    auto_optimize : bool, optional
-        Whether to automatically optimize the time step before running the simulation
-    safety_factor : float, optional
-        Safety factor for time step optimization (0-1, lower is more conservative)
         
     Returns:
     --------
     tuple
-        (model, times, phases, order_parameter, optimized_time_step)
-        Note: optimized_time_step will be None if auto_optimize=False
+        (model, times, phases, order_parameter)
     """
     # Convert random_seed to integer to prevent type errors
     if random_seed is not None:
@@ -941,29 +934,15 @@ def run_simulation(n_oscillators, coupling_strength, frequencies, simulation_tim
         coupling_strength=coupling_strength,
         frequencies=frequencies,
         simulation_time=simulation_time,
-        time_step=time_step,
         random_seed=random_seed,
         adjacency_matrix=adjacency_matrix
     )
     
-    # Track if optimization was applied
-    optimized_time_step = None
-    
-    # Apply automatic time step optimization if requested
-    if auto_optimize:
-        # Get optimization results
-        opt_results = model.compute_optimal_time_step(safety_factor=safety_factor)
-        optimized_time_step = opt_results['optimal_time_step']
-        
-        # Update the model's time step
-        model.time_step = optimized_time_step
-        model.t_eval = np.arange(0, model.simulation_time, optimized_time_step)
-    
     # Run the simulation
     times, phases, order_parameter = model.simulate()
     
-    # Return results along with the optimized time step (if any)
-    return model, times, phases, order_parameter, optimized_time_step
+    # Return results
+    return model, times, phases, order_parameter
 
 # Run the simulation
 # If we have a custom adjacency matrix, adjust the oscillator count to match matrix dimensions
@@ -987,25 +966,15 @@ if adj_matrix is not None:
 # Get current random seed from session state
 current_random_seed = st.session_state.random_seed if "random_seed" in st.session_state else 42
 
-# Run simulation with auto-optimization if enabled
-model, times, phases, order_parameter, optimized_time_step = run_simulation(
+# Run simulation 
+model, times, phases, order_parameter = run_simulation(
     n_oscillators=sim_n_oscillators,
     coupling_strength=coupling_strength,
     frequencies=frequencies,
     simulation_time=simulation_time,
-    time_step=time_step,
     random_seed=current_random_seed,
-    adjacency_matrix=adj_matrix,
-    auto_optimize=auto_optimize_on_run
+    adjacency_matrix=adj_matrix
 )
-
-# If time step was optimized during simulation, display a note
-if optimized_time_step is not None:
-    st.sidebar.info(f"""
-    Time step was automatically optimized to {optimized_time_step:.4f}
-    
-    You can manually set this value in the Time Step slider for future runs.
-    """)
 
 ########################
 # TAB 1: NETWORK TAB

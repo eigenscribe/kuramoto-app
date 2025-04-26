@@ -366,20 +366,6 @@ simulation_time = st.sidebar.slider(
 # Default value maintained for backward compatibility with database functions
 time_step = 0.01
 
-# Initialize model with specified parameters
-# Use session state to prevent warnings about duplicate initialization
-if "random_seed" not in st.session_state:
-    st.session_state.random_seed = 42
-
-random_seed = int(st.sidebar.number_input(
-    "Random Seed", 
-    min_value=0,
-    step=1,
-    help="Seed for reproducibility",
-    key="random_seed"
-))
-
-
 # Add separator before individual parameters
 st.sidebar.markdown("<hr style='margin: 15px 0px; border-color: rgba(255,255,255,0.2);'>", unsafe_allow_html=True)
 
@@ -513,7 +499,17 @@ else:  # Custom
         st.sidebar.error("Invalid frequency input. Using normal distribution instead.")
         frequencies = np.random.normal(0, 1, n_oscillators)
 
-# Time controls moved to the top of the sidebar and random seed moved in-line with them
+# Random seed setting
+if "random_seed" not in st.session_state:
+    st.session_state.random_seed = 42
+
+random_seed = int(st.sidebar.number_input(
+    "Random Seed", 
+    min_value=0,
+    step=1,
+    help="Seed for reproducibility",
+    key="random_seed"
+))
 
 # Network Connectivity Configuration
 st.sidebar.markdown("<h3 class='gradient_text1'>Network Connectivity</h3>", unsafe_allow_html=True)
@@ -1795,58 +1791,69 @@ with tab3:
     
     # Removed "Current Time" display as requested
     
-    # Put animation controls first (at the top)
-    # Create centered columns for control buttons
-    col1, col2, col3, col4, col5 = st.columns([1, 1, 1, 1, 1])
+    # Put animation controls first (at the top) with proper containment
+    st.markdown("<h4 style='margin-bottom: 20px;'>Animation Controls</h4>", unsafe_allow_html=True)
     
-    # Create a placeholder for displaying time step info 
-    current_time_placeholder = col4.empty()
+    # Create a container for the buttons to ensure they stay together
+    button_container = st.container()
     
-    # Function to update time step display
-    def update_time_step_display(time_idx):
-        # Calculate the actual time step (difference between consecutive time points)
-        if time_idx > 0:
-            time_step = times[time_idx] - times[time_idx-1]
-        else:
-            # Use first difference for the first point
-            if len(times) > 1:
-                time_step = times[1] - times[0]
-            else:
-                time_step = 0
-                
-        current_time = times[time_idx]
-        current_percent = (time_idx / (len(times) - 1)) * 100
+    # Create centered columns for control buttons within the container
+    with button_container:
+        # Use wider columns for the buttons to center them better
+        bcol1, bcol2, bcol3, bcol4, bcol5 = st.columns([1, 2, 2, 2, 1])
+    
+        # Set a fixed animation speed value
+        animation_speed = 3.0  # Fixed moderate animation speed
         
-        # Update the placeholder with the time step information
-        current_time_placeholder.markdown(f"""
-        <div style="padding: 10px; border-radius: 5px; background: linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(255, 0, 255, 0.2)); 
-                    border: 1px solid rgba(255, 255, 255, 0.1); text-align: center;">
-            <span style="font-size: 0.85rem; color: white;">Δt = {time_step:.5f}</span><br>
-            <span style="font-size: 0.75rem; color: rgba(255, 255, 255, 0.7);">t = {current_time:.3f}</span>
-        </div>
-        """, unsafe_allow_html=True)
+        # Previous frame button
+        if bcol2.button("⏪ Previous", use_container_width=True):
+            if st.session_state.time_index > 0:
+                st.session_state.time_index -= 1
+                st.rerun()
+        
+        # Simplified Play/Pause button with text inside
+        play_button_text = "⏯️ Play"
+        if bcol3.button(play_button_text, use_container_width=True):
+            # Toggle animation state
+            animate = True
+            # Let the animation code run
+        
+        # Next frame button 
+        if bcol4.button("⏩ Next", use_container_width=True):
+            if st.session_state.time_index < len(times) - 1:
+                st.session_state.time_index += 1
+                st.rerun()
     
-    # Set a fixed animation speed value
-    animation_speed = 3.0  # Fixed moderate animation speed
-    
-    # Previous frame button (in second column for centering)
-    if col2.button("⏪ Previous", use_container_width=True):
-        if st.session_state.time_index > 0:
-            st.session_state.time_index -= 1
-            st.rerun()
-    
-    # Simplified Play/Pause button with text inside (centered in middle column)
-    play_button_text = "⏯️ Play"
-    if col3.button(play_button_text, use_container_width=True):
-        # Toggle animation state
-        animate = True
-        # Let the animation code run
-    
-    # Next frame button 
-    if col4.button("⏩ Next", use_container_width=True):
-        if st.session_state.time_index < len(times) - 1:
-            st.session_state.time_index += 1
-            st.rerun()
+    # Create a separate container for time step display
+    time_info_container = st.container()
+    with time_info_container:
+        time_col1, time_col2, time_col3 = st.columns([1, 2, 1])
+        # Create a placeholder for displaying time step info 
+        current_time_placeholder = time_col2.empty()
+        
+        # Function to update time step display
+        def update_time_step_display(time_idx):
+            # Calculate the actual time step (difference between consecutive time points)
+            if time_idx > 0:
+                time_step = times[time_idx] - times[time_idx-1]
+            else:
+                # Use first difference for the first point
+                if len(times) > 1:
+                    time_step = times[1] - times[0]
+                else:
+                    time_step = 0
+                    
+            current_time = times[time_idx]
+            current_percent = (time_idx / (len(times) - 1)) * 100
+            
+            # Update the placeholder with the time step information
+            current_time_placeholder.markdown(f"""
+            <div style="padding: 10px; border-radius: 5px; background: linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(255, 0, 255, 0.2)); 
+                        border: 1px solid rgba(255, 255, 255, 0.1); text-align: center;">
+                <span style="font-size: 0.85rem; color: white;">Δt = {time_step:.5f}</span><br>
+                <span style="font-size: 0.75rem; color: rgba(255, 255, 255, 0.7);">t = {current_time:.3f}</span>
+            </div>
+            """, unsafe_allow_html=True)
     
     # Initial display of time step
     update_time_step_display(st.session_state.time_index)

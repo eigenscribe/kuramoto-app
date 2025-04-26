@@ -726,7 +726,7 @@ def plot_interactive_network(model, n_oscillators, network_type, adj_matrix):
         mode='lines',
         line=dict(width=1, color='#888'),
         hoverinfo='none',
-        line_color=edge_colors,
+        # Fixed: Use a single color instead of a list for line
     )
     
     # Create node trace

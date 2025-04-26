@@ -355,7 +355,7 @@ st.sidebar.markdown("<h3 class='gradient_text1'>Time Controls</h3>", unsafe_allo
 simulation_time = st.sidebar.slider(
     "Simulation Time",
     min_value=1.0,
-    max_value=100.0,
+    max_value=200.0,
     value=100.0,  # Set default value to 100.0
     step=1.0,
     help="Total simulation time",
@@ -366,6 +366,18 @@ simulation_time = st.sidebar.slider(
 # Default value maintained for backward compatibility with database functions
 time_step = 0.01
 
+# Initialize model with specified parameters
+# Use session state to prevent warnings about duplicate initialization
+if "random_seed" not in st.session_state:
+    st.session_state.random_seed = 42
+
+random_seed = int(st.sidebar.number_input(
+    "Random Seed", 
+    min_value=0,
+    step=1,
+    help="Seed for reproducibility",
+    key="random_seed"
+))
 
 
 # Add separator before individual parameters
@@ -401,7 +413,7 @@ if 'simulation_time' not in st.session_state:
 time_step = 0.01
 # random_seed is now initialized directly in the widget section
 if 'network_type' not in st.session_state:
-    st.session_state.network_type = "All-to-All"
+    st.session_state.network_type = "Random"
 if 'adj_matrix_input' not in st.session_state:
     # Create a default example matrix for a 5x5 ring topology
     default_matrix = "0, 1, 0, 0, 1\n1, 0, 1, 0, 0\n0, 1, 0, 1, 0\n0, 0, 1, 0, 1\n1, 0, 0, 1, 0"
@@ -501,20 +513,7 @@ else:  # Custom
         st.sidebar.error("Invalid frequency input. Using normal distribution instead.")
         frequencies = np.random.normal(0, 1, n_oscillators)
 
-# Time controls removed from here - moved to the top of the sidebar
-
-# Initialize model with specified parameters
-# Use session state to prevent warnings about duplicate initialization
-if "random_seed" not in st.session_state:
-    st.session_state.random_seed = 42
-
-random_seed = int(st.sidebar.number_input(
-    "Random Seed", 
-    min_value=0,
-    step=1,
-    help="Seed for reproducibility",
-    key="random_seed"
-))
+# Time controls moved to the top of the sidebar and random seed moved in-line with them
 
 # Network Connectivity Configuration
 st.sidebar.markdown("<h3 class='gradient_text1'>Network Connectivity</h3>", unsafe_allow_html=True)

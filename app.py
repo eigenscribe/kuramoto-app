@@ -397,9 +397,7 @@ if 'simulation_time' not in st.session_state:
     st.session_state.simulation_time = 100.0
 # Default time_step value maintained for backward compatibility
 time_step = 0.01
-# random_seed is now initialized directly in the widget section
-if 'network_type' not in st.session_state:
-    st.session_state.network_type = "Random"
+# network_type is now initialized in the network connectivity section
 if 'adj_matrix_input' not in st.session_state:
     # Create a default example matrix for a 5x5 ring topology
     default_matrix = "0, 1, 0, 0, 1\n1, 0, 1, 0, 0\n0, 1, 0, 1, 0\n0, 0, 1, 0, 1\n1, 0, 0, 1, 0"
@@ -513,13 +511,27 @@ random_seed = int(st.sidebar.number_input(
 
 # Network Connectivity Configuration
 st.sidebar.markdown("<h3 class='gradient_text1'>Network Connectivity</h3>", unsafe_allow_html=True)
+# Create radio button for network type without specifying both index and session state key
+# This fixes the warning: "widget created with default value but also had value set via Session State API"
+options = ["All-to-All", "Nearest Neighbor", "Random", "Custom Adjacency Matrix"]
+if "network_type" not in st.session_state:
+    # Only set this if it's not already in session state
+    st.session_state.network_type = "Random"
+
+# Get current index
+current_index = options.index(st.session_state.network_type)
+
+# Create the radio button
 network_type = st.sidebar.radio(
     "Network Type",
-    options=["All-to-All", "Nearest Neighbor", "Random", "Custom Adjacency Matrix"],
-    index=["All-to-All", "Nearest Neighbor", "Random", "Custom Adjacency Matrix"].index(st.session_state.network_type),
-    help="Define how oscillators are connected to each other",
-    key="network_type"
+    options=options,
+    index=current_index,
+    help="Define how oscillators are connected to each other"
 )
+
+# Update session state if changed
+if network_type != st.session_state.network_type:
+    st.session_state.network_type = network_type
 
 # Custom adjacency matrix input
 adj_matrix = None

@@ -1,53 +1,41 @@
 import streamlit as st
-import sys
-import traceback
 
-print("Starting app.py - Debug Mode")
-sys.stdout.flush()
+# Set page config must be the first Streamlit command
+st.set_page_config(
+    page_title="Kuramoto Model Simulator",
+    page_icon="🔄",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
 
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.colors
+from matplotlib.animation import FuncAnimation
+import plotly.graph_objects as go
+from matplotlib.colors import LinearSegmentedColormap
+from io import BytesIO
+import base64
+import json
+from kuramoto_model import KuramotoModel
+import time
+
+# Import Aclonica font from Google Fonts
+st.markdown("""
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Aclonica&display=swap" rel="stylesheet">
+""", unsafe_allow_html=True)
+
+# Load custom CSS from src/styles directory
 try:
-    # Set page config must be the first Streamlit command
-    print("Setting page config...")
-    sys.stdout.flush()
-    st.set_page_config(
-        page_title="Kuramoto Model Simulator",
-        page_icon="🔄",
-        layout="wide",
-        initial_sidebar_state="expanded",
-    )
-    print("Page config set successfully")
-    sys.stdout.flush()
-
-    # Let's strip down all CSS in the app to the minimum needed
-    print("Adding basic styling...")
-    sys.stdout.flush()
-    st.markdown("""
-    <style>
-        /* No special styling - let Streamlit's defaults handle alignment */
-    </style>
-    """, unsafe_allow_html=True)
-    print("Basic styling added")
-    sys.stdout.flush()
-
-    import numpy as np
-    import matplotlib.pyplot as plt
-    import matplotlib.colors
-    from matplotlib.animation import FuncAnimation
-    import plotly.graph_objects as go
-    from matplotlib.colors import LinearSegmentedColormap
-    from io import BytesIO
-    import base64
-    import json
-    print("Importing kuramoto_model...")
-    sys.stdout.flush()
-    from kuramoto_model import KuramotoModel
-    print("Successfully imported KuramotoModel")
-    sys.stdout.flush()
-    import time
+    with open("src/styles/styles.css") as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 except Exception as e:
-    print(f"INITIALIZATION ERROR: {str(e)}")
-    print(traceback.format_exc())
-    sys.stdout.flush()
+    st.error(f"Error loading CSS: {e}")
+
+# Title
+st.markdown("<h1 class='gradient_text1'>Kuramoto Model Simulator</h1>", unsafe_allow_html=True)
 
 # Function to parse JSON parameters input
 def parse_json_parameters(json_string):

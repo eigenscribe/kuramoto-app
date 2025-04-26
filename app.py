@@ -24,7 +24,7 @@ from matplotlib.colors import LinearSegmentedColormap
 from io import BytesIO
 import base64
 import json
-from kuramoto_model import KuramotoModel
+from src.models.kuramoto_model import KuramotoModel
 import time
 
 # Function to parse JSON parameters input
@@ -297,48 +297,7 @@ st.markdown("""
 with open("src/styles/styles.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-# Get the base64 encoded image from static/images directory
-import base64
-with open("static/images/wisp.base64", "r") as f:
-    encoded_image = f.read()
-
-# Add custom background and custom font
-st.markdown(f"""
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Aclonica&display=swap');
-    
-    .stApp {{
-        background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
-                         url('data:image/jpeg;base64,{encoded_image}');
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
-    }}
-    
-    /* Ensure Aclonica font is applied everywhere */
-    body, div, p, h1, h2, h3, h4, h5, h6, li, span, label, button, .sidebar .sidebar-content {{
-        font-family: 'Aclonica', sans-serif !important;
-    }}
-    
-    /* Fix Streamlit buttons to use Aclonica */
-    button, .stButton button, .stDownloadButton button {{
-        font-family: 'Aclonica', sans-serif !important;
-    }}
-    
-    /* Fix Streamlit widgets text */
-    .stSlider label, .stSelectbox label, .stNumberInput label {{
-        font-family: 'Aclonica', sans-serif !important;
-    }}
-    
-    /* Apply gradient_text1 to sidebar labels */
-    .sidebar .sidebar-content label {{
-        background: -webkit-linear-gradient(#14a5ff, #8138ff);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        font-weight: bold;
-    }}
-</style>
-""", unsafe_allow_html=True)
+# No need to load base64 image or define custom styles since it's all in the CSS now
 
 # Title
 st.markdown("<h1 class='gradient_text1'>Kuramoto Model Simulator</h1>", unsafe_allow_html=True)

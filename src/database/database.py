@@ -140,59 +140,8 @@ class Configuration(Base):
         return f"<Configuration(id={self.id}, name={self.name})>"
 
 
-class MLDataset(Base):
-    """Model for machine learning datasets composed of multiple simulations."""
-    __tablename__ = "ml_datasets"
-    
-    id = Column(Integer, primary_key=True)
-    name = Column(String(100))
-    description = Column(Text, nullable=True)
-    timestamp = Column(DateTime, default=datetime.now)
-    feature_type = Column(String(50))  # e.g., 'time_series', 'graph', 'image'
-    target_type = Column(String(50))   # e.g., 'regression', 'classification'
-    
-    # Relationships
-    simulations = relationship("MLDatasetSimulation", back_populates="dataset", cascade="all, delete-orphan")
-    features = relationship("MLFeature", back_populates="dataset", cascade="all, delete-orphan")
-    
-    def __repr__(self):
-        return f"<MLDataset(id={self.id}, name={self.name})>"
-
-
-class MLDatasetSimulation(Base):
-    """Association between ML datasets and simulations."""
-    __tablename__ = "ml_dataset_simulations"
-    
-    id = Column(Integer, primary_key=True)
-    dataset_id = Column(Integer, ForeignKey("ml_datasets.id"))
-    simulation_id = Column(Integer, ForeignKey("simulations.id"))
-    split = Column(String(20))  # 'train', 'validation', 'test'
-    
-    # Relationships
-    dataset = relationship("MLDataset", back_populates="simulations")
-    simulation = relationship("Simulation")
-    
-    def __repr__(self):
-        return f"<MLDatasetSimulation(dataset_id={self.dataset_id}, simulation_id={self.simulation_id})>"
-
-
-class MLFeature(Base):
-    """Features extracted from simulations for machine learning."""
-    __tablename__ = "ml_features"
-    
-    id = Column(Integer, primary_key=True)
-    dataset_id = Column(Integer, ForeignKey("ml_datasets.id"))
-    name = Column(String(100))
-    feature_type = Column(String(20))  # 'input', 'target', 'metadata'
-    description = Column(Text, nullable=True)
-    extraction_method = Column(Text)  # How the feature was extracted
-    data = Column(LargeBinary)  # Serialized feature data
-    
-    # Relationship
-    dataset = relationship("MLDataset", back_populates="features")
-    
-    def __repr__(self):
-        return f"<MLFeature(id={self.id}, name={self.name})>"
+# ML-related classes were removed to simplify the codebase
+# These were not being used by the Kuramoto Simulator application
 
 
 # Create all tables if they don't exist

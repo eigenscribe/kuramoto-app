@@ -1825,8 +1825,8 @@ with tab3:
         # Use wider columns for the buttons to center them better
         bcol1, bcol2, bcol3, bcol4, bcol5 = st.columns([1, 3, 3, 3, 1])
     
-        # Set a fixed animation speed value
-        animation_speed = 3.0  # Fixed moderate animation speed
+        # Set a fixed animation speed value for smoother playback
+        animation_speed = 5.0  # Faster speed for smoother animation
         
         # Previous frame button
         if bcol2.button("⏪ Previous", use_container_width=True):
@@ -1906,8 +1906,8 @@ with tab3:
             start_idx = 0
             st.session_state.time_index = 0
         
-        # Calculate how many frames to skip based on speed
-        frame_skip = max(1, int(11 - animation_speed))
+        # Calculate how many frames to skip for smoother animation
+        frame_skip = max(1, len(times) // 100)  # Skip more frames for smoother playback
         
         # Set up a progress bar
         progress_bar = st.progress(0)
@@ -1933,7 +1933,7 @@ with tab3:
             update_time_step_display(plot_idx)
             
             # Add a short pause to control animation speed
-            time.sleep(0.1 / animation_speed)
+            time.sleep(0.02 / animation_speed)  # Much faster frame updates
         
         # Clear progress bar after animation
         progress_bar.empty()

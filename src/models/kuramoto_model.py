@@ -135,7 +135,7 @@ class KuramotoModel:
 
         self.times = sol.t
         self.phases = sol.y
-        # order parameter r(t) = |∑ e^{iθ_j}| / N
+        # order parameter r(t) = |sum of e^{i*phase_j}| / N
         self.order = np.abs(np.sum(np.exp(1j*self.phases), axis=0)) / self.N
         return self.times, self.phases, self.order
 
@@ -159,7 +159,7 @@ class KuramotoModel:
         for i in range(self.N):
             ax.plot(self.times, self.phases[i,:] % (2*np.pi), lw=0.8)
         ax.set_xlabel("Time")
-        ax.set_ylabel("Phase (mod 2π)")
+        ax.set_ylabel("Phase (mod 2*pi)")
         ax.set_title("Oscillator Phases")
         ax.set_ylim(0, 2*np.pi)
         ax.grid(True)

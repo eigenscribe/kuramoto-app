@@ -21,11 +21,11 @@ class KuramotoModel:
         self.K = coupling_strength
         self.T = simulation_time
 
-        # natural frequencies ω_i
+        # natural frequencies for each oscillator
         if frequencies is None:
-            self.ω = np.random.normal(0, 1, self.N)
+            self.natural_frequencies = np.random.normal(0, 1, self.N)
         else:
-            self.ω = np.array(frequencies, dtype=float)
+            self.natural_frequencies = np.array(frequencies, dtype=float)
 
         # adjacency matrix A (all‐to‐all by default)
         if adjacency_matrix is None:
@@ -37,22 +37,28 @@ class KuramotoModel:
             if self.A.shape != (self.N, self.N):
                 raise ValueError("Adjacency matrix must be NxN")
 
-        # initial random phases θ(0)
-        self.θ0 = 2*np.pi*np.random.rand(self.N)
+        # initial random phases for each oscillator
+        self.initial_phases = 2*np.pi*np.random.rand(self.N)
 
         # placeholders
         self.times = None
         self.phases = None
         self.order = None
 
-    def kuramoto_rhs(self, t, θ):
+    def kuramoto_rhs(self, t, phases):
         """
-        Vectorized Kuramoto RHS: dθ_i/dt = ω_i + (K/N) * sum_j A_ij * sin(θ_j - θ_i)
+        Vectorized Kuramoto equation: dphase_i/dt = natural_freq_i + (K/N) * sum_j A_ij * sin(phase_j - phase_i)
         """
-        Δ = θ[:, None] - θ[None, :]          # shape (N,N): θ[i] - θ[j]
-        coupling = (self.K/self.N) * self.A * np.sin(-Δ)
-        dθ = self.ω + np.sum(coupling, axis=1)
-        return dθ
+        # Calculate phase differences between all pairs of oscillators
+        phase_diff = phases[:, None] - phases[None, :]
+        
+        # Calculate coupling term
+        coupling = (self.K/self.N) * self.A * np.sin(-phase_diff)
+        
+        # Rate of change = natural frequency + coupling influence
+        dphase_dt = self.natural_frequencies + np.sum(coupling, axis=1)
+        
+        return dphase_dt
         
     # Alias for backwards compatibility
     _rhs = kuramoto_rhs
@@ -85,16 +91,16 @@ class KuramotoModel:
             (times, phases, order_parameter)
         """
         # 1) Estimate fastest rate: natural frequencies + coupling
-        ω_max = np.max(np.abs(self.ω))
-        # maximum node–degree in the adjacency
+        freq_max = np.max(np.abs(self.natural_frequencies))
+        # maximum node degree in the adjacency
         max_deg = np.max(np.sum(self.A > 0, axis=1))
-        λ_max = ω_max + self.K * max_deg
+        lambda_max = freq_max + self.K * max_deg
 
         # 2) Convert that rate to an effective period (avoid div 0)
-        if λ_max <= 0:
+        if lambda_max <= 0:
             T_eff = np.inf
         else:
-            T_eff = 2 * np.pi / λ_max
+            T_eff = 2 * np.pi / lambda_max
 
         # 3) Compute our cap: "steps_per_period" per fastest period
         cap = T_eff / steps_per_period
@@ -112,14 +118,14 @@ class KuramotoModel:
         # Create the t_eval array with scaled number of points
         t_eval = np.linspace(0, self.T, scaled_points)
         
-        print(f"Simulating with max_step={max_step:.5f}, ω_max={ω_max:.5f}, λ_max={λ_max:.5f}")
+        print(f"Simulating with max_step={max_step:.5f}, freq_max={freq_max:.5f}, lambda_max={lambda_max:.5f}")
         print(f"Using t_eval with {len(t_eval)} points for simulation duration {self.T:.1f}")
 
         # 5) Call the integrator with this max_step and t_eval for fixed time points
         sol = solve_ivp(
             fun=self._rhs,
             t_span=(0, self.T),
-            y0=self.θ0,
+            y0=self.initial_phases,
             method='RK45',
             rtol=rtol,
             atol=atol,
@@ -165,6 +171,6 @@ if __name__ == "__main__":
                          coupling_strength=2.5,
                          simulation_time=20.0,
                          random_seed=123)
-    t, θ, r = model.simulate()
+    t, theta, r = model.simulate()
     model.plot_order_parameter()
     plt.show()

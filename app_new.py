@@ -9,7 +9,6 @@ st.set_page_config(
 )
 
 # Import our organized modules
-import numpy as np
 from src.components.sidebar import render_sidebar
 from src.components.animation_tab import render_animation_tab
 from src.utils.simulation import run_simulation

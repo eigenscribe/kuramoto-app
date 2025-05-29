@@ -18,14 +18,10 @@ st.markdown("""
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors
-from matplotlib.animation import FuncAnimation
-import plotly.graph_objects as go
 from matplotlib.colors import LinearSegmentedColormap
-from io import BytesIO
-import base64
 import json
 from src.models.kuramoto_model import KuramotoModel
-from src.database.database import save_configuration, get_configuration, list_configurations
+from src.database.database import save_configuration
 import time
 
 # Initialize refresh state for network refresh button
@@ -246,7 +242,7 @@ if st.session_state.loaded_config is not None:
             if hasattr(matrix, 'shape'):
                 print(f"Matrix sum: {np.sum(matrix)}, non-zeros: {np.count_nonzero(matrix)}")
                 if matrix.shape[0] >= 3:
-                    print(f"Sample (top-left 3x3):")
+                    print("Sample (top-left 3x3):")
                     print(matrix[:3, :3])
                 
             # Convert matrix to string representation for the text area
@@ -301,7 +297,6 @@ with open("src/styles/styles.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 # Get the base64 encoded image
-import base64
 with open("static/images/wisp.base64", "r") as f:
     encoded_image = f.read()
 
@@ -819,7 +814,7 @@ if st.sidebar.button("Import Parameters", key="sidebar_import_json_button"):
 
 
 # Create tabs for different visualizations (Network is default tab)
-tab1, tab2, tab3 = st.tabs(["Network", "Distributions", "Animation"])
+tab1, tab2, tab3, tab4 = st.tabs(["Network", "Distributions", "Animation", "Numerical Considerations"])
 
 # Set a unique key for each tab to force refresh of the Network tab
 if 'current_tab' not in st.session_state:
@@ -835,7 +830,7 @@ if st.session_state.current_tab == "Network" and adj_matrix is not None:
 # If we have a custom matrix, ALWAYS force the network type to custom
 # regardless of what's displayed in the UI
 if adj_matrix is not None:
-    print(f"Detected valid adjacency matrix - forcing internal network type to Custom")
+    print("Detected valid adjacency matrix - forcing internal network type to Custom")
     print(f"Matrix shape: {adj_matrix.shape}, sum: {np.sum(adj_matrix)}, non-zeros: {np.count_nonzero(adj_matrix)}")
     
     # Don't change the UI selection, but use Custom type for all internal processing
@@ -1031,7 +1026,7 @@ with tab1:
             print(f"Sum of elements: {np.sum(network_adj_matrix)}")
             print(f"Number of non-zero elements: {np.count_nonzero(network_adj_matrix)}")
             if network_adj_matrix.shape[0] >= 3:
-                print(f"Sample (top-left 3x3):")
+                print("Sample (top-left 3x3):")
                 print(network_adj_matrix[:3, :3])
         else:
             print("Warning: No custom adjacency matrix provided, using fallback")
@@ -1048,7 +1043,7 @@ with tab1:
     
     # Print debug info
     if network_type_internal == "Custom Adjacency Matrix":
-        print(f"Network adjacency matrix before creating graph:")
+        print("Network adjacency matrix before creating graph:")
         print(f"Shape: {network_adj_matrix.shape}")
         print(f"Sum of elements: {np.sum(network_adj_matrix)}")
         print(f"Number of non-zero elements: {np.count_nonzero(network_adj_matrix)}")
@@ -1216,7 +1211,7 @@ with tab1:
     ax2.set_yticks([])
     
     # Add labels and styling
-    ax2.set_title(f'Adjacency Matrix', color='white', fontsize=14)
+    ax2.set_title('Adjacency Matrix', color='white', fontsize=14)
     ax2.set_xlabel('Oscillator Index', color='white')
     ax2.set_ylabel('Oscillator Index', color='white')
     
@@ -1509,7 +1504,6 @@ with tab3:
     current_r = order_parameter[time_index]
     
     # Import needed module
-    from matplotlib.collections import LineCollection
     
     # Function to create the phase visualization
     def create_phase_plot(time_idx):
@@ -1960,4 +1954,21 @@ with tab3:
     </div>
     """, unsafe_allow_html=True)
 
-# Database and configurations sections removed
+########################
+# TAB 4: NUMERICAL CONSIDERATIONS TAB
+########################
+with tab4:
+    # Update current tab in session state to track which tab is active
+    st.session_state.current_tab = "Numerical Considerations"
+    st.markdown("""
+    <div class='section'>
+    <ul>
+        <li>The animation uses an explicit RK45 integrator with an adaptive, heuristically chosen maximum step size.</li>
+        <li>No formal error or stability bounds are provided, however extreme coupling strengths, highly non-uniform frequency distributions, or large time steps may lead to numerical instability.</li>
+        <li>For production-level accuracy, one should compare against sympletic or implicit schemes, tighten tolerances, and perform systematic convergence tests.</li>
+        
+        <li>Note that the time step is automatically calculated based on oscillator frequencies to ensure numerical stability and accuracy.</li>
+        
+    </ul>
+    </div>
+    """, unsafe_allow_html=True)

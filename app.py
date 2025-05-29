@@ -1966,9 +1966,7 @@ with tab4:
         <li>The animation uses an explicit RK45 integrator with an adaptive, heuristically chosen maximum step size.</li>
         <li>No formal error or stability bounds are provided, however extreme coupling strengths, highly non-uniform frequency distributions, or large time steps may lead to numerical instability.</li>
         <li>For production-level accuracy, one should compare against sympletic or implicit schemes, tighten tolerances, and perform systematic convergence tests.</li>
-        
         <li>Note that the time step is automatically calculated based on oscillator frequencies to ensure numerical stability and accuracy.</li>
-        
     </ul>
     </div>
     """, unsafe_allow_html=True)

@@ -1931,12 +1931,12 @@ with tab3:
     st.markdown("""
     <div class='section'>
         <h3 class='gradient_text1'>Order Parameter Analysis</h3>
-        <p>The order parameter r(t) measures the degree of synchronization among oscillators:</p>
+        <p>The order parameter $r(t)$ measures the degree of synchronization among oscillators:</p>
         <ul>
             <li>r = 1: Complete synchronization (all oscillators have the same phase)</li>
             <li>r = 0: Complete desynchronization (phases are uniformly distributed)</li>
         </ul>
-        <p>At critical coupling strength (K_c), the system transitions from desynchronized to partially synchronized state.</p>
+        <p>At critical coupling strength ($K_c$), the system transitions from desynchronized to partially synchronized state.</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -1951,7 +1951,7 @@ with tab4:
     <ul>
         <li>The animation uses an explicit RK45 integrator with an adaptive, heuristically chosen maximum step size.</li>
         <li>No formal error or stability bounds are provided, however extreme coupling strengths, highly non-uniform frequency distributions, or large time steps may lead to numerical instability.</li>
-        <li>For production-level accuracy, one should compare against sympletic or implicit schemes, tighten tolerances, and perform systematic convergence tests.</li>
+        <li>For production-level accuracy, one should compare against explict or implicit schemes, tighten tolerances, and perform systematic convergence tests.</li>
         <li>Note that the time step is automatically calculated based on oscillator frequencies to ensure numerical stability and accuracy.</li>
     </ul>
     </div>
